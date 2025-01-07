@@ -1,34 +1,19 @@
-FROM ubuntu:latest
+# Start from the pre-built image
+FROM bit3/nginx-waf:latest
 
-USER root
+# Install any necessary tools (e.g., vim, curl, or other utilities)
+RUN apt-get update && apt-get install -y vim curl net-tools
 
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    gcc \
-    g++ \
-    make \
-    libtool \
-    automake \
-    autoconf \
-    libpcre3-dev \
-    zlib1g-dev \
-    wget \
-    git \
-    pkg-config \
-    sudo \
-    nginx
+# Copy your custom configuration files (e.g., nginx.conf, default.conf, etc.)
+COPY src/default.conf /etc/nginx/conf.d/
 
+# Optionally, install additional software or make further changes
+RUN apt-get install -y libmodsecurity3
 
-# Copy and run the script
-COPY script.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/script.sh
-RUN /usr/local/bin/script.sh
+# Expose the necessary ports (adjust based on your requirements)
+EXPOSE 8081
 
-RUN echo "load_module /usr/lib/nginx/modules/ngx_http_modsecurity_module.so;" >> /etc/nginx/nginx.conf
+# Define the command to run the image
+RUN bash docker-entrypoint.sh
 
-# Expose NGINX ports
-EXPOSE 80
-
-# Start NGINX
 CMD ["nginx", "-g", "daemon off;"]
-
