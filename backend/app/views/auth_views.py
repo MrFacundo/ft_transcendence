@@ -47,7 +47,7 @@ class LoginView(TwoFactorAuthView):
                 'otp_token': otp_token,
             })
         
-        return generate_jwt_response(user, serializer.validated_data['refresh'])
+        return generate_jwt_response(user)
 
 class VerifyEmailView(APIView):
     permission_classes = [AllowAny]

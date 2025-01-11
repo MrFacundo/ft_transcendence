@@ -6,9 +6,10 @@ from django.contrib.auth.password_validation import validate_password
 from django.conf import settings
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError, APIException
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from user.models import GameStats
 from app.models import GameInvitation, PongGame
+from django.db.models import Q
+from rest_framework.exceptions import AuthenticationFailed
 
 User = get_user_model()
 logger = logging.getLogger(__name__)
@@ -18,13 +19,32 @@ class EmailNotVerifiedException(APIException):
     default_detail = "Email is not verified."
     default_code = "email_not_verified"
 
-class LoginSerializer(TokenObtainPairSerializer):
+class LoginSerializer(serializers.Serializer):
+    email_or_username = serializers.CharField(write_only=True)
+    password = serializers.CharField(write_only=True, style={'input_type': 'password'})
+
     def validate(self, attrs):
-        data = super().validate(attrs)
-        if not self.user.email_is_verified:
+        email_or_username = attrs.get('email_or_username')
+        password = attrs.get('password')
+
+        if not email_or_username or not password:
+            raise serializers.ValidationError(
+                ('Must include "email_or_username" and "password".'),
+                'missing_fields'
+            )
+
+        user = User.objects.filter(
+            Q(email__iexact=email_or_username) | 
+            Q(username__iexact=email_or_username)
+        ).first()
+
+        if not user or not user.check_password(password):
+            raise AuthenticationFailed()
+
+        if not user.email_is_verified:
             raise EmailNotVerifiedException()
-        data['user'] = self.user
-        return data
+
+        return {'user': user}
 
 class GameStatsSerializer(serializers.ModelSerializer):
     class Meta:

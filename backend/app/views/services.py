@@ -39,12 +39,11 @@ def send_verification_email(user):
     )
     logger.info(f"Verification email sent to user ID {user.id}")
         
-def generate_jwt_response(user, refresh=None):
+def generate_jwt_response(user):
     """
     Generate a JWT response for the user. If no refresh token is provided, a new one is created.
     """
-    if not refresh or not isinstance(refresh, RefreshToken):
-        refresh = RefreshToken.for_user(user)
+    refresh = RefreshToken.for_user(user)
     access = refresh.access_token
     return Response({
         "refresh": str(refresh),

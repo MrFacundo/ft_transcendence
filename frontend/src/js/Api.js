@@ -111,7 +111,7 @@ export class Api {
      */
     async login(email, password) {
         return this.request("post", "/token/", {
-            email: email,
+            email_or_username: email,
             password: password,
         });
     }
