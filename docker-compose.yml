@@ -10,9 +10,9 @@ services:
       - "8000:8000"
     networks:
       - backend-network
-    depends_on:
-      db:
-        condition: service_healthy
+    # depends_on:
+      # db:
+        # condition: service_healthy
     restart: always
     env_file:
       - .env
