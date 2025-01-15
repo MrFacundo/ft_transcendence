@@ -197,7 +197,6 @@ export class Auth {
             this.app.navigate("/home");
         } catch (error) {
             console.error(error);
-            alert("Login failed. Please try again.");
             if (this.oauthPopup) this.oauthPopup.close();
             this.oauthPopup = null;
         }

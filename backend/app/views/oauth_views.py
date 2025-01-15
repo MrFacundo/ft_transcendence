@@ -47,12 +47,12 @@ class OAuth42CallbackView(APIView):
                 'code': code,
                 'redirect_uri': settings.OAUTH_42_REDIRECT_URI,
             }).json()
-            
+            if 'error' in token_response:
+                raise ValueError(token_response['error'])
             # Fetch user info
             user_info = requests.get("https://api.intra.42.fr/v2/me", 
                 headers={'Authorization': f'Bearer {token_response["access_token"]}'}
             ).json()
-            
             # Create user and response
             tokens = get_or_create_user_from_oauth(user_info)
             response = redirect(f"{settings.FRONTEND_URL}/oauth-result")
