@@ -1,4 +1,5 @@
 import { EMPTY_AVATAR_URL } from "../constants.js";
+import { getAvatarSrc } from "../utils.js";
 
 class ScoreBoard extends HTMLElement {
     constructor() {
@@ -69,17 +70,17 @@ class ScoreBoard extends HTMLElement {
         const match = await api.getGame(this.page.params.id);
         if (!match) return;
 
-        const setElement = (id, value) => (this.shadowRoot.getElementById(id).textContent = value);
-        const setAvatar = async (id, avatar, oauth) => {
-            this.shadowRoot.getElementById(id).src =
-                avatar ? await api.fetchAvatarObjectUrl(avatar) : oauth || EMPTY_AVATAR_URL;
+        const setElement = (id, value) => this.shadowRoot.getElementById(id).textContent = value;
+        const setAvatar = async (id, user) => {
+            const avatarSrc = await getAvatarSrc(user, api.fetchAvatarObjectUrl);
+            this.shadowRoot.getElementById(id).src = avatarSrc;
         };
-
-        await setAvatar("avatar-1", match.player1.avatar_upload, match.player1.avatar_oauth);
+        
+        await setAvatar("avatar-1", match.player1);
         setElement("username-1", match.player1.username);
         setElement("score-1", match.score_player1);
 
-        await setAvatar("avatar-2", match.player2.avatar_upload, match.player2.avatar_oauth);
+        await setAvatar("avatar-2", match.player2);
         setElement("username-2", match.player2.username);
         setElement("score-2", match.score_player2);
 

@@ -1,3 +1,5 @@
+import { EMPTY_AVATAR_URL, DEBUG, MEDIA_URL } from "./constants.js";
+
 export function capitalizeFirstLetter(message) {
 	return message.charAt(0).toUpperCase() + message.slice(1);
 }
@@ -48,4 +50,14 @@ export function parsePath(path, pages) {
 export function formatDate(dateString) {
     const date = new Date(dateString);
     return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear().toString().slice(-2)}`;
+}
+
+export async function getAvatarSrc(user, apiFetchCallback) {
+    if (!user) return null;
+
+    const avatar_upload = DEBUG 
+    ? (user.avatar_upload ? `${MEDIA_URL}/${user.avatar_upload}` : null) 
+    : (user.avatar_upload ? await apiFetchCallback(user.avatar_upload) : null);
+
+    return avatar_upload || user.avatar_oauth || EMPTY_AVATAR_URL;
 }

@@ -3,6 +3,7 @@
 const path = require("path");
 const autoprefixer = require("autoprefixer");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const Dotenv = require('dotenv-webpack');
 
 module.exports = {
     mode: "development",
@@ -29,6 +30,7 @@ module.exports = {
             template: "./src/index.html",
             filename: "index.html",
         }),
+        new Dotenv({systemvars: true}),
     ],
     module: {
         rules: [

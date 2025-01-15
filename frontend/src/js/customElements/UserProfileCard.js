@@ -1,4 +1,5 @@
 import { EMPTY_AVATAR_URL } from "../constants.js";
+import { getAvatarSrc } from "../utils.js";
 
 class UserProfileCard extends HTMLElement {
     constructor() {
@@ -58,7 +59,6 @@ class UserProfileCard extends HTMLElement {
         const lossesEl = this.shadowRoot.getElementById("profile-losses");
         const profileStats = this.shadowRoot.getElementById("profile-stats");
         const { api } = this.page.app;
-        const avatar_upload = user.avatar_upload ? await api.fetchAvatarObjectUrl(user.avatar_upload): null;
         infoEl.setAttribute('data-href', `/profile/${user.id}`);
 
         this.shadowRoot.querySelectorAll("[data-href]").forEach(element => {
@@ -69,8 +69,8 @@ class UserProfileCard extends HTMLElement {
         usernameEl.style.opacity = 0;
         profileStats.style.opacity = 0;
 
-        setTimeout(() => {
-            avatarEl.src = avatar_upload || user.avatar_oauth || EMPTY_AVATAR_URL;
+        setTimeout(async () => {
+            avatarEl.src = await getAvatarSrc(user, api.fetchAvatarObjectUrl);
             usernameEl.textContent = user.username;
             winsEl.textContent = user.game_stats.wins;
             lossesEl.textContent = user.game_stats.losses;
@@ -79,7 +79,7 @@ class UserProfileCard extends HTMLElement {
             avatarEl.style.opacity = 1;
             usernameEl.style.opacity = 1;
             profileStats.style.opacity = 1;
-        }, 300);
+        }, 100);
     }
 
     disconnectedCallback() {

@@ -1,4 +1,5 @@
 import { EMPTY_AVATAR_URL } from "../constants.js";
+import { getAvatarSrc } from "../utils.js";
 
 class UserProfileCardSm extends HTMLElement {
     constructor() {
@@ -75,9 +76,8 @@ class UserProfileCardSm extends HTMLElement {
         const avatarEl = this.shadowRoot.getElementById("profile-avatar");
         const usernameEl = this.shadowRoot.getElementById("profile-username");
         const { api } = this.page.app;
-        const avatar_upload = user.avatar_upload ? await api.fetchAvatarObjectUrl(user.avatar_upload): null;
 
-        avatarEl.src = avatar_upload || user.avatar_oauth || EMPTY_AVATAR_URL;
+        avatarEl.src = await getAvatarSrc(user, api.fetchAvatarObjectUrl);
         usernameEl.textContent = user.username;
     }
 

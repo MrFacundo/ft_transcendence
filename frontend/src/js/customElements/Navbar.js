@@ -1,4 +1,5 @@
 import { EMPTY_AVATAR_URL } from "../constants.js";
+import { getAvatarSrc } from "../utils.js";
 
 class Navbar extends HTMLElement {
     constructor() {
@@ -57,7 +58,7 @@ class Navbar extends HTMLElement {
             <nav class="navbar">
                 <a class="navbar-brand" data-href="/home">PONG</a>
                 <div class="profile navbar-center" data-href="/profile">
-                    <img src={EMPTY_AVATAR_URL} width="40" height="40" alt="Avatar" class="avatar" />
+                    <img src="${EMPTY_AVATAR_URL}" width="40" height="40" alt="Avatar" class="avatar" />
                     <span class="username"></span>
                 </div>
                 <ul class="navbar-nav">
@@ -89,8 +90,7 @@ class Navbar extends HTMLElement {
 
         if (auth.authenticated) {
             const { user } = auth;
-            const avatar_upload = user.avatar_upload ? await api.fetchAvatarObjectUrl(user.avatar_upload) : null;
-            profileEl.querySelector("img").src = avatar_upload || user.avatar_oauth || EMPTY_AVATAR_URL;
+            profileEl.querySelector("img").src = await getAvatarSrc(user, api.fetchAvatarObjectUrl);
             profileEl.querySelector(".username").textContent = user.username;
             profileEl.setAttribute('data-href', `/profile/${user.id}`);
             this.setDisplay([loginEl, registerEl], "none");
