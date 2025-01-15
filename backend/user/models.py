@@ -36,6 +36,7 @@ class CustomUser(AbstractUser):
         validators=[EmailValidator]
     )
     new_email_is_verified = models.BooleanField(default=False)
+    oauth_uid = models.CharField(max_length=255, blank=True, null=True)
     avatar_oauth = models.URLField(blank=True, null=True)
     avatar_upload = models.ImageField(
         upload_to='avatars/', 
