@@ -40,13 +40,13 @@ class Ball(Hitbox):
     def __init__(self, x, y):
         super().__init__(x, y, 0.02, 0.02)
         self._init_velocity()
-    
+
     def _init_velocity(self):
         initial_speed = 0.03
         initial_angle = random.uniform(-math.pi/4, math.pi/4)
         self.speed_x = abs(initial_speed * math.cos(initial_angle))
         self.speed_y = initial_speed * math.sin(initial_angle)
-    
+
     def calculate_angle(self, paddle):
         impact_position = (self.y + self.height/2 - (paddle.y + paddle.height/2)) / (paddle.height/2)
         max_angle = math.pi/4
@@ -56,5 +56,13 @@ class Ball(Hitbox):
         self.speed_y = speed * math.sin(angle)
 
     def update(self):
+        # Update position
         self.x = truncate(self.x + self.speed_x, 2)
         self.y = truncate(self.y + self.speed_y, 2)
+        
+        if self.y <= 0:
+            self.y = 0
+            self.speed_y = abs(self.speed_y)
+        elif self.y + self.height >= 1:
+            self.y = 1 - self.height
+            self.speed_y = -abs(self.speed_y) 

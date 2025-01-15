@@ -54,10 +54,6 @@ class Game:
             paddle.update()
 
     async def _handle_collisions(self):
-        # Wall collisions
-        if self.ball.y <= 0 or self.ball.y + self.ball.height >= 1:
-            self.ball.speed_y *= -1
-
         for paddle in self.paddles:
             if self.ball.collides(paddle):
                 self.ball.calculate_angle(paddle)
