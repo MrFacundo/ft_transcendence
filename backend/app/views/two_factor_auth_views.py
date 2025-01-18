@@ -11,8 +11,13 @@ from .services import generate_jwt_response
 from app.tokens.OTPToken import OTPToken
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
+from django.conf import settings
+from django.core.mail import send_mail
+import logging
+
 User = get_user_model()
 jwt_auth = JWTAuthentication()
+logger = logging.getLogger(__name__)
 
 class TwoFactorAuthView(GenericAPIView):
     permission_classes = [AllowAny]
@@ -27,7 +32,6 @@ class TwoFactorAuthView(GenericAPIView):
         
         totp = pyotp.TOTP(user.validation_secret, interval=30)
         otp = totp.now()
-        print(f"Generated OTP for {user.email}: {otp}") # TODO: Remove this line once OTP is sent by email
         return otp
 
     def validate_otp(self, user, otp):
@@ -40,6 +44,18 @@ class TwoFactorAuthView(GenericAPIView):
         totp = pyotp.TOTP(user.validation_secret, interval=30)
         return totp.verify(otp, valid_window=2)
     
+    def send_otp_email(self, user, otp):
+        if settings.DEBUG:
+            logger.info(f"Generated OTP for user ID {user.id}: {otp}")
+            return
+        send_mail(
+            'Your PONG OTP',
+            f'Your PONG OTP is: {otp}',
+            settings.DEFAULT_FROM_EMAIL,
+            [user.email],
+        )
+        logger.info(f"OTP sent to user ID {user.id}")
+
 class AuthenticatorSetupView(TwoFactorAuthView):
     permission_classes = [IsAuthenticated]
 
