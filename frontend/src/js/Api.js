@@ -168,14 +168,14 @@ export class Api {
     /**
      * Retrieves a list of friends that can be invited.
      */
-    async getFriendsInvitable() {
+    async getPotentialFriendRequests() {
         return this.request("get", "/friends-invitable/");
     }
 
     /**
      * Retrieves a list of friend requests.
      */
-    async getFriendsRequests() {
+    async getIncomingFriendRequests() {
         return this.request("get", "/friends-requests/");
     }
 
@@ -204,6 +204,14 @@ export class Api {
         return this.request("post", `/friend-accept/${userId}`, {});
     }
 
+    /* Online Status */
+
+    /**
+     * Lists all online status objects.
+    */
+    async getOnlineStatuses() {
+        return this.request("get", "/online-status/");
+    }
 
     /* Games */
 

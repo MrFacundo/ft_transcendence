@@ -154,10 +154,9 @@ class MatchHistorySerializer(serializers.ModelSerializer):
         user_id = self.context['request'].parser_context['kwargs']['id']
         return 'win' if obj.winner.id == user_id else 'loss'
 
-# TODO: see if there is a use case for this serializer  
 class UserOnlineStatusSerializer(serializers.ModelSerializer):
-    user = UserSerializer(read_only=True)
+    username = serializers.CharField(source='user.username', read_only=True)
 
     class Meta:
         model = UserOnlineStatus
-        fields = ['user', 'is_online', 'last_seen']
+        fields = ['user_id', 'username', 'is_online', 'last_seen']

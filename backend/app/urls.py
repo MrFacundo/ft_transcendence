@@ -26,7 +26,8 @@ from app.views.user_views import (
 	 FriendInvitableUsersListView,
 	 FriendRequestUsersListView,
 	 FriendsListView,
-	 OnlineUserListView
+	 OnlineUserListView,
+	 OnlineStatusListView
 )
 
 from app.views.game_views import (
@@ -58,6 +59,7 @@ urlpatterns = [
 	path('friends-invitable/', FriendInvitableUsersListView.as_view(), name='friend-invitable-users'),
 	path('friends-requests/', FriendRequestUsersListView.as_view(), name='friend-request-users'),
 	path('friends/<int:user_id>/', FriendsListView.as_view(), name='friends-list'),
+	path('online-status/', OnlineStatusListView.as_view(), name='online-status'),
 	# Game invitations
 	path('game-invitation/<int:user_id>/', CreateGameInvitationView.as_view(), name='game-invitation'),
 	path('game-invitation/<int:invitation_id>/accept/', AcceptGameInvitationView.as_view(), name='accept-game-invitation'),

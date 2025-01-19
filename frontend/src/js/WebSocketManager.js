@@ -18,11 +18,11 @@ export class WebSocketManager {
         const userId = this.app.auth.user.id;
         
         if (!this.gameWs) {
-            this.setupGameWebSocket(userId);
+            this.setupGameInvitationWebSocket(userId);
         }
 
         if (!this.friendWs) {
-            this.setupFriendWebSocket(userId);
+            this.setupFriendInvitationWebSocket(userId);
         }
 
         if (!this.onlineStatusWs) {
@@ -30,7 +30,7 @@ export class WebSocketManager {
         }
     }
 
-    setupGameWebSocket(userId) {
+    setupGameInvitationWebSocket(userId) {
         this.gameWs = new WebSocket(`${WS_URL}/game-invitation/${userId}/?token=${this.app.auth.accessToken}`);
 
         this.gameWs.onopen = () => {
@@ -78,7 +78,7 @@ export class WebSocketManager {
         };
     }
 
-    setupFriendWebSocket(userId) {
+    setupFriendInvitationWebSocket(userId) {
         this.friendWs = new WebSocket(`${WS_URL}/friend-invitation/${userId}/?token=${this.app.auth.accessToken}`);
         
         this.friendWs.onopen = () => {
@@ -119,11 +119,33 @@ export class WebSocketManager {
 
         this.onlineStatusWs.onopen = async ()  => {
             console.log("Online status WebSocket connection established.");
+            try {
+                const response = await this.app.api.getOnlineStatuses();
+                console.log("Online status data:", response);
+                response.forEach(user => {
+                    this.app.onlineStatuses.set(user.user_id, {
+                        username: user.username,
+                        is_online: user.is_online,
+                        last_seen: user.last_seen
+                    });
+                });
+                console.log("Updated online status data:", this.app.onlineStatuses);
+            } catch (error) {
+                console.error("Error fetching online status data:", error);
+            }
         };
 
         this.onlineStatusWs.onmessage = (event) => {
             const data = JSON.parse(event.data);
             console.log("Online status update:", data);
+            if (data.type === "user_status") {
+                this.app.onlineStatuses.set(data.user_id, {
+                    username: data.username,
+                    is_online: data.is_online,
+                    last_seen: data.last_seen
+                });
+            }
+            console.log("Updated online status data:", this.app.onlineStatuses);
         };
 
         this.onlineStatusWs.onerror = (error) => {

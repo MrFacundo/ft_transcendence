@@ -232,7 +232,8 @@ class UserOnlineStatusConsumer(AsyncWebsocketConsumer):
                 "type": "user_status",
                 "user_id": self.user.id,
                 "username": self.user.username,
-                "is_online": True
+                "is_online": True,
+                "last_seen": timezone.now().isoformat()
             }
         )
         
@@ -246,7 +247,8 @@ class UserOnlineStatusConsumer(AsyncWebsocketConsumer):
                     "type": "user_status",
                     "user_id": self.user.id,
                     "username": self.user.username,
-                    "is_online": False
+                    "is_online": False,
+                    "last_seen": timezone.now().isoformat()
                 }
             )
             

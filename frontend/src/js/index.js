@@ -44,6 +44,7 @@ class App {
             game: new GamePage(this),
         };
         this.currentPage = null;
+        this.onlineStatuses = new Map();
         this.wsManager = new WebSocketManager(this);
         this.init();
         if (document.getElementById("noScript"))

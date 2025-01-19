@@ -2,12 +2,12 @@
 from rest_framework.generics import ListAPIView
 from rest_framework.views import APIView
 from django.contrib.auth import get_user_model
-from .serializers import UserSerializer, FriendshipInvitationSerializer
+from .serializers import UserSerializer, FriendshipInvitationSerializer, UserOnlineStatusSerializer
 from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
-from user.models import Friendship
+from user.models import Friendship, UserOnlineStatus
 from django.db import transaction
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
@@ -147,10 +147,22 @@ class FriendsListView(ListAPIView):
         ).values_list('sender_id', 'receiver_id')
         friend_ids = [uid for pair in friends for uid in pair if uid != int(user_id)]
         return User.objects.filter(id__in=friend_ids)
-    
+   
 class OnlineUserListView(ListAPIView):
+    """
+    Lists online users
+    """
     serializer_class = UserSerializer
 
     def get_queryset(self):
         online_users = User.objects.filter(online_status__is_online=True)
         return online_users
+    
+class OnlineStatusListView(ListAPIView):
+    """
+    Lists all user online statuses
+    """
+    serializer_class = UserOnlineStatusSerializer
+
+    def get_queryset(self):
+        return UserOnlineStatus.objects.all()

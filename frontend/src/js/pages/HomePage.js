@@ -15,67 +15,65 @@ class HomePage extends Page {
     async render() {
         const { api } = this.app;
         
-        const sendList = document.querySelector("#send-list");
-        const receiveList = document.querySelector("#receive-list");
-        const ActionBtn = document.querySelector("#action-friend");
-        const selectedFriend = this.mainElement.querySelector("user-profile");
-        selectedFriend.page = this;
+        const sendFriendInvitationList = document.querySelector("#send-list");
+        const receivedFriendInvitationList = document.querySelector("#receive-list");
+        const actionBtn = document.querySelector("#action-friend");
+        const selectedUser = this.mainElement.querySelector("user-profile");
+        selectedUser.page = this;
     
-        const setupFriendItem = (friend, actionText, actionCallback) => {
-            const friendItem = document.createElement("user-profile-small");
-            friendItem.page = this;
-            friendItem.setUser(friend);
+        const setupUserProfileCardSm = (friend, actionText, actionCallback) => {
+            const userProfileCardSm = document.createElement("user-profile-small");
+            userProfileCardSm.page = this;
+            userProfileCardSm.setUser(friend);
         
             if (friend.friendship_status === "pending") {
-                friendItem.appendPendingButton();
+                userProfileCardSm.appendPendingButton();
             }
-            friendItem.addEventListener("click", () => {
-                selectedFriend.setUser(friend);
+            userProfileCardSm.addEventListener("click", () => {
+                selectedUser.setUser(friend);
                 const shouldShowActionBtn = actionText === "Accept" || (actionText === "Invite" && friend.friendship_status !== "pending");
-                ActionBtn.classList.toggle("d-none", !shouldShowActionBtn);
+                actionBtn.classList.toggle("d-none", !shouldShowActionBtn);
                 if (shouldShowActionBtn) {
-                    ActionBtn.textContent = actionText;
-                    ActionBtn.onclick = actionCallback;
+                    actionBtn.textContent = actionText;
+                    actionBtn.onclick = actionCallback;
                 }
             });
         
-            return friendItem;
+            return userProfileCardSm;
         };
 
-        const friendsInvitable = await api.getFriendsInvitable()
-        friendsInvitable.forEach(friend => {
-            const friendItem = setupFriendItem(friend, "Invite", async () => {
+        const potentialFriendRequests = await api.getPotentialFriendRequests()
+        potentialFriendRequests.forEach(user => {
+            const userProfileCardSm = setupUserProfileCardSm(user, "Invite", async () => {
                 try {
-                    await api.friendRequest(friend.id);
-                    friendItem.appendPendingButton();
-                    ActionBtn.classList.add("d-none");
+                    const response = await api.friendRequest(user.id);
+                    userProfileCardSm.appendPendingButton();
+                    actionBtn.classList.add("d-none");
+                    showMessage(response.message);
                 } catch (error) {
                     showMessage(error.response.data.message);
                 }
             });
-            sendList.appendChild(friendItem);
+            sendFriendInvitationList.appendChild(userProfileCardSm);
         });
     
-        const friendsRequests = await api.getFriendsRequests();
-        friendsRequests.forEach(invite => {
-            const friendItem = setupFriendItem(invite, "Accept", async () => {
+        const incomingFriendRequests = await api.getIncomingFriendRequests();
+        incomingFriendRequests.forEach(user => {
+            const userProfileCardSm = setupUserProfileCardSm(user, "Accept", async () => {
                 try {
-                    const response = await api.friendAccept(invite.id);
-                    receiveList.removeChild(friendItem);
-                    ActionBtn.classList.add("d-none");
+                    const response = await api.friendAccept(user.id);
+                    receivedFriendInvitationList.removeChild(userProfileCardSm);
+                    actionBtn.classList.add("d-none");
                     showMessage(response.message);
                 } catch (error) {
                     console.log(error);
                     showMessage(error.response.data.message);
                 }
             });
-            receiveList.appendChild(friendItem);
+            receivedFriendInvitationList.appendChild(userProfileCardSm);
         });
     
-        ActionBtn.classList.add("d-none");
-    
-        const onlineUsers = await api.getOnlineUsers();
-        console.log("Online users:", onlineUsers);
+        actionBtn.classList.add("d-none");
     }
 }
 
