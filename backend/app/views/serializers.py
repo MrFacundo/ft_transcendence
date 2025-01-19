@@ -6,7 +6,7 @@ from django.contrib.auth.password_validation import validate_password
 from django.conf import settings
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError, APIException
-from user.models import GameStats
+from user.models import GameStats, Friendship
 from app.models import GameInvitation, PongGame
 from django.db.models import Q
 from rest_framework.exceptions import AuthenticationFailed
@@ -55,12 +55,24 @@ class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, validators=[validate_password])
     new_password = serializers.CharField(write_only=True, required=False, validators=[validate_password])
     game_stats = GameStatsSerializer(required=False)
+    friendship_status = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'password', 'avatar_oauth', 'avatar_upload','two_factor_method', 'new_email', 'new_password', 'date_joined', 'game_stats']
+        fields = ['id', 'username', 'email', 'password', 'avatar_oauth', 'avatar_upload', 'two_factor_method', 'new_email', 'new_password', 'date_joined', 'game_stats', 'friendship_status']
         read_only_fields = ['id', 'avatar_oauth', 'date_joined', 'game_stats']
 
+    def get_friendship_status(self, obj):
+        request = self.context.get('request', None)
+        if request and request.user.is_authenticated:
+            friendship = Friendship.objects.filter(
+                (Q(user=request.user) & Q(friend=obj)) | 
+                (Q(user=obj) & Q(friend=request.user))
+            ).first()
+            if friendship:
+                return friendship.status
+        return None
+    
     def update(self, instance, validated_data):
         new_password = validated_data.pop('new_password', None)
         if new_password:
@@ -106,6 +118,15 @@ class GameInvitationSerializer(serializers.ModelSerializer):
     class Meta:
         model = GameInvitation
         fields = ['id', 'sender', 'receiver', 'status', 'game']
+
+
+class FriendshipInvitationSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+    friend = UserSerializer(read_only=True)
+
+    class Meta:
+        model = Friendship
+        fields = ['id', 'user', 'friend', 'status']
 
 
 class PongGameSerializer(serializers.ModelSerializer):

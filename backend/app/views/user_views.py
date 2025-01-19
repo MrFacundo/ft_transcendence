@@ -2,12 +2,15 @@
 from rest_framework.generics import ListAPIView
 from rest_framework.views import APIView
 from django.contrib.auth import get_user_model
-from .serializers import UserSerializer
+from .serializers import UserSerializer, FriendshipInvitationSerializer
 from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
 from user.models import Friendship
+from django.db import transaction
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
 
 User = get_user_model()
 
@@ -18,62 +21,81 @@ class UserListView(ListAPIView):
 
 class FriendRequestView(APIView):
     """
-    Sends a friend request to the user with the given ID. Checks if the user is not sending a friend request to themselves, and if a friendship already exists.
+    Sends a friend request to the user with the given ID. Checks if the user is not sending a request to themselves, and if a request already exists.
     """
     def post(self, request, friend_id):
-        friend = get_object_or_404(User, id=friend_id)
-        
-        if friend.id == request.user.id:
-            return Response(
-                {"message": "Requester and friend cannot be the same user"},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
-        existing_friendship = Friendship.objects.filter(
-            (Q(user=request.user, friend=friend) | 
-             Q(user=friend, friend=request.user))
-        ).first()
-        
-        if existing_friendship:
-            return Response(
-                {"message": "Invitation already sent"},
-                status=status.HTTP_400_BAD_REQUEST
+        with transaction.atomic():
+            friend = get_object_or_404(User, id=friend_id)
+            
+            if friend.id == request.user.id:
+                return Response(
+                    {"message": "Requester and friend cannot be the same user"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            existing_friendship = Friendship.objects.filter(
+                (Q(user=request.user, friend=friend) | 
+                Q(user=friend, friend=request.user))
+            ).first()
+            
+            if existing_friendship:
+                return Response(
+                    {"message": "Invitation already sent"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+                
+            friendship = Friendship.objects.create(
+                user=request.user,
+                friend=friend,
+                status='pending'
             )
             
-        Friendship.objects.create(
-            user=request.user,
-            friend=friend,
-            status='pending'
-        )
-        
-        return Response(
-            {"message": f"Friend request sent to {friend.username}"},
-            status=status.HTTP_201_CREATED
-        )
+            channel_layer = get_channel_layer()
+            print("Friend request sent. Sending message to", f"friend_invitation_{friend.id}")
+            async_to_sync(channel_layer.group_send)(
+                f"friend_invitation_{friend.id}",
+                {
+                    "type": "friend_invited",
+                    "friendship": FriendshipInvitationSerializer(friendship).data
+                }
+            )
+
+            return Response(
+                {"message": f"Friend request sent to {friend.username}"},
+                status=status.HTTP_201_CREATED
+            )
 
 class FriendAcceptView(APIView):
-        
     def post(self, request, friend_id):
-        friend = get_object_or_404(User, id=friend_id)
-        
-        friendship = Friendship.objects.filter(
-            user=friend, friend=request.user, status='pending'
-        ).first()
-        
-        if not friendship:
-            return Response(
-                {"message": "No pending friend request found"},
-                status=status.HTTP_400_BAD_REQUEST
+        with transaction.atomic():
+            friendship = Friendship.objects.select_for_update().filter(
+                user=friend_id,
+                friend=request.user,
+                status='pending'
+            ).first()
+            
+            if not friendship:
+                return Response(
+                    {"message": "No pending friend request found"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+                
+            friendship.status = 'accepted'
+            friendship.save()
+            
+            channel_layer = get_channel_layer()
+            print("Friend request accepted. Sending message to", f"friend_invitation_{friendship.user.id}")
+            async_to_sync(channel_layer.group_send)(
+                f"friend_invitation_{friendship.user.id}",
+                {
+                    "type": "friend_accepted",
+                    "friendship": FriendshipInvitationSerializer(friendship).data
+                }
             )
-        
-        friendship.status = 'accepted'
-        friendship.save()
-        
-        return Response(
-            {"message": f"{friend.username} is now your friend"},
-            status=status.HTTP_200_OK
-        )
-        
+            return Response(
+                {"message": f"{friendship.user.username} is now your friend"},
+                status=status.HTTP_200_OK
+            )
 
 class FriendInvitableUsersListView(ListAPIView):
     """

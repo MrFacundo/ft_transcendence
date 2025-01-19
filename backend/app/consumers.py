@@ -152,10 +152,56 @@ class GameInvitationConsumer(AsyncWebsocketConsumer):
 
     async def game_accepted(self, event):
         game_url = event['game_url']
-        await self.send(text_data=json.dumps({'type': 'game_accepted', 'game_url': game_url}))
+        await self.send(text_data=json.dumps({
+            'type': 'game_accepted',
+            'game_url': game_url
+        }))
         print(f"Sent game URL: {game_url} to room: {self.room_name}, group: {self.room_group_name}")
 
     async def game_invited(self, event):
         invitation = event['invitation']
-        await self.send(text_data=json.dumps({'type': 'game_invited', 'invitation': invitation}))
-        print(f"Sent invitation: {invitation} to room: {self.room_name}, group: {self.room_group_name}")
+        await self.send(text_data=json.dumps({
+            'type': 'game_invited',
+            'invitation': invitation
+        }))
+
+"""
+
+Friend Invitation Consumer
+
+"""
+
+class FriendInvitationConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
+        self.room_name = self.scope['url_route']['kwargs']['room_name']
+        self.room_group_name = f"friend_invitation_{self.room_name}"
+        
+        await self.channel_layer.group_add(
+            self.room_group_name,
+            self.channel_name
+        )
+        await self.accept()
+        print(f"Connected to friend room: {self.room_name}, group: {self.room_group_name}")
+
+    async def disconnect(self, close_code):
+        await self.channel_layer.group_discard(
+            self.room_group_name,
+            self.channel_name
+        )
+        print(f"Disconnected from friend room: {self.room_name}, group: {self.room_group_name}")
+
+    async def friend_accepted(self, event):
+        friendship = event['friendship']
+        await self.send(text_data=json.dumps({
+            'type': 'friend_accepted',
+            'friendship': friendship
+        }))
+        print(f"Sent friend accepted to room: {self.room_name}, group: {self.room_group_name}")
+
+    async def friend_invited(self, event):
+        friendship = event['friendship']
+        await self.send(text_data=json.dumps({
+            'type': 'friend_invited',
+            'friendship': friendship
+        }))
+        print(f"Sent friend invitation to room: {self.room_name}")
