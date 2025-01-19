@@ -14,6 +14,9 @@ from django.db import models
 User = get_user_model()
 
 class CreateGameInvitationView(APIView):
+    """
+    Sends a game request to the user with the given ID. Checks if the user is not sending a request to themselves, and if a request already exists.
+    """
     def post(self, request, user_id):
         with transaction.atomic():
             receiver = get_object_or_404(User, id=user_id)
