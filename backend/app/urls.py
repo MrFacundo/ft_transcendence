@@ -20,12 +20,13 @@ from app.views.two_factor_auth_views import (
 )
 
 from app.views.user_views import (
-	UserListView,
+	 UserListView,
 	 FriendRequestView,
 	 FriendAcceptView,
 	 FriendInvitableUsersListView,
 	 FriendRequestUsersListView,
-	 FriendsListView
+	 FriendsListView,
+	 OnlineUserListView
 )
 
 from app.views.game_views import (
@@ -50,6 +51,7 @@ urlpatterns = [
 	# Users and friends
     path('user', UserDetailView.as_view(), name='user-detail'),
 	path('users/', UserListView.as_view(), name='user-list'),
+	path('online-users/', OnlineUserListView.as_view(), name='online-users'),
 	path('user/<int:pk>', UserDetailView.as_view(), name='user-detail-pk'),
 	path('friend-request/<int:friend_id>', FriendRequestView.as_view(), name='friend-request'),
 	path('friend-accept/<int:friend_id>', FriendAcceptView.as_view(), name='friend-accept'),

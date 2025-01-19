@@ -159,6 +159,13 @@ export class Api {
     }
 
     /**
+     * Retrieves a list with online users only.
+     */
+    async getOnlineUsers() {
+        return this.request("get", "/online-users/");
+    }
+
+    /**
      * Retrieves a list of friends that can be invited.
      */
     async getFriendsInvitable() {

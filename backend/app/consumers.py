@@ -3,6 +3,7 @@ import asyncio
 from channels.generic.websocket import AsyncWebsocketConsumer
 from .game.Game import Game
 from .models import PongGame
+from user.models import UserOnlineStatus
 from channels.db import database_sync_to_async
 from django.utils import timezone
 
@@ -205,3 +206,66 @@ class FriendInvitationConsumer(AsyncWebsocketConsumer):
             'friendship': friendship
         }))
         print(f"Sent friend invitation to room: {self.room_name}")
+
+
+"""
+
+User Status Consumer
+
+"""
+
+class UserOnlineStatusConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
+        self.user = self.scope["user"]
+        if not self.user.is_authenticated:
+            await self.close()
+            return
+
+        self.group_name = "online_users"
+        await self.channel_layer.group_add(self.group_name, self.channel_name)
+        
+        await self.set_user_online()
+        
+        await self.channel_layer.group_send(
+            self.group_name,
+            {
+                "type": "user_status",
+                "user_id": self.user.id,
+                "username": self.user.username,
+                "is_online": True
+            }
+        )
+        
+        await self.accept()
+
+    async def disconnect(self, close_code):
+        if hasattr(self, 'user') and self.user.is_authenticated:
+            await self.channel_layer.group_send(
+                self.group_name,
+                {
+                    "type": "user_status",
+                    "user_id": self.user.id,
+                    "username": self.user.username,
+                    "is_online": False
+                }
+            )
+            
+            await self.set_user_offline()
+            await self.channel_layer.group_discard(self.group_name, self.channel_name)
+
+    async def user_status(self, event):
+        await self.send(text_data=json.dumps(event))
+
+    @database_sync_to_async
+    def set_user_online(self):
+        UserOnlineStatus.objects.update_or_create(
+            user=self.user,
+            defaults={"is_online": True, "last_seen": timezone.now()}
+        )
+
+    @database_sync_to_async
+    def set_user_offline(self):
+        UserOnlineStatus.objects.update_or_create(
+            user=self.user,
+            defaults={"is_online": False, "last_seen": timezone.now()}
+        )

@@ -6,6 +6,7 @@ export class WebSocketManager {
         this.app = app;
         this.gameWs = null;
         this.friendWs = null;
+        this.onlineStatusWs = null;
     }
 
     setupConnections() {
@@ -22,6 +23,10 @@ export class WebSocketManager {
 
         if (!this.friendWs) {
             this.setupFriendWebSocket(userId);
+        }
+
+        if (!this.onlineStatusWs) {
+            this.setupOnlineStatusWebSocket(userId);
         }
     }
 
@@ -109,6 +114,30 @@ export class WebSocketManager {
         };
     }
 
+    setupOnlineStatusWebSocket() {
+        this.onlineStatusWs = new WebSocket(`${WS_URL}/online-status/?token=${this.app.auth.accessToken}`);
+
+        this.onlineStatusWs.onopen = async ()  => {
+            console.log("Online status WebSocket connection established.");
+        };
+
+        this.onlineStatusWs.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            console.log("Online status update:", data);
+        };
+
+        this.onlineStatusWs.onerror = (error) => {
+            console.error("Online status WebSocket error:", error);
+            this.onlineStatusWs = null;
+        };
+
+        this.onlineStatusWs.onclose = () => {
+            console.warn("Online status WebSocket connection closed.");
+            this.onlineStatusWs = null;
+        };
+    
+    }
+
     closeConnections() {
         if (this.gameWs) {
             this.gameWs.close();
@@ -117,6 +146,10 @@ export class WebSocketManager {
         if (this.friendWs) {
             this.friendWs.close();
             this.friendWs = null;
+        }
+        if (this.onlineStatusWs) {
+            this.onlineStatusWs.close();
+            this.onlineStatusWs = null;
         }
     }
 }

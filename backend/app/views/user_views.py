@@ -147,3 +147,10 @@ class FriendsListView(ListAPIView):
         ).values_list('sender_id', 'receiver_id')
         friend_ids = [uid for pair in friends for uid in pair if uid != int(user_id)]
         return User.objects.filter(id__in=friend_ids)
+    
+class OnlineUserListView(ListAPIView):
+    serializer_class = UserSerializer
+
+    def get_queryset(self):
+        online_users = User.objects.filter(online_status__is_online=True)
+        return online_users

@@ -73,6 +73,9 @@ class HomePage extends Page {
         });
     
         ActionBtn.classList.add("d-none");
+    
+        const onlineUsers = await api.getOnlineUsers();
+        console.log("Online users:", onlineUsers);
     }
 }
 
