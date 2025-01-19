@@ -60,19 +60,14 @@ class GameCommunication:
         return {
             "x": truncate(self.game.ball.x, 2),
             "y": truncate(self.game.ball.y, 2),
-            "width": truncate(self.game.ball.width, 2),
-            "height": truncate(self.game.ball.height, 2),
             "speed_x": truncate(self.game.ball.speed_x, 2),
-            "speed_y": truncate(self.game.ball.speed_y, 2)
+            "speed_y": truncate(self.game.ball.speed_y, 2),
         }
 
     def _get_paddles_state(self):
         return [
             {
-                "x": truncate(paddle.x, 2),
                 "y": truncate(paddle.y, 2),
-                "width": truncate(paddle.width, 2),
-                "height": truncate(paddle.height, 2)
             }
             for paddle in self.game.paddles
         ]
