@@ -40,8 +40,7 @@ class LoginView(TwoFactorAuthView):
         if user.two_factor_method != 'none':
             otp_token = str(OTPToken.for_user(user))
             if user.two_factor_method == 'email':
-                self.generate_otp(user)
-                # TODO: Send OTP via email
+                self.send_otp_email(user, self.generate_otp(user))
             return Response({
                 'two_factor_required': True,
                 'otp_token': otp_token,

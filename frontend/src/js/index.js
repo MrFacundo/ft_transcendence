@@ -17,6 +17,7 @@ import {
 import "../scss/styles.scss";
 import { Api } from "./Api.js";
 import { Auth } from "./Auth.js";
+import { logConstants } from "./constants.js";
 import { WebSocketManager } from './WebSocketManager.js';
 
 /**
@@ -87,6 +88,7 @@ class App {
      * Initializes the application, sets up event listeners, and handles initial navigation.
      */
     init() {
+        logConstants();
         window.addEventListener("popstate", () => {
             this.navigate(window.location.pathname.toLowerCase());
         });

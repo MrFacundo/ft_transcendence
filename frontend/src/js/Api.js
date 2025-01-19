@@ -269,13 +269,14 @@ export class Api {
      * @param {string} path - The path to the avatar image.
      * @returns {Promise<string|null>} The object URL of the avatar image, or null if the request fails.
      */
-    async fetchAvatarObjectUrl(path) {
+    fetchAvatarObjectUrl = async (path) => {
         try {
             const response = await this.request("get", `${MEDIA_URL}/${path}`, null, {
                 responseType: "blob",
             });
             return URL.createObjectURL(response);
-        } catch {
+        } catch (error) {
+            console.error("Error fetching avatar object URL:", error);
             return null;
         }
     }

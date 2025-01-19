@@ -25,7 +25,7 @@ export class Auth {
                 this.authenticated = true;
                 return true;
             } catch (error) {
-                console.error(error.response.data);
+                console.error(error.response?.data || error.message);
                 this.accessToken = null;
                 Cookies.remove("access_token");
                 Cookies.remove("refresh_token");
