@@ -17,7 +17,7 @@ class HomePage extends Page {
         
         const sendList = document.querySelector("#send-list");
         const receiveList = document.querySelector("#receive-list");
-        const inviteBtn = document.querySelector("#action-friend");
+        const ActionBtn = document.querySelector("#action-friend");
         const selectedFriend = this.mainElement.querySelector("user-profile");
         selectedFriend.page = this;
     
@@ -25,12 +25,20 @@ class HomePage extends Page {
             const friendItem = document.createElement("user-profile-small");
             friendItem.page = this;
             friendItem.setUser(friend);
+        
+            if (friend.friendship_status === "pending") {
+                friendItem.appendPendingButton();
+            }
             friendItem.addEventListener("click", () => {
-                inviteBtn.classList.remove("d-none");
-                inviteBtn.textContent = actionText;
-                inviteBtn.onclick = actionCallback;
                 selectedFriend.setUser(friend);
+                const shouldShowActionBtn = actionText === "Accept" || (actionText === "Invite" && friend.friendship_status !== "pending");
+                ActionBtn.classList.toggle("d-none", !shouldShowActionBtn);
+                if (shouldShowActionBtn) {
+                    ActionBtn.textContent = actionText;
+                    ActionBtn.onclick = actionCallback;
+                }
             });
+        
             return friendItem;
         };
 
@@ -40,7 +48,7 @@ class HomePage extends Page {
                 try {
                     await api.friendRequest(friend.id);
                     friendItem.appendPendingButton();
-                    inviteBtn.classList.add("d-none");
+                    ActionBtn.classList.add("d-none");
                 } catch (error) {
                     showMessage(error.response.data.message);
                 }
@@ -54,7 +62,7 @@ class HomePage extends Page {
                 try {
                     const response = await api.friendAccept(invite.id);
                     receiveList.removeChild(friendItem);
-                    inviteBtn.classList.add("d-none");
+                    ActionBtn.classList.add("d-none");
                     showMessage(response.message);
                 } catch (error) {
                     console.log(error);
@@ -64,7 +72,7 @@ class HomePage extends Page {
             receiveList.appendChild(friendItem);
         });
     
-        inviteBtn.classList.add("d-none");
+        ActionBtn.classList.add("d-none");
     }
 }
 
