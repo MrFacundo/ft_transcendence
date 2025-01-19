@@ -66,8 +66,8 @@ class UserSerializer(serializers.ModelSerializer):
         request = self.context.get('request', None)
         if request and request.user.is_authenticated:
             friendship = Friendship.objects.filter(
-                (Q(user=request.user) & Q(friend=obj)) | 
-                (Q(user=obj) & Q(friend=request.user))
+                (Q(sender=request.user) & Q(receiver=obj)) | 
+                (Q(sender=obj) & Q(sender=request.user))
             ).first()
             if friendship:
                 return friendship.status
@@ -121,12 +121,12 @@ class GameInvitationSerializer(serializers.ModelSerializer):
 
 
 class FriendshipInvitationSerializer(serializers.ModelSerializer):
-    user = UserSerializer(read_only=True)
-    friend = UserSerializer(read_only=True)
+    sender = UserSerializer(read_only=True)
+    receiver = UserSerializer(read_only=True)
 
     class Meta:
         model = Friendship
-        fields = ['id', 'user', 'friend', 'status']
+        fields = ['id', 'sender', 'receiver', 'status']
 
 
 class PongGameSerializer(serializers.ModelSerializer):

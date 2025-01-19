@@ -86,12 +86,12 @@ class Friendship(models.Model):
     ]
     
     id = models.BigAutoField(primary_key=True)
-    user = models.ForeignKey(
+    sender = models.ForeignKey(
         CustomUser, 
         on_delete=models.CASCADE, 
         related_name='friendships_initiated'
     )
-    friend = models.ForeignKey(
+    receiver = models.ForeignKey(
         CustomUser, 
         on_delete=models.CASCADE, 
         related_name='friendships_received'
@@ -103,4 +103,4 @@ class Friendship(models.Model):
     )
 
     def __str__(self):
-        return f"{self.user.username} -> {self.friend.username} ({self.status})"
+        return f"{self.sender.username} -> {self.receiver.username} ({self.status})"

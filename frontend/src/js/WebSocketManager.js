@@ -85,17 +85,16 @@ export class WebSocketManager {
             
             if (data.type === "friend_invited") {
                 console.log("Friend invitation received:", data);
-                if (confirm(`${data.friendship.user.username} wants to be your friend. Do you accept?`)) {
+                if (confirm(`${data.friendship.sender.username} wants to be your friend. Do you accept?`)) {
                     try {
-                        await this.app.api.friendAccept(data.friendship.user.id);
-                        console.log("Friendship accepted");
+                        await this.app.api.friendAccept(data.friendship.sender.id);
+                        showMessage(`${data.friendship.sender.username} is now your friend.`);
                     } catch (error) {
                         console.error("Error accepting friendship:", error);
                     }
                 }
             } else if (data.type === "friend_accepted") {
-                const message = `${data.friendship.friend.username} is now your friend.`;
-                showMessage(message);
+                showMessage(`${data.friendship.receiver.username} is now your friend.`);
             }
         };
         
