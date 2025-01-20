@@ -1,5 +1,4 @@
 import Page from "./Page.js";
-import "../customElements/UserProfileCardSm.js";
 import { formatDate, capitalizeFirstLetter } from "../utils.js";
 
 class ProfilePage extends Page {
@@ -21,38 +20,27 @@ class ProfilePage extends Page {
         return matchItem;
     }
 
-    setupFriendItem(friend) {
-        const friendItem = document.createElement("user-profile-small");
-        friendItem.page = this;
-        friendItem.setUser(friend);
-        friendItem.addEventListener("click", () => {
-            const selectedFriendEl = this.mainElement.querySelector("user-profile#selected-friend");
-            selectedFriendEl.page = this;
-            selectedFriendEl.setUser(friend);
-        });
-        return friendItem;
-    }
-
     async render() {
-        const { api } = this.app;
-        const { mainElement, params } = this;
+        const { api, auth } = this.app;
+        const { params } = this;
         const profileId = params["id"];
 
-        const pageTitle = mainElement.querySelector("h1");
-        const UserProfileCard = mainElement.querySelector("user-profile");
-        const userJoinedEl = mainElement.querySelector("#profile-joined");
-        const matchHistoryEl = mainElement.querySelector("#match-history");
-        const friendListTitle = mainElement.querySelector("#friend-list-title");
-        const friendListEl = mainElement.querySelector("#friend-list");
-        const selectedFriendEl = this.mainElement.querySelector("user-profile#selected-friend");
+        const pageTitle = document.querySelector("h1");
+        const UserProfileCard = document.querySelector("user-profile");
+        const userJoinedEl = document.querySelector("#profile-joined");
+        const matchHistoryEl = document.querySelector("#match-history");
+        const friendListTitle = document.querySelector("#friend-list-title");
+        const friendListEl = document.querySelector("#friend-list");
+        const selectedFriendEl = document.querySelector("user-profile#selected-friend");
 
-        const friends = await api.getFriends(profileId);
-        const matchHistory = await api.getMatchHistory(profileId);
+        [UserProfileCard, friendListEl, selectedFriendEl].forEach(el => (el.page = this));
+
         const userProfile = await api.getProfile(profileId);
+        const matchHistory = await api.getMatchHistory(profileId);
+        const friends = await api.getFriends(profileId);
 
-        UserProfileCard.page = this;
         UserProfileCard.setUser(userProfile);
-        pageTitle.textContent = profileId == this.app.auth.user.id ? "Your Profile" : capitalizeFirstLetter(userProfile.username) + "'s profile";
+        pageTitle.textContent = profileId == auth.user.id ? "Your Profile" : capitalizeFirstLetter(userProfile.username) + "'s profile";
         userJoinedEl.textContent = "joined: " + formatDate(userProfile.date_joined);
 
         if (matchHistory.length === 0) {
@@ -65,11 +53,9 @@ class ProfilePage extends Page {
         }
 
         if (friends.length > 0) {
-            friendListTitle.textContent = profileId == this.app.auth.user.id ? "Your friends" : capitalizeFirstLetter(userProfile.username) + "'s friends";
-            friends.forEach(friend => {
-                const friendItem = this.setupFriendItem(friend);
-                friendListEl.appendChild(friendItem);
-            });
+            friendListTitle.textContent = profileId == auth.user.id ? "Your friends" : capitalizeFirstLetter(userProfile.username) + "'s friends";
+            friendListEl.initialize(null, selectedFriendEl);
+            friendListEl.populateList(friends);
         } else {
             selectedFriendEl.remove();
         }

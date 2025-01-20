@@ -67,14 +67,6 @@ class UserProfileCardSm extends HTMLElement {
                 <span id="profile-username" class="profile-username"></span>
             </div>
         `;
-        this.shadowRoot.querySelector('.profile-container').addEventListener('click', () => this.updateSelected());
-    }
-
-    updateSelected() {
-        document.querySelectorAll("user-profile-small").forEach((profile) => {
-            profile.shadowRoot.querySelector(".profile-container").classList.remove("selected");
-        });
-        this.shadowRoot.querySelector(".profile-container").classList.add("selected");
     }
 
     async setUser(user) {
@@ -90,7 +82,6 @@ class UserProfileCardSm extends HTMLElement {
         } else {
             this.shadowRoot.querySelector(".status-indicator").style.backgroundColor = "#a6a6a6";
         }
-
 
         avatarEl.src = await getAvatarSrc(user, api.fetchAvatarObjectUrl);
         usernameEl.textContent = user.username;

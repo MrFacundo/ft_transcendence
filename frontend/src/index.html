@@ -326,14 +326,15 @@
         </div>
         <h2 class="my-5 text-center display-6">Add friends</h2>
         <div class="row">
-            <div class="col-md-4">
-                <p class="font-weight-bold">Invitations Received</p>
-                <ul class="list-group" id="receive-list"></ul>
-            </div>
-            <div class="col-md-4">
-                <p class="font-weight-bold">Send Invitations</p>
-                <ul class="list-group" id="send-list"></ul>
-            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <p>Invitations Received</p>
+                    <user-list id="receive-list"></user-list>
+                </div>
+                <div class="col-md-4">
+                    <p>Send Invitations</p>
+                    <user-list id="send-list"></user-list>
+                </div>
             <div class="col-md-4 d-flex flex-column align-items-center text-center">
                 <user-profile></user-profile>
                 <button class="btn btn-primary mt-3" id="action-friend">Invite</button>
@@ -355,11 +356,11 @@
         <div class="row">
             <div class="col-md-4">
                 <p>Invitations Received</p>
-                <ul class="list-group" id="receive-list"></ul>
+                <user-list id="receive-list"></user-list>
             </div>
             <div class="col-md-4">
                 <p>Send Invitations</p>
-                <ul class="list-group" id="send-list"></ul>
+                <user-list id="send-list"></user-list>
             </div>
             <div class="col-md-4 d-flex flex-column align-items-center text-center">
                 <user-profile></user-profile>
@@ -409,7 +410,7 @@
         <h2 id="friend-list-title" class="my-5 text-center display-6"></h2>
         <div class="row justify-content-center">
             <div class="col-md-4">
-                <ul class="list-group" id="friend-list"></ul>
+                <user-list id="friend-list"></user-list>
             </div>
             <div class="col-md-4 d-flex flex-column align-items-center text-center">
                 <user-profile id="selected-friend"></user-profile>

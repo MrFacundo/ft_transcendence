@@ -39,7 +39,7 @@ class App {
             home: new HomePage(this),
             oneVsOne: new OneVsOne(this),
             tournament: new TournamentPage(this),
-            gameStats: new ProfilePage(this),
+            profile: new ProfilePage(this),
             AI: new AIPage(this),
             game: new GamePage(this),
         };
