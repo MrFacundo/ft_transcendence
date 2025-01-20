@@ -61,14 +61,14 @@ class UserProfileCard extends HTMLElement {
         const profileStats = this.shadowRoot.getElementById("profile-stats");
         const onlineStatusEl = this.shadowRoot.getElementById("online-status");
 
-        const { api, onlineStatuses } = this.page.app;
+        const { api, onlineStatusManager } = this.page.app;
         infoEl.setAttribute('data-href', `/profile/${user.id}`);
 
         this.shadowRoot.querySelectorAll("[data-href]").forEach(element => {
             element.addEventListener("click", this.page.handleClick);
         });
 
-        let onlineStatus = onlineStatuses.get(user.id);
+        let onlineStatus = onlineStatusManager.statuses.get(user.id);
         if (onlineStatus) {
             if (onlineStatus.is_online) {
                 onlineStatusEl.textContent = "Online";

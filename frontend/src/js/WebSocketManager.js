@@ -119,33 +119,12 @@ export class WebSocketManager {
 
         this.onlineStatusWs.onopen = async ()  => {
             console.log("Online status WebSocket connection established.");
-            try {
-                const response = await this.app.api.getOnlineStatuses();
-                console.log("Online status data:", response);
-                response.forEach(user => {
-                    this.app.onlineStatuses.set(user.user_id, {
-                        username: user.username,
-                        is_online: user.is_online,
-                        last_seen: user.last_seen
-                    });
-                });
-                console.log("Updated online status data:", this.app.onlineStatuses);
-            } catch (error) {
-                console.error("Error fetching online status data:", error);
-            }
+            this.app.onlineStatusManager.fetchInitialStatuses();
         };
 
         this.onlineStatusWs.onmessage = (event) => {
             const data = JSON.parse(event.data);
-            console.log("Online status update:", data);
-            if (data.type === "user_status") {
-                this.app.onlineStatuses.set(data.user_id, {
-                    username: data.username,
-                    is_online: data.is_online,
-                    last_seen: data.last_seen
-                });
-            }
-            console.log("Updated online status data:", this.app.onlineStatuses);
+            this.app.onlineStatusManager.updateStatus(data);
         };
 
         this.onlineStatusWs.onerror = (error) => {

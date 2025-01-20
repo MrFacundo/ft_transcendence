@@ -67,24 +67,17 @@ class UserProfileCardSm extends HTMLElement {
                 <span id="profile-username" class="profile-username"></span>
             </div>
         `;
+        this.user = null;
     }
 
     async setUser(user) {
-        if (!user) return;
+        this.user = user;
 
         const avatarEl = this.shadowRoot.getElementById("profile-avatar");
         const usernameEl = this.shadowRoot.getElementById("profile-username");
-        const { api, onlineStatuses } = this.page.app;
-
-        let onlineStatus = onlineStatuses.get(user.id);
-        if (onlineStatus) {
-            this.shadowRoot.querySelector(".status-indicator").style.backgroundColor = "#e0a800";
-        } else {
-            this.shadowRoot.querySelector(".status-indicator").style.backgroundColor = "#a6a6a6";
-        }
-
-        avatarEl.src = await getAvatarSrc(user, api.fetchAvatarObjectUrl);
-        usernameEl.textContent = user.username;
+        this.updateOnlineStatus();
+        avatarEl.src = await getAvatarSrc(this.user, this.page.app.api.fetchAvatarObjectUrl);
+        usernameEl.textContent = this.user.username;
     }
 
     appendPendingButton() {
@@ -95,6 +88,16 @@ class UserProfileCardSm extends HTMLElement {
             pendingButton.className = "btn-warning";
             pendingButton.innerText = "Pending";
             profileContainer.appendChild(pendingButton);
+        }
+    }
+
+    updateOnlineStatus() {
+        const { onlineStatusManager} = this.page.app;
+        let onlineStatus = onlineStatusManager.statuses.get(this.user.id)?.is_online;
+        if (onlineStatus) {
+            this.shadowRoot.querySelector(".status-indicator").style.backgroundColor = "#e0a800";
+        } else {
+            this.shadowRoot.querySelector(".status-indicator").style.backgroundColor = "#a6a6a6";
         }
     }
 }
