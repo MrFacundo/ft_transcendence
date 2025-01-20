@@ -16,11 +16,11 @@ class HomePage extends Page {
         const sendList = document.querySelector("#send-list");
         const receiveList = document.querySelector("#receive-list");
         const actionBtn = document.querySelector("#action-friend");
-        const selectedFriend = document.querySelector("user-profile");
+        const selectedUserCard = document.querySelector("user-profile");
 
-        [sendList, receiveList, selectedFriend].forEach(el => (el.page = this));
-        sendList.initialize(actionBtn, selectedFriend);
-        receiveList.initialize(actionBtn, selectedFriend);
+        [sendList, receiveList, selectedUserCard].forEach(el => (el.page = this));
+        sendList.initialize(selectedUserCard, actionBtn);
+        receiveList.initialize(selectedUserCard, actionBtn);
 
         const potentialFriendRequests = await api.getPotentialFriendRequests(auth.user.id);
         const incomingFriendRequests = await api.getIncomingFriendRequests();

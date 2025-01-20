@@ -36,9 +36,9 @@ class UserList extends HTMLElement {
         this.page = null;
     }
 
-    initialize(actionButton, selectedUserProfile) {
+    initialize(selectedUserCard, actionButton = null) {
+        this.selectedUserCard = selectedUserCard;
         this.actionButton = actionButton;
-        this.selectedUserProfile = selectedUserProfile;
     }
 
     async populateList(users, options = {}) {
@@ -61,19 +61,19 @@ class UserList extends HTMLElement {
     }
 
     createUserCard(user, { actionText, actionCallback, isPending }) {
-        const userCard = document.createElement("user-profile-small");
-        userCard.page = this.page;
-        userCard.setUser(user);
-        userCard.setAttribute("data-user-id", user.id);
+        const userCardSm = document.createElement("user-profile-small");
+        userCardSm.page = this.page;
+        userCardSm.setUser(user);
+        userCardSm.setAttribute("data-user-id", user.id);
 
-        if (isPending) userCard.appendPendingButton();
+        if (isPending) userCardSm.appendPendingButton();
 
-        userCard.addEventListener("click", async () => {
-            this.selectedUserProfile.setUser(user);
-            this.updateSelectedStyle(userCard);
-            const shouldShowActionBtn = actionText && (!isPending || actionText === "Accept");
+        userCardSm.addEventListener("click", async () => {
+            this.updateSelectedStyle(userCardSm);
+            this.selectedUserCard.setUser(user);
             
             if (this.actionButton) {
+                const shouldShowActionBtn = !isPending || actionText === "Accept";
                 this.actionButton.classList.toggle("d-none", !shouldShowActionBtn);
     
                 if (shouldShowActionBtn) {
@@ -84,7 +84,7 @@ class UserList extends HTMLElement {
                             if (actionText === "Accept") {
                                 this.removeCard(user.id);
                             } else {
-                                userCard.appendPendingButton();
+                                userCardSm.appendPendingButton();
                             }
                             this.actionButton.classList.add("d-none");
                         } catch (error) {
@@ -95,7 +95,7 @@ class UserList extends HTMLElement {
             }
         });
 
-        return userCard;
+        return userCardSm;
     }
 
     removeCard(userId) {

@@ -31,9 +31,9 @@ class ProfilePage extends Page {
         const matchHistoryEl = document.querySelector("#match-history");
         const friendListTitle = document.querySelector("#friend-list-title");
         const friendListEl = document.querySelector("#friend-list");
-        const selectedFriendEl = document.querySelector("user-profile#selected-friend");
+        const selectedUserCard = document.querySelector("user-profile#selected-friend");
 
-        [UserProfileCard, friendListEl, selectedFriendEl].forEach(el => (el.page = this));
+        [UserProfileCard, friendListEl, selectedUserCard].forEach(el => (el.page = this));
 
         const userProfile = await api.getProfile(profileId);
         const matchHistory = await api.getMatchHistory(profileId);
@@ -54,10 +54,10 @@ class ProfilePage extends Page {
 
         if (friends.length > 0) {
             friendListTitle.textContent = profileId == auth.user.id ? "Your friends" : capitalizeFirstLetter(userProfile.username) + "'s friends";
-            friendListEl.initialize(null, selectedFriendEl);
+            friendListEl.initialize(selectedUserCard);
             friendListEl.populateList(friends);
         } else {
-            selectedFriendEl.remove();
+            selectedUserCard.remove();
         }
     }
 }
