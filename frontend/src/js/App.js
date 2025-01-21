@@ -19,6 +19,7 @@ import { Api } from "./Api.js";
 import { Auth } from "./Auth.js";
 import { logConstants } from "./constants.js";
 import { WebSocketManager } from './WebSocketManager.js';
+import { OnlineStatusManager } from './OnlineStatusManager.js';
 
 /**
  * App class initializes the application, manages page navigation, and handles authentication.
@@ -39,12 +40,13 @@ class App {
             home: new HomePage(this),
             oneVsOne: new OneVsOne(this),
             tournament: new TournamentPage(this),
-            gameStats: new ProfilePage(this),
+            profile: new ProfilePage(this),
             AI: new AIPage(this),
             game: new GamePage(this),
         };
         this.currentPage = null;
         this.wsManager = new WebSocketManager(this);
+        this.onlineStatusManager = new OnlineStatusManager(this);
         this.init();
         if (document.getElementById("noScript"))
             document.getElementById("noScript").remove();
@@ -99,6 +101,11 @@ class App {
         window.addEventListener("beforeunload", () => {
             this.wsManager.closeConnections();
         });
+        window.addEventListener("online-status-update", (event) => {
+            console.log("Received online status update event");
+            console.log("event", event);
+            this.onlineStatusManager.updateUI(event);
+        }); 
     }
 }
 

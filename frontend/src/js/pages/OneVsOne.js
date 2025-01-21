@@ -1,6 +1,7 @@
 import Page from "./Page.js";
 import "../customElements/UserProfileCard.js";
 import "../customElements/UserProfileCardSm.js";
+import "../customElements/UserList.js";
 
 class OneVsOne extends Page {
     constructor(app) {
@@ -14,74 +15,44 @@ class OneVsOne extends Page {
     }
 
     async render() {
-        const { api } = this.app;
+        const { api, auth, navigate } = this.app;
         const sendList = document.querySelector("#send-list");
         const receiveList = document.querySelector("#receive-list");
-        const inviteBtn = document.querySelector("#action-friend");
-        const selectedFriend = this.mainElement.querySelector("user-profile");
-        selectedFriend.page = this;
+        const actionBtn = document.querySelector("#action-friend");
+        const selectedUserCard = document.querySelector("user-profile");
 
+        [sendList, receiveList, selectedUserCard].forEach(el => (el.page = this));
+        sendList.initialize(selectedUserCard, actionBtn);
+        receiveList.initialize(selectedUserCard, actionBtn);
+
+        const friends = await api.getFriends(auth.user.id);
         const sentInvites = await api.getSentGameInvites();
-        const friends = await api.getFriends(this.app.auth.user.id);
         const receivedInvites = await api.getReceivedGameInvites();
 
-        this.createFriendList(friends, sentInvites, inviteBtn, selectedFriend, sendList);
-        this.createReceivedInvitesList(receivedInvites, inviteBtn, selectedFriend, receiveList);
+        const pendingInviteIds = sentInvites
+            .filter(invite => invite.status === "pending")
+            .map(invite => invite.receiver.id);
 
-        inviteBtn.classList.add("d-none");
-    }
-
-    createFriendList(friends, sentInvites, inviteBtn, selectedFriend, sendList) {
-        friends.forEach(friend => {
-            const friendItem = this.setupFriendItem(friend, "Invite", async () => {
-                try {
-                    await this.app.api.gameRequest(friend.id);
-                    friendItem.appendPendingButton();
-                    inviteBtn.classList.add("d-none");
-                } catch (error) {
-                    console.error(error);
-                }
-            }, sentInvites, inviteBtn, selectedFriend);
-            sendList.appendChild(friendItem);
-        });
-    }
-
-    createReceivedInvitesList(receivedInvites, inviteBtn, selectedFriend, receiveList) {
-        receivedInvites.forEach(invite => {
-            if (invite.status !== "pending") return;
-            const friendItem = this.setupFriendItem(invite.sender, "Accept", async () => {
-                try {
-                    const response = await this.app.api.gameAccept(invite.id);
-                    receiveList.removeChild(friendItem);
-                    inviteBtn.classList.add("d-none");
-                    console.log(response);
-                    console.log(`Redirecting to game: ${response.game_url}`);
-                    this.app.currentGame = true; // TODO: implement game state management
-                    this.app.navigate(response.game_url);
-                } catch (error) {
-                    console.error(error);
-                }
-            }, [], inviteBtn, selectedFriend);
-            receiveList.appendChild(friendItem);
-        });
-    }
-
-    setupFriendItem(friend, actionText, actionCallback, sentInvites, inviteBtn, selectedFriend) {
-        const friendItem = document.createElement("user-profile-small");
-        friendItem.page = this;
-        friendItem.setUser(friend);
-        friendItem.addEventListener("click", () => {
-            inviteBtn.classList.remove("d-none");
-            inviteBtn.textContent = actionText;
-            inviteBtn.onclick = actionCallback;
-            selectedFriend.setUser(friend);
+        await sendList.populateList(friends, {
+            actionText: "Invite",
+            actionCallback: user => api.gameRequest(user.id),
+            pendingIds: pendingInviteIds,
         });
 
-        if (sentInvites.some(invite => invite.receiver.id === friend.id && invite.status === "pending")) {
-            friendItem.appendPendingButton();
-        }
+        const pendingReceivedInvites = receivedInvites.filter(invite => invite.status === "pending");
+        await receiveList.populateList(pendingReceivedInvites.map(invite => invite.sender), {
+            actionText: "Accept",
+            actionCallback: async (user) => {
+                const invite = pendingReceivedInvites.find(inv => inv.sender.id === user.id);
+                const response = await this.app.api.gameAccept(invite.id);
+                console.log(`Redirecting to game: ${response.game_url}`);
+                this.app.currentGame = true;
+                navigate(response.game_url);
+                return response;
+            },
+        });
 
-        return friendItem;
+        actionBtn.classList.add("d-none");
     }
 }
 

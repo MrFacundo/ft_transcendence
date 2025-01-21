@@ -40,6 +40,7 @@ class UserProfileCard extends HTMLElement {
                 <div id="profile-info" class="profile-info">
                     <img id="profile-avatar" src="${EMPTY_AVATAR_URL}" alt="User Avatar" class="profile-avatar" width="150" height="150">
                     <p id="profile-username"></p>
+                    <p id="online-status"></p>
                 </div>
                 <div id="profile-stats" class="profile-stats">
                     <p>Wins: <span id="profile-wins"></span></p>
@@ -58,12 +59,27 @@ class UserProfileCard extends HTMLElement {
         const winsEl = this.shadowRoot.getElementById("profile-wins");
         const lossesEl = this.shadowRoot.getElementById("profile-losses");
         const profileStats = this.shadowRoot.getElementById("profile-stats");
-        const { api } = this.page.app;
+        const onlineStatusEl = this.shadowRoot.getElementById("online-status");
+
+        const { api, onlineStatusManager } = this.page.app;
         infoEl.setAttribute('data-href', `/profile/${user.id}`);
 
         this.shadowRoot.querySelectorAll("[data-href]").forEach(element => {
             element.addEventListener("click", this.page.handleClick);
         });
+
+        let onlineStatus = onlineStatusManager.statuses.get(user.id);
+        if (onlineStatus) {
+            if (onlineStatus.is_online) {
+                onlineStatusEl.textContent = "Online";
+            } else {
+                const lastSeenDate = new Date(onlineStatus.last_seen);
+                const formattedLastSeen = `${lastSeenDate.getHours()}:${lastSeenDate.getMinutes()} ${lastSeenDate.getDate()}/${lastSeenDate.getMonth() + 1}`;
+                onlineStatusEl.textContent = `Offline, last seen: ${formattedLastSeen}`;
+            }
+        } else {
+            onlineStatusEl.textContent = "Offline";
+        }
 
         avatarEl.style.opacity = 0;
         usernameEl.style.opacity = 0;

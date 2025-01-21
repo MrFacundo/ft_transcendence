@@ -5,6 +5,7 @@ export const WS_URL = "ws://localhost:8000/ws";
 export const DEBUG = process.env.DEBUG === 'True';
 
 export function logConstants() {
+	if (!DEBUG)return;
 	const constants = {
 		"EMPTY_AVATAR_URL": EMPTY_AVATAR_URL,
 		"API_URL": API_URL,
@@ -12,6 +13,6 @@ export function logConstants() {
 		"WS_URL": WS_URL,
 		"DEBUG": DEBUG,
 	}
-	console.log("App constants:");
+	console.log("Settings:");
     console.log(constants);
 }

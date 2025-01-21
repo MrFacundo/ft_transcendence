@@ -104,3 +104,15 @@ class Friendship(models.Model):
 
     def __str__(self):
         return f"{self.sender.username} -> {self.receiver.username} ({self.status})"
+
+class UserOnlineStatus(models.Model):
+    user = models.OneToOneField(
+        CustomUser, 
+        on_delete=models.CASCADE, 
+        related_name='online_status'
+    )
+    is_online = models.BooleanField(default=False)
+    last_seen = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username} is {'online' if self.is_online else 'offline'}"

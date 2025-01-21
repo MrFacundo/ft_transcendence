@@ -35,6 +35,12 @@ class UserProfileCardSm extends HTMLElement {
                     font-weight: bold;
                     color: #343a40;
                 }
+                .status-indicator {
+                    width: 10px;
+                    height: 10px;
+                    border-radius: 50%;
+                    margin-right: 0.75rem;
+                }
                 .btn-warning {
                     margin-left: 10px;
                     background-color: #ffc107;
@@ -57,28 +63,21 @@ class UserProfileCardSm extends HTMLElement {
             </style>
             <div class="profile-container">
                 <img id="profile-avatar" src="${EMPTY_AVATAR_URL}" alt="User Avatar" class="profile-avatar" width="50" height="50" />
+                <div class="status-indicator"></div>
                 <span id="profile-username" class="profile-username"></span>
             </div>
         `;
-        this.shadowRoot.querySelector('.profile-container').addEventListener('click', () => this.updateSelected());
-    }
-
-    updateSelected() {
-        document.querySelectorAll("user-profile-small").forEach((profile) => {
-            profile.shadowRoot.querySelector(".profile-container").classList.remove("selected");
-        });
-        this.shadowRoot.querySelector(".profile-container").classList.add("selected");
+        this.user = null;
     }
 
     async setUser(user) {
-        if (!user) return;
+        this.user = user;
 
         const avatarEl = this.shadowRoot.getElementById("profile-avatar");
         const usernameEl = this.shadowRoot.getElementById("profile-username");
-        const { api } = this.page.app;
-
-        avatarEl.src = await getAvatarSrc(user, api.fetchAvatarObjectUrl);
-        usernameEl.textContent = user.username;
+        this.updateOnlineStatus();
+        avatarEl.src = await getAvatarSrc(this.user, this.page.app.api.fetchAvatarObjectUrl);
+        usernameEl.textContent = this.user.username;
     }
 
     appendPendingButton() {
@@ -89,6 +88,16 @@ class UserProfileCardSm extends HTMLElement {
             pendingButton.className = "btn-warning";
             pendingButton.innerText = "Pending";
             profileContainer.appendChild(pendingButton);
+        }
+    }
+
+    updateOnlineStatus() {
+        const { onlineStatusManager} = this.page.app;
+        let onlineStatus = onlineStatusManager.statuses.get(this.user.id)?.is_online;
+        if (onlineStatus) {
+            this.shadowRoot.querySelector(".status-indicator").style.backgroundColor = "#e0a800";
+        } else {
+            this.shadowRoot.querySelector(".status-indicator").style.backgroundColor = "#a6a6a6";
         }
     }
 }
