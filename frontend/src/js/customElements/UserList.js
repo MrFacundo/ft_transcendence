@@ -43,11 +43,18 @@ class UserList extends HTMLElement {
 
     async populateList({ users, actionText, actionCallback }) {
         const listGroup = this.shadowRoot.querySelector(".list-group");
-
-        users.forEach(user => {
+    
+        users.forEach((user) => {
             const listItem = document.createElement("li");
             listItem.className = "list-group-item";
-            listItem.appendChild(this.createUserCard(user, actionText, actionCallback));
+            const userCardSm = this.createUserCard(user, actionText, async () => {
+                try {
+                    await actionCallback(user, userCardSm);
+                } catch (error) {
+                    console.error("Action failed:", error);
+                }
+            });
+            listItem.appendChild(userCardSm);
             listGroup.appendChild(listItem);
         });
     }
@@ -58,36 +65,23 @@ class UserList extends HTMLElement {
         userCardSm.setUser(user);
         userCardSm.setAttribute("data-user-id", user.id);
     
-        const isPending = user.pending_invite?.expires_at || user.friendship?.status === "pending";
-        if (isPending) {
-            userCardSm.appendPendingButton(user.pending_invite?.expires_at);
-            this.actionButton.classList.add("d-none");
-        }
+        const isPending = user.game_invite?.expires_at || user.friendship?.status === "pending";
+        if (isPending) userCardSm.appendPendingButton(user.game_invite?.expires_at);
     
-        userCardSm.addEventListener("click", async () => {
+        userCardSm.addEventListener("click", () => {
+            this.actionButton && this.actionButton.classList.add("d-none");
             this.updateSelectedStyle(userCardSm);
             this.selectedUserCard.setUser(user);
     
-            if (this.actionButton && !isPending) {
+            if (this.actionButton && (actionText === "Accept" || !isPending)) {
                 this.actionButton.classList.remove("d-none");
                 this.actionButton.textContent = actionText;
-                this.actionButton.onclick = async () => {
-                    try {
-                        await actionCallback(user);
-                        if (actionText === "Accept") {
-                            this.removeCard(user.id);
-                        } else {
-                            userCardSm.appendPendingButton(Date.now() + 10 * 60 * 1000);
-                        }
-                        this.actionButton.classList.add("d-none");
-                    } catch (error) {
-                        console.error("Action failed:", error);
-                    }
-                };
+                this.actionButton.onclick = actionCallback;
             }
         });
         return userCardSm;
     }
+
     removeCard(userId) {
         const listGroup = this.shadowRoot.querySelector(".list-group");
         const listItem = listGroup.querySelector(`user-profile-small[data-user-id="${userId}"]`)?.parentElement;

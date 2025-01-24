@@ -40,13 +40,19 @@ class HomePage extends Page {
 		await sendList.populateList({
 			users: sendListData,
 			actionText: "Invite",
-			actionCallback: (user) => api.friendRequest(user.id),
+			actionCallback: async (user, userCardSm) => {
+				await api.friendRequest(user.id);
+				userCardSm.appendPendingButton();
+			},
 		});
 
 		await receiveList.populateList({
 			users: receiveListData,
 			actionText: "Accept",
-			actionCallback: (user) => api.friendAccept(user.id),
+			actionCallback: async (user) =>  {
+				api.friendAccept(user.id)
+				receiveList.removeCard(user.id);
+			}
 		});
 		actionBtn.classList.add("d-none");
 	}

@@ -15,7 +15,7 @@ class OneVsOne extends Page {
     }
 
     async render() {
-        const { api, auth, currentGame } = this.app;
+        const { api, auth, onlineStatusManager } = this.app;
         const sendList = document.querySelector("#send-list");
         const receiveList = document.querySelector("#receive-list");
         const actionBtn = document.querySelector("#action-friend");
@@ -28,19 +28,20 @@ class OneVsOne extends Page {
 
         const friendList = await api.getFriends(auth.user.id);
 
-        const sendListData = friendList.filter(user => 
-            !user.pending_invite || user.pending_invite.sender === auth.user.id
+        const sendListData = friendList.filter(user =>
+            !user.game_invite || user.game_invite.sender === auth.user.id
         );
 
-        const receiveListData = friendList.filter(user => 
-            user.pending_invite && user.pending_invite.sender === user.id
+        const receiveListData = friendList.filter(user =>
+            user.game_invite && user.game_invite.sender === user.id
         );
 
         await sendList.populateList({
             users: sendListData,
             actionText: "Invite",
-            actionCallback: async (user) => {
+            actionCallback: async (user, userCardSm) => {
                 const response = await api.gameRequest(user.id);
+                userCardSm.appendPendingButton(Date.now() + 10 * 60 * 1000);
                 console.log(`Game invite sent to: ${user.username}`);
                 return response;
             },
@@ -50,7 +51,11 @@ class OneVsOne extends Page {
             users: receiveListData,
             actionText: "Accept",
             actionCallback: async (user) => {
-                const response = await api.gameAccept(user.pending_invite.id);
+                if (!onlineStatusManager.statuses.get(user.id)?.is_online) {
+                    alert(`${user.username} is offline, try again later.`);
+                    return;
+                }
+                const response = await api.gameAccept(user.game_invite.id);
                 console.log(`Game invite accepted from: ${user.username}`);
                 this.app.currentGame = true;
                 this.app.navigate(response.game_url);
@@ -59,6 +64,7 @@ class OneVsOne extends Page {
         });
 
         actionBtn.classList.add("d-none");
+        console.log(onlineStatusManager.statuses);
     }
 }
 
