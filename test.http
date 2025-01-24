@@ -14,8 +14,8 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiY
 
 ###
 
-POST  http://localhost:8000/api/game-invitation/1 HTTP/1.1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMzODUxMjAxLCJpYXQiOjE3MzM4NDc2MDEsImp0aSI6IjRlMmZjN2YwNGNmYzQwMThhNmRlZjE1Yjg5MGI5MDUwIiwidXNlcl9pZCI6MTB9.MxVyN8xyQdJ1lqLagBsp9ba5o8VyTO5GPV6o666CNeQ
+POST  http://localhost:8000/api/game-invitation/1/ HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM3NDc2MjIxLCJpYXQiOjE3Mzc0NzI2MjEsImp0aSI6ImZhZTVkN2I5ZGU0YjQxNWZiMmI5MWUyYWQ4ZGE0YTM3IiwidXNlcl9pZCI6MTB9.JKjFvu_OTAJoysTScwrO69xTtrIFMksQbx4sjmNSyLk
 
 ###
 

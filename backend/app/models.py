@@ -1,5 +1,7 @@
 from django.db import models
 from django.conf import settings
+from django.utils import timezone
+from datetime import timedelta
 
 User = settings.AUTH_USER_MODEL
 
@@ -38,11 +40,14 @@ class Tournament(models.Model):
     def __str__(self):
         return self.name
     
+def default_expires_at():
+    return timezone.now() + timedelta(minutes=10)
+
 class GameInvitation(models.Model):
     STATUS_CHOICES = [
         ('pending', 'Pending'),
         ('accepted', 'Accepted'),
-        ('rejected', 'Rejected')
+        ('expired', 'Expired')
     ]
 
     sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_game_invitations')
@@ -50,6 +55,7 @@ class GameInvitation(models.Model):
     game = models.ForeignKey('PongGame', on_delete=models.SET_NULL, null=True, blank=True)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
     created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField(default=default_expires_at)
 
     def __str__(self):
         return f"Game invitation from {self.sender.username} to {self.receiver.username}"

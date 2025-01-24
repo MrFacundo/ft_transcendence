@@ -80,13 +80,20 @@ class UserProfileCardSm extends HTMLElement {
         usernameEl.textContent = this.user.username;
     }
 
-    appendPendingButton() {
+    appendPendingButton(expiresAt = null) {
+        if (!expiresAt) {
+            expiresAt = "Pending"
+        } else {
+            const expirationTime = new Date(expiresAt);
+            expiresAt = `expires at ${expirationTime.toLocaleTimeString()}`;
+        }
+    
         const profileContainer = this.shadowRoot.querySelector(".profile-container");
         const existingPendingButton = profileContainer.querySelector(".btn-warning");
         if (!existingPendingButton) {
             const pendingButton = document.createElement("button");
             pendingButton.className = "btn-warning";
-            pendingButton.innerText = "Pending";
+            pendingButton.innerText = expiresAt;
             profileContainer.appendChild(pendingButton);
         }
     }

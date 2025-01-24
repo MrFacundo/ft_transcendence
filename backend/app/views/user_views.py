@@ -2,7 +2,7 @@
 from rest_framework.generics import ListAPIView
 from rest_framework.views import APIView
 from django.contrib.auth import get_user_model
-from .serializers import UserSerializer, FriendshipInvitationSerializer, UserOnlineStatusSerializer
+from .serializers import UserSerializer, UserOnlineStatusSerializer, FriendSerializer, UserListSerializer, FriendshipInvitationSerializer
 from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
@@ -14,10 +14,12 @@ from asgiref.sync import async_to_sync
 
 User = get_user_model()
 
-# Lists all users who have verified their email
 class UserListView(ListAPIView):
-	queryset = User.objects.filter(email_is_verified=True)
-	serializer_class = UserSerializer
+    """
+    Lists all users, along with Friendship data related to the current user.
+    """
+    queryset = User.objects.filter(email_is_verified=True)
+    serializer_class = UserListSerializer
 
 class FriendRequestView(APIView):
     """
@@ -97,57 +99,6 @@ class FriendAcceptView(APIView):
                 status=status.HTTP_200_OK
             )
 
-class FriendInvitableUsersListView(ListAPIView):
-    """
-    Lists all users except the current user, their friends, and users who have sent a friend request to the current user.
-    """
-    serializer_class = UserSerializer
-
-    def get_queryset(self):
-        sender = self.request.user
-
-        friends = Friendship.objects.filter(
-            Q(sender=sender, status='accepted') | Q(receiver=sender, status='accepted')
-        ).values_list('sender_id', 'receiver_id')
-
-        pending_received = Friendship.objects.filter(
-            receiver=sender, status='pending'
-        ).values_list('sender_id', flat=True)
-
-        pending_sent = Friendship.objects.filter(
-            sender=sender, status='pending'
-        ).values_list('receiver_id', flat=True)
-
-        return User.objects.exclude(
-            id__in=[sender.id] +
-            list(set([uid for pair in friends for uid in pair])) +
-            list(pending_received)
-        ).union(User.objects.filter(id__in=pending_sent))
-    
-class FriendRequestUsersListView(ListAPIView):
-    """
-    Lists all users who have sent a friend request to the current user (not yet accepted)
-    """
-    serializer_class = UserSerializer
-
-    def get_queryset(self):
-        user = self.request.user
-        pending_received = Friendship.objects.filter(
-            receiver=user, status='pending'
-        ).values_list('sender_id', flat=True)
-        return User.objects.filter(id__in=pending_received)
-    
-class FriendsListView(ListAPIView):
-    serializer_class = UserSerializer
-
-    def get_queryset(self):
-        user_id = self.kwargs.get('user_id')
-        friends = Friendship.objects.filter(
-            Q(sender_id=user_id, status='accepted') | Q(receiver_id=user_id, status='accepted')
-        ).values_list('sender_id', 'receiver_id')
-        friend_ids = [uid for pair in friends for uid in pair if uid != int(user_id)]
-        return User.objects.filter(id__in=friend_ids)
-   
 class OnlineUserListView(ListAPIView):
     """
     Lists online users
@@ -166,3 +117,17 @@ class OnlineStatusListView(ListAPIView):
 
     def get_queryset(self):
         return UserOnlineStatus.objects.all()
+    
+class FriendsListView(ListAPIView):
+    """
+    Lists all current user friends, along with their Game Invitation data related to the current user.
+    """
+    serializer_class = FriendSerializer
+
+    def get_queryset(self):
+        user_id = self.kwargs.get('user_id')
+        friends = Friendship.objects.filter(
+            Q(sender_id=user_id, status='accepted') | Q(receiver_id=user_id, status='accepted')
+        ).values_list('sender_id', 'receiver_id')
+        friend_ids = [uid for pair in friends for uid in pair if uid != int(user_id)]
+        return User.objects.filter(id__in=friend_ids)

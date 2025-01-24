@@ -1,24 +1,23 @@
 # backend/Dockerfile
 FROM python:3.9.6
 
-# Set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-# Set work directory
+RUN apt-get update && apt-get install -y cron
+
 WORKDIR /usr/src/app
 
-# Install dependencies
 COPY requirements.txt /usr/src/app/
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
-# Copy project
 COPY . /usr/src/app/
+COPY crontab /etc/cron.d/crontab
 
+RUN chmod 0644 /etc/cron.d/crontab
+RUN crontab /etc/cron.d/crontab
 
-# Expose port
 EXPOSE 8000
 
-# Run server
 CMD ["sh", "/usr/src/app/entrypoint.sh"]
