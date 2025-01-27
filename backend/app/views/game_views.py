@@ -10,6 +10,9 @@ from app.models import GameInvitation, PongGame
 from .serializers import GameInvitationSerializer, PongGameSerializer, MatchHistorySerializer
 from django.db import transaction
 from django.db import models
+from user.models import Friendship
+from django.db.models import Q
+from django.utils import timezone
 
 User = get_user_model()
 
@@ -27,11 +30,23 @@ class CreateGameInvitationView(APIView):
                     {"message": "You cannot invite yourself."},
                     status=status.HTTP_400_BAD_REQUEST
                 )
+            
+            is_friend = Friendship.objects.filter(
+                (Q(sender=sender, receiver=receiver) | 
+                Q(sender=receiver, receiver=sender)),
+                status="accepted"
+            ).exists()
+
+            if not is_friend:
+                return Response(
+                    {"message": "You can only invite friends to a game."},
+                    status=status.HTTP_400_BAD_REQUEST)
 
             existing_invitation = GameInvitation.objects.select_for_update().filter(
                 sender=sender, 
                 receiver=receiver, 
-                status="pending"
+                status="pending",
+                expires_at__gt=timezone.now()
             ).first()
 
             if existing_invitation:
@@ -60,12 +75,18 @@ class CreateGameInvitationView(APIView):
 class AcceptGameInvitationView(APIView):
     def post(self, request, invitation_id):
         with transaction.atomic():
-            invitation = GameInvitation.objects.select_for_update().get(id=invitation_id, status="pending")
+            invitation = GameInvitation.objects.select_for_update().get(id=invitation_id)
            
             if invitation.receiver != request.user:
                 return Response(
                     {"message": "You are not authorized to accept this invitation."},
                     status=status.HTTP_403_FORBIDDEN
+                )
+
+            if invitation.status != "pending":
+                return Response(
+                    {"message": "Invitation has expired."},
+                    status=status.HTTP_400_BAD_REQUEST
                 )
 
             invitation.status = "accepted"
@@ -88,18 +109,6 @@ class AcceptGameInvitationView(APIView):
                 {"type": "game_accepted", "message": "Invitation accepted.", "game_url": f"/game/{game.id}"},
                 status=status.HTTP_200_OK
             )
-
-class SentGameInvitationsListView(ListAPIView):
-    serializer_class = GameInvitationSerializer
-
-    def get_queryset(self):
-        return GameInvitation.objects.filter(sender=self.request.user).select_related('receiver').order_by('-created_at')
-
-class ReceivedGameInvitationsListView(ListAPIView):
-    serializer_class = GameInvitationSerializer
-
-    def get_queryset(self):
-        return GameInvitation.objects.filter(receiver=self.request.user).select_related('sender').order_by('-created_at')
 
 class PongGameDetailView(RetrieveAPIView):
     serializer_class = PongGameSerializer

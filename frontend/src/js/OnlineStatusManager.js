@@ -14,7 +14,6 @@ export class OnlineStatusManager {
 					last_seen: user.last_seen
 				});
 			});
-			console.log("Initial online status data:", this.statuses);
 		} catch (error) {
 			console.error("Error fetching online status data:", error);
 		}
@@ -31,7 +30,6 @@ export class OnlineStatusManager {
 				user_id: data.user_id
 			}
 		}));
-		console.log("Updated online status data:", this.statuses);
 	}
 
 	updateUI(event) {

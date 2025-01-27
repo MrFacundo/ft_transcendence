@@ -102,8 +102,6 @@ class App {
             this.wsManager.closeConnections();
         });
         window.addEventListener("online-status-update", (event) => {
-            console.log("Received online status update event");
-            console.log("event", event);
             this.onlineStatusManager.updateUI(event);
         }); 
     }

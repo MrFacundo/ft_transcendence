@@ -19,6 +19,15 @@ class EmailNotVerifiedException(APIException):
     default_detail = "Email is not verified."
     default_code = "email_not_verified"
 
+class AvatarUploadMixin:
+    def add_avatar_upload_path(self, representation, instance):
+        if instance.avatar_upload:
+            representation['avatar_upload'] = os.path.relpath(
+                instance.avatar_upload.path,
+                settings.MEDIA_ROOT
+            )
+        return representation
+    
 class LoginSerializer(serializers.Serializer):
     email_or_username = serializers.CharField(write_only=True)
     password = serializers.CharField(write_only=True, style={'input_type': 'password'})
@@ -51,7 +60,7 @@ class GameStatsSerializer(serializers.ModelSerializer):
         model = GameStats
         fields = ['total_matches', 'wins', 'losses']
 
-class UserSerializer(serializers.ModelSerializer):
+class UserSerializer(serializers.ModelSerializer, AvatarUploadMixin):
     password = serializers.CharField(write_only=True, validators=[validate_password])
     new_password = serializers.CharField(write_only=True, required=False, validators=[validate_password])
     game_stats = GameStatsSerializer(required=False)
@@ -104,30 +113,7 @@ class UserSerializer(serializers.ModelSerializer):
     
     def to_representation(self, instance):
         representation = super().to_representation(instance)
-        if instance.avatar_upload:
-            representation['avatar_upload'] = os.path.relpath(
-                instance.avatar_upload.path, 
-                settings.MEDIA_ROOT
-            )
-        return representation
-
-class GameInvitationSerializer(serializers.ModelSerializer):
-    sender = UserSerializer(read_only=True)
-    receiver = UserSerializer(read_only=True)
-
-    class Meta:
-        model = GameInvitation
-        fields = ['id', 'sender', 'receiver', 'status', 'game']
-
-
-class FriendshipInvitationSerializer(serializers.ModelSerializer):
-    sender = UserSerializer(read_only=True)
-    receiver = UserSerializer(read_only=True)
-
-    class Meta:
-        model = Friendship
-        fields = ['id', 'sender', 'receiver', 'status']
-
+        return self.add_avatar_upload_path(representation, instance)
 
 class PongGameSerializer(serializers.ModelSerializer):
     player1 = UserSerializer(read_only=True)
@@ -160,3 +146,63 @@ class UserOnlineStatusSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserOnlineStatus
         fields = ['user_id', 'username', 'is_online', 'last_seen']
+
+class FriendshipInvitationSerializer(serializers.ModelSerializer):
+    sender = UserSerializer(read_only=True)
+    receiver = UserSerializer(read_only=True)
+
+    class Meta:
+        model = Friendship
+        fields = ['id', 'sender', 'receiver', 'status']
+        
+class GameInvitationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GameInvitation
+        fields = '__all__'
+
+class FriendSerializer(serializers.ModelSerializer, AvatarUploadMixin):
+    pending_invite = serializers.SerializerMethodField()
+    game_stats = GameStatsSerializer(required=False)
+
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'avatar_oauth', 'avatar_upload', 'date_joined', 'game_stats', 'pending_invite']
+
+    def get_pending_invite(self, friend):
+        user = self.context['request'].user
+
+        invitation = GameInvitation.objects.filter(
+            Q(sender=user, receiver=friend) | Q(sender=friend, receiver=user),
+            status='pending'
+        ).order_by('-created_at').first()
+
+        return GameInvitationSerializer(invitation).data if invitation else None
+    
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        return self.add_avatar_upload_path(representation, instance)
+
+
+class FriendshipSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Friendship
+        fields = '__all__'
+
+class UserListSerializer(serializers.ModelSerializer, AvatarUploadMixin):
+    friendship = serializers.SerializerMethodField()
+    game_stats = GameStatsSerializer(required=False)
+
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'avatar_oauth', 'avatar_upload', 'date_joined', 'game_stats', 'friendship']
+
+    def get_friendship(self, target_user):
+        user = self.context['request'].user
+        friendship = Friendship.objects.filter(
+            Q(sender=user, receiver=target_user) | Q(sender=target_user, receiver=user)
+        ).first()
+        return FriendshipSerializer(friendship).data if friendship else None
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        return self.add_avatar_upload_path(representation, instance)

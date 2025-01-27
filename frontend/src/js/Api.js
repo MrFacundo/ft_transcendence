@@ -54,8 +54,8 @@ export class Api {
 
     /**
      * Creates a new user.
-     * @param {Object} data - The user data.
-     * @returns {Promise<Object>} The response data.
+     * @param {Object} data - The user email, password, and username.
+     * @returns {Promise<Object>} The created user.
      */
     async createUser(data) {
         return this.request("post", "/user", data);
@@ -63,7 +63,7 @@ export class Api {
 
     /**
      * Retrieves the authenticated user's data.
-     * @returns {Promise<Object>} The response data.
+     * @returns {Promise<Object>} The current user.
      */
     async getUser() {
         return this.request("get", "/user");
@@ -72,7 +72,7 @@ export class Api {
     /**
      * Retrieves a user's profile data.
      * @param {string} userId - The ID of the user.
-     * @returns {Promise<Object>} The response
+     * @returns {Promise<Object>} The id specified user.
      */
     async getProfile(userId) {
         return this.request("get", `/user/${userId}`);
@@ -80,8 +80,8 @@ export class Api {
 
     /**
      * Updates the authenticated user's data.
-     * @param {Object} data - The updated user data.
-     * @returns {Promise<Object>} The response data.
+     * @param {Object} data - The user data to update.
+     * @returns {Promise<Object>} The updated user.
      */
     async updateUser(data) {
         return this.request("patch", "/user", data);
@@ -89,7 +89,6 @@ export class Api {
 
     /**
      * Deletes the authenticated user's account.
-     * @returns {Promise<Object>} The response data.
      */
     async deleteUser() {
         return this.request("delete", "/user");
@@ -152,7 +151,7 @@ export class Api {
     /* User lists */
 
     /**
-     * Retrieves a list with all users.
+     * Retrieves a list with all users, along with Friendship data related to the current user.
      */
     async getUsers() {
         return this.request("get", "/users/");
@@ -166,21 +165,7 @@ export class Api {
     }
 
     /**
-     * Retrieves a list of friends that can be invited.
-     */
-    async getPotentialFriendRequests() {
-        return this.request("get", "/friends-invitable/");
-    }
-
-    /**
-     * Retrieves a list of friend requests.
-     */
-    async getIncomingFriendRequests() {
-        return this.request("get", "/friends-requests/");
-    }
-
-    /**
-     * Retrieves a list of friends of the user specified by userId.
+     * Retrieves a list current the user friends, along with their Game Invitation data related to the current user.
      */
     async getFriends(userId) {
         return this.request("get", `/friends/${userId}/`);
@@ -231,20 +216,6 @@ export class Api {
      */
     async gameAccept(gameInviteId) {
         return this.request("post", `/game-invitation/${gameInviteId}/accept/`, {});
-    }
-
-    /**
-     * Retrieves a list of invitations sent by the authenticated user.
-     */
-    async getSentGameInvites() {
-        return this.request("get", "/game-invitations/sent/");
-    }
-
-    /**
-     * Retrieves a list of invitations sent to the authenticated user.
-     */
-    async getReceivedGameInvites() {
-        return this.request("get", "/game-invitations/received/");
     }
 
     /**
