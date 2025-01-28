@@ -76,6 +76,8 @@ class ScoreBoard extends HTMLElement {
             this.shadowRoot.getElementById(id).src = avatarSrc;
         };
         
+        setElement("scoreboard-title", match.status === "completed" ? "WELL PONGED" : "PONG INTERRUPTED");
+        
         await setAvatar("avatar-1", match.player1);
         setElement("username-1", match.player1.username);
         setElement("score-1", match.score_player1);
@@ -84,11 +86,13 @@ class ScoreBoard extends HTMLElement {
         setElement("username-2", match.player2.username);
         setElement("score-2", match.score_player2);
 
-        const winner = match.player1.id === match.winner ? 1 : 2;
-        ["avatar", "username", "score"].forEach((key) => {
-            this.shadowRoot.getElementById(`${key}-${winner}`).style.cssText =
-                key === "avatar" ? "border: 2px solid yellow;" : "color: gold;";
-        });
+        if (match.winner) {
+            const winner = match.player1.id === match.winner ? 1 : 2;
+            ["avatar", "username", "score"].forEach((key) => {
+                this.shadowRoot.getElementById(`${key}-${winner}`).style.cssText =
+                    key === "avatar" ? "border: 2px solid yellow;" : "color: gold;";
+            });
+        }
     }
 }
 

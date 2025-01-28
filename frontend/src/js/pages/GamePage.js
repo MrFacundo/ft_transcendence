@@ -17,28 +17,20 @@ export default class GamePage extends Page {
         const { mainElement, params } = this;
         const gameId = params["id"];
         const gameEl = mainElement.querySelector("pong-game");
-        const scoreBoardEl = mainElement.querySelector("score-board");
 
         gameEl.page = this;
-        scoreBoardEl.page = this;
 
         try {
             const gameInstance = await app.api.getGame(gameId);
-            const showScoreBoard = () => {
-                scoreBoardEl.displayMatch();
-                gameEl.remove();
-                scoreBoardEl.classList.remove("d-none");
-            };
 
             if (gameInstance.status === "not_started") {
                 gameEl.startGame(gameId);
                 gameEl.addEventListener("gameOver", async () => {
-                    console.log("Game over from Pong component");
                     this.app.currentGame = false;
-                    showScoreBoard();
+                    this.showScoreBoard();
                 });
-            } else if (gameInstance.status === "completed") {
-                showScoreBoard();
+            } else if (gameInstance.status === "completed" || gameInstance.status === "interrupted") {
+                this.showScoreBoard();
             } else {
                 gameEl.remove();
             }
@@ -46,5 +38,15 @@ export default class GamePage extends Page {
             console.error("Error fetching game instance:", error);
             gameEl.remove();
         }
+    }
+
+    showScoreBoard() {
+        const { mainElement } = this;
+        const gameEl = mainElement.querySelector("pong-game");
+        const scoreBoardEl = mainElement.querySelector("score-board");
+        scoreBoardEl.page = this;
+        scoreBoardEl.displayMatch();
+        gameEl.remove();
+        scoreBoardEl.classList.remove("d-none");
     }
 }

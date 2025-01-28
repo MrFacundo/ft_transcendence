@@ -31,7 +31,7 @@ export class WebSocketManager {
     }
 
     setupGameInvitationWebSocket(userId) {
-        const { auth, currentGame, api } = this.app;
+        const { auth, api } = this.app;
         this.gameWs = new WebSocket(`${WS_URL}/game-invitation/${userId}/?token=${auth.accessToken}`);
 
         this.gameWs.onopen = () => {
@@ -42,16 +42,16 @@ export class WebSocketManager {
             const data = JSON.parse(event.data);
             if (data.type === "game_accepted") {
                 console.log("Game invitation accepted:", data);
-                if (currentGame) {
+                if (this.app.currentGame) {
                     console.log("Game already in progress, can not start new game now");
                     return;
                 }
                 console.log(`Redirecting to game: ${data.game_url}`);
-                currentGame = true;
+                this.app.currentGame = true;
                 this.app.navigate(data.game_url);
             } else if (data.type === "game_invited") {
                 console.log("Game invitation received:", data);
-                if (currentGame) {
+                if (this.app.currentGame) {
                     console.log("Game already in progress, can not start new game now");
                     return;
                 }
@@ -59,7 +59,7 @@ export class WebSocketManager {
                     try {
                         const response = await api.gameAccept(data.invitation.id);
                         console.log("Starting game", response);
-                        currentGame = true;
+                        this.app.currentGame = true;
                         this.app.navigate(response.game_url);
                     } catch (error) {
                         console.error(error);
