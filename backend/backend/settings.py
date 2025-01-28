@@ -75,8 +75,7 @@ INSTALLED_APPS = [
     'channels',
     'corsheaders',
     'rest_framework_simplejwt.token_blacklist',
-    'silk',
-    'django_crontab'
+    'silk'
 ]
 
 ASGI_APPLICATION = 'backend.asgi.application'
