@@ -161,14 +161,14 @@ class GameInvitationSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class FriendSerializer(serializers.ModelSerializer, AvatarUploadMixin):
-    pending_invite = serializers.SerializerMethodField()
+    game_invite = serializers.SerializerMethodField()
     game_stats = GameStatsSerializer(required=False)
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'avatar_oauth', 'avatar_upload', 'date_joined', 'game_stats', 'pending_invite']
+        fields = ['id', 'username', 'avatar_oauth', 'avatar_upload', 'date_joined', 'game_stats', 'game_invite']
 
-    def get_pending_invite(self, friend):
+    def get_game_invite(self, friend):
         user = self.context['request'].user
 
         invitation = GameInvitation.objects.filter(

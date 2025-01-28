@@ -9,11 +9,12 @@ from django.utils import timezone
 
 """
 
-Game Invitation Consumer
+Game Consumer
 
 """
 
 active_games = {}
+game_timers = {}
 
 def create_group_name(player_id: int, game_id: int) -> str:
     return f"{game_id}_{player_id}"
@@ -24,6 +25,7 @@ class GameConsumer(AsyncWebsocketConsumer):
     asyncio.set_event_loop(loop)
     update_lock = asyncio.Lock()
     side: int = 0
+    is_connected = False
 
     @database_sync_to_async
     def get_player1(self, game: PongGame):
@@ -49,6 +51,8 @@ class GameConsumer(AsyncWebsocketConsumer):
             return
 
         await self.accept()
+        self.is_connected = True
+        
         game_id = self.scope["url_route"]["kwargs"].get("game_id")
         if not game_id:
             await self.send(text_data=json.dumps({"type": "error", "message": "No game ID provided"}))
@@ -57,6 +61,7 @@ class GameConsumer(AsyncWebsocketConsumer):
 
         if game_id not in active_games:
             active_games[game_id] = Game()
+            game_timers[game_id] = asyncio.create_task(self.start_timeout_timer(game_id))
         self.game = active_games[game_id]
 
         db_game = await database_sync_to_async(PongGame.objects.filter(id=game_id).first)()
@@ -83,6 +88,9 @@ class GameConsumer(AsyncWebsocketConsumer):
             await self.channel_layer.group_add(db_game.channel_group_name, self.channel_name)
             await database_sync_to_async(db_game.save)()
         else:
+            if game_id in game_timers:
+                game_timers[game_id].cancel()
+                del game_timers[game_id]
             await self.channel_layer.group_add(channel_group_name, self.channel_name)
 
         await self.channel_layer.group_send(
@@ -96,17 +104,57 @@ class GameConsumer(AsyncWebsocketConsumer):
         self.game_group_name = db_game.channel_group_name
 
     async def disconnect(self, close_code):
+        self.is_connected = False
+        game_id = self.scope["url_route"]["kwargs"].get("game_id")
+        
         if self.game_group_name:
             await self.channel_layer.group_discard(self.game_group_name, self.channel_name)
-        if self.game:
-            await self.game.handle_disconnect()
-        if not self.db_game.winner and self.db_game.status == 'in_progress':
-            self.db_game.status = 'interrupted'
-            await database_sync_to_async(self.db_game.save)()
         
-        game_id = self.scope["url_route"]["kwargs"].get("game_id")
-        if game_id in active_games and self.db_game.status in ["completed", "interrupted"]:
-            del active_games[game_id]
+        if hasattr(self, 'game') and self.game:
+            await self.game.handle_disconnect()
+        
+        if hasattr(self, 'db_game') and self.db_game:
+            if not self.db_game.winner and self.db_game.status == 'in_progress':
+                self.db_game.status = 'interrupted'
+                await database_sync_to_async(self.db_game.save)()
+        
+        if game_id and game_id in game_timers:
+            game_timers[game_id].cancel()
+            del game_timers[game_id]
+        
+        if game_id and game_id in active_games:
+            if hasattr(self, 'db_game') and self.db_game and self.db_game.status in ["completed", "interrupted"]:
+                del active_games[game_id]
+
+    async def start_timeout_timer(self, game_id):
+        try:
+            await asyncio.sleep(10)
+            
+            if game_id in active_games:
+                if hasattr(self, 'db_game'):
+                    self.db_game.status = 'interrupted'
+                    await database_sync_to_async(self.db_game.save)()
+                
+                if self.game_group_name and self.is_connected:
+                    try:
+                        await self.channel_layer.group_send(
+                            self.game_group_name,
+                            {"type": "state_update", "objects": {
+                                "type": "error",
+                                "message": "Game interrupted - second player did not connect in time"
+                            }}
+                        )
+                    except Exception:
+                        pass  # Ignore sending errors during shutdown
+                
+                del active_games[game_id]
+                
+                if self.is_connected:
+                    await self.close()
+                
+        finally:
+            if game_id in game_timers:
+                del game_timers[game_id]
 
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
@@ -124,7 +172,11 @@ class GameConsumer(AsyncWebsocketConsumer):
                 self.game.paddles[self.side].moving = 0
 
     async def state_update(self, event):
-        await self.send(text_data=json.dumps(event.get("objects")))
+        if self.is_connected:
+            try:
+                await self.send(text_data=json.dumps(event.get("objects")))
+            except Exception:
+                pass  # Ignore sending errors during shutdown
 
 """
 

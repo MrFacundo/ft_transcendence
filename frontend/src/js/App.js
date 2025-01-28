@@ -44,6 +44,7 @@ class App {
             AI: new AIPage(this),
             game: new GamePage(this),
         };
+        this.currentGame = false;
         this.currentPage = null;
         this.wsManager = new WebSocketManager(this);
         this.onlineStatusManager = new OnlineStatusManager(this);
