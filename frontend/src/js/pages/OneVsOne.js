@@ -64,7 +64,6 @@ class OneVsOne extends Page {
         });
 
         actionBtn.classList.add("d-none");
-        console.log(onlineStatusManager.statuses);
     }
 }
 
