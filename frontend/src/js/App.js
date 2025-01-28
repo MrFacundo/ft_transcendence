@@ -52,12 +52,12 @@ class App {
         if (document.getElementById("noScript"))
             document.getElementById("noScript").remove();
     }
-
     /**
      * Navigates to the specified path and updates the current page.
      * @param {string} path - The path to navigate to.
+     * @param {boolean} replaceHistory - Whether to replace the current history entry instead of pushing a new one.
      */
-    async navigate(path) {
+    async navigate(path, replaceHistory = false) {
         if (path === "/") {
             path = "/home";
         } else if (path === "/logout") {
@@ -67,9 +67,10 @@ class App {
         const parsedPath = parsePath(path, this.pages);
         if (!parsedPath || !parsedPath.page) {
             console.error("No matching page found for path:", path);
-            if (path !== "/404") this.navigate("/404");
+            if (path !== "/404") this.navigate("/404", true);
             return;
         }
+
         const { page, params } = parsedPath;
         const queryParams = window.location.search;
         console.log("Navigating to:", path, "page: ", page, "params: ", params, "queryParams: ", queryParams);
@@ -79,7 +80,10 @@ class App {
         this.mainElement.setAttribute("data-page", page.name);
         this.currentPage = page;
 
-        history.pushState({}, page.name, path + (queryParams || ''));
+        // Avoid modifying the history stack on popstate navigation
+        if (!replaceHistory) {
+            history.pushState({}, page.name, path + (queryParams || ''));
+        }
 
         await page.open(this);
         if (this.auth.authenticated) {
@@ -93,7 +97,7 @@ class App {
     init() {
         logConstants();
         window.addEventListener("popstate", () => {
-            this.navigate(window.location.pathname.toLowerCase());
+            this.navigate(window.location.pathname.toLowerCase(), true);
         });
         this.navigate(window.location.pathname.toLowerCase());
         window.addEventListener("load", () => {
@@ -104,7 +108,7 @@ class App {
         });
         window.addEventListener("online-status-update", (event) => {
             this.onlineStatusManager.updateUI(event);
-        }); 
+        });
     }
 }
 
