@@ -296,6 +296,7 @@
     <section id="Home" class="container mt-5">
         <h1 class="mb-4 text-center display-4">CHOOSE YOUR DESTINY</h1>
         <div class="row">
+            
             <div class="col-md-4" data-href="/ai">
                 <div class="card bg-light my-4 shadow-sm" style="min-height: 250px; cursor: pointer;">
                     <div class="card-body text-center">
@@ -305,6 +306,7 @@
                     </div>
                 </div>
             </div>
+
             <div class="col-md-4" data-href="/onevsone">
                 <div class="card bg-light my-4 shadow-sm" style="min-height: 250px; cursor: pointer;">
                     <div class="card-body text-center">
@@ -343,11 +345,26 @@
     </section>
 
     <section id="AI" class="container mt-5">
-        <h1 class="mb-4">AI Game</h1>
+        <div class="row justify-content-center align-items-center min-vh-75">
+            <div class="d-flex justify-content-center align-items-center p-4">
+            <div class="card shadow">
+                <div class="card-body">
+                <h2 class="text-center mb-4">AI Game Settings</h2>
+                <div class="form-group mb-4">
+                    <label for="difficulty">Select Difficulty</label>
+                    <select class="form-select" id="difficulty">
+                    <option value="easy">Easy</option>
+                    <option value="medium">Medium</option>
+                    <option value="hard">Hard</option>
+                    </select>
+                </div>
+                <button id="startGame" class="btn btn-primary w-100">Start Game</button>
+                </div>
+            </div>
+            </div>
         </div>
-        <div id="pong-simulator" class="bg-secondary text-white rounded"
-            style="width: 500px; height: 500px; font-size: 2rem; margin: 0 auto">
-            <p>Pong</p>
+        <div id="gameCanvas" class="mt-4 d-none">
+            <canvas id="pongCanvas" width="800" height="400"></canvas>
         </div>
     </section>
 
