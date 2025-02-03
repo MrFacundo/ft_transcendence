@@ -2,19 +2,19 @@ from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView
 
 # Authentication views
-from app.authentication.views.auth_views import (
+from app.auth.views.auth_views import (
     LoginView,
     UserDetailView,
     VerifyEmailView,
 )
 
 
-from app.authentication.views.oauth_views import (
+from app.auth.views.oauth_views import (
     OAuth42View,
     OAuth42CallbackView,
 )
 
-from app.authentication.views.two_factor_auth_views import (
+from app.auth.views.two_factor_auth_views import (
     VerifyOTPView,
     AuthenticatorSetupView,
     VerifyAuthenticatorSetupView,
