@@ -15,7 +15,7 @@ from app.utils.jwtMiddleware import JwtAuthMiddleware
 import app.routing
 
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'app.settings')
 
 
 application = ProtocolTypeRouter({
