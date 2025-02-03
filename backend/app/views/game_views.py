@@ -7,10 +7,10 @@ from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from django.contrib.auth import get_user_model
 from app.models import GameInvitation, PongGame
-from .serializers import GameInvitationSerializer, PongGameSerializer, MatchHistorySerializer
+from ..serializers import GameInvitationSerializer, PongGameSerializer, MatchHistorySerializer
 from django.db import transaction
 from django.db import models
-from user.models import Friendship
+from app.users.models import Friendship
 from django.db.models import Q
 from django.utils import timezone
 

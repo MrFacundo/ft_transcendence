@@ -11,7 +11,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated, BasePermission
 from rest_framework.generics import RetrieveUpdateDestroyAPIView, CreateAPIView
 from rest_framework import status
 
-from .serializers import LoginSerializer, UserSerializer
+from ..serializers import LoginSerializer, UserSerializer
 from .services import send_verification_email, generate_jwt_response
 
 from app.views.two_factor_auth_views import TwoFactorAuthView

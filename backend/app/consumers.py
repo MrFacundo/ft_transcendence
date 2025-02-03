@@ -3,7 +3,7 @@ import asyncio
 from channels.generic.websocket import AsyncWebsocketConsumer
 from .game.Game import Game
 from .models import PongGame
-from user.models import UserOnlineStatus
+from app.users.models import UserOnlineStatus
 from channels.db import database_sync_to_async
 from django.utils import timezone
 

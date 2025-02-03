@@ -32,7 +32,7 @@ from app.views.two_factor_auth_views import (
 )
 
 # User and friend views
-from app.views.user_views import (
+from app.users.views import (
     UserListView,
     FriendRequestView,
     FriendAcceptView,
