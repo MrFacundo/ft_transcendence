@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 from django.utils import timezone
-from app.models import GameInvitation
+from app.games.models import GameInvitation
 
 class Command(BaseCommand):
     help = 'Expire game invitations that have passed their expiry date'

@@ -52,7 +52,7 @@ class GameInvitation(models.Model):
 
     sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_game_invitations')
     receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_game_invitations')
-    game = models.ForeignKey('PongGame', on_delete=models.SET_NULL, null=True, blank=True)
+    game = models.ForeignKey('games.PongGame', on_delete=models.SET_NULL, null=True, blank=True)
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
     created_at = models.DateTimeField(auto_now_add=True)
     expires_at = models.DateTimeField(default=default_expires_at)

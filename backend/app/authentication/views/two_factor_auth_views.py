@@ -8,7 +8,7 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.generics import GenericAPIView
 from .services import generate_jwt_response
-from app.tokens.OTPToken import OTPToken
+from app.authentication.tokens import OTPToken
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from django.conf import settings

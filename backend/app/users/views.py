@@ -2,7 +2,8 @@
 from rest_framework.generics import ListAPIView
 from rest_framework.views import APIView
 from django.contrib.auth import get_user_model
-from app.serializers import UserSerializer, UserOnlineStatusSerializer, FriendSerializer, UserListSerializer, FriendshipInvitationSerializer
+from .serializers import UserSerializer
+from app.games.serializers import UserOnlineStatusSerializer, FriendSerializer, UserListSerializer, FriendshipInvitationSerializer
 from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404

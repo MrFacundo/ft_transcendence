@@ -11,11 +11,12 @@ from rest_framework.permissions import AllowAny, IsAuthenticated, BasePermission
 from rest_framework.generics import RetrieveUpdateDestroyAPIView, CreateAPIView
 from rest_framework import status
 
-from ..serializers import LoginSerializer, UserSerializer
+from app.authentication.serializers import LoginSerializer
+from app.users.serializers import UserSerializer
 from .services import send_verification_email, generate_jwt_response
 
-from app.views.two_factor_auth_views import TwoFactorAuthView
-from app.tokens.OTPToken import OTPToken
+from app.authentication.views.two_factor_auth_views import TwoFactorAuthView
+from app.authentication.tokens import OTPToken
 
 User = get_user_model()
 signer = Signer()

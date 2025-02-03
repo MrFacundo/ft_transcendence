@@ -26,7 +26,7 @@ class UserSerializer(serializers.ModelSerializer, AvatarUploadMixin):
 
     # FIXME: This is a workaround to avoid circular import
     def get_game_stats(self, obj):
-        from app.serializers import GameStatsSerializer
+        from app.games.serializers import GameStatsSerializer
         return GameStatsSerializer(obj.game_stats).data if obj.game_stats else None
 
 

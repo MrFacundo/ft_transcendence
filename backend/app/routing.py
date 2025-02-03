@@ -1,6 +1,6 @@
 from channels.routing import ProtocolTypeRouter, URLRouter
 from django.urls import re_path, path
-from app.consumers import GameInvitationConsumer, GameConsumer, FriendInvitationConsumer, UserOnlineStatusConsumer
+from app.games.consumers import GameInvitationConsumer, GameConsumer, FriendInvitationConsumer, UserOnlineStatusConsumer
 
 # URLs that handle the WebSocket connection are placed here.
 websocket_urlpatterns=[

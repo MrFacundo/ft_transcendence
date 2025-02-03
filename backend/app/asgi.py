@@ -11,7 +11,7 @@ import os
 
 from django.core.asgi import get_asgi_application
 from channels.routing import ProtocolTypeRouter, URLRouter
-from app.utils.jwtMiddleware import JwtAuthMiddleware
+from app.authentication.jwtMiddleware import JwtAuthMiddleware
 import app.routing
 
 

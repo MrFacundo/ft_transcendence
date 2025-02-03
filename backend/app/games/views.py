@@ -6,8 +6,8 @@ from django.shortcuts import get_object_or_404
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from django.contrib.auth import get_user_model
-from app.models import GameInvitation, PongGame
-from ..serializers import GameInvitationSerializer, PongGameSerializer, MatchHistorySerializer
+from app.games.models import GameInvitation, PongGame
+from .serializers import GameInvitationSerializer, PongGameSerializer, MatchHistorySerializer
 from django.db import transaction
 from django.db import models
 from app.users.models import Friendship

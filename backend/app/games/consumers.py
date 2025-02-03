@@ -1,7 +1,7 @@
 import json
 import asyncio
 from channels.generic.websocket import AsyncWebsocketConsumer
-from .game.Game import Game
+from .game import Game
 from .models import PongGame
 from app.users.models import UserOnlineStatus
 from channels.db import database_sync_to_async
