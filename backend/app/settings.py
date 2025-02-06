@@ -72,6 +72,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'app.users',
     'app.games',
+    'app.tournaments',
     'app',
     'channels',
     'corsheaders',

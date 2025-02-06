@@ -19,6 +19,7 @@ urlpatterns = [
     path('api/', include('app.users.urls')),
     path('api/', include('app.auth.urls')),
     path('api/', include('app.games.urls')),
+    path('api/', include('app.tournaments.urls')),
 
     # Profiling (Django Silk)
     path('silk/', include('silk.urls', namespace='silk')),

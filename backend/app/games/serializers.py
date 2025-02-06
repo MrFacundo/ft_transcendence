@@ -10,10 +10,7 @@ from app.games.models import GameInvitation, PongGame
 from django.db.models import Q
 from app.users.serializers import UserSerializer, AvatarUploadMixin
 
-
-
 User = get_user_model()
-
 logger = logging.getLogger(__name__)
 
 class GameStatsSerializer(serializers.ModelSerializer):
