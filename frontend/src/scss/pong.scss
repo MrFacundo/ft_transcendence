@@ -1,8 +1,9 @@
 pong-game {
-    width: 100%;
+    width: 1000px;
     display: inline-block;
-    height: 100vh;
+    height: 700px;
     background: #31313a;
+    position: relative;
 
     #scoreboard {
         color: #f1f1f1;
@@ -16,7 +17,7 @@ pong-game {
     #leftPaddle,
     #rightPaddle {
         $paddleWidth: 0.02;
-        $paddleHeight: 0.15;
+        $paddleHeight: 0.25;
         left: 0;
         top: calc(50% - (100% * #{$paddleHeight} / 2));
         height: calc(100% * #{$paddleHeight});

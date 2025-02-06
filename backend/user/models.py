@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.base_user import BaseUserManager
 from django.core.validators import RegexValidator, MinLengthValidator, EmailValidator, FileExtensionValidator
+import pyotp
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, username, password, **extra_fields):
@@ -31,7 +32,7 @@ class CustomUser(AbstractUser):
     TWO_FACTOR_CHOICES = [
         ('none', 'None'),
         ('email', 'Email'),
-        ('qr', 'QR Code')
+        ('authenticator', 'Authenticator')
     ]
     username = models.CharField(
         max_length=20,
@@ -66,7 +67,8 @@ class CustomUser(AbstractUser):
         null=True, 
         validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'gif'])]
     )
-    two_factor_method = models.CharField(max_length=5, choices=TWO_FACTOR_CHOICES, default='none')
+    two_factor_method = models.CharField(max_length=13, choices=TWO_FACTOR_CHOICES, default='none')
+    validation_secret = models.CharField(max_length=32, null=True, blank=True)
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
 
@@ -79,6 +81,13 @@ class CustomUser(AbstractUser):
         if self.email_is_verified:
             self.email = self.email.lower()
         super().save(*args, **kwargs)
+
+    def generate_totp(self):
+        """Generate a Time-Based One-Time Password object using the validation secret"""
+        if not self.validation_secret:
+            self.validation_secret = pyotp.random_base32()
+            self.save()
+        return pyotp.TOTP(self.validation_secret, interval=300)
 
 class GameStats(models.Model):
     id = models.BigAutoField(primary_key=True)

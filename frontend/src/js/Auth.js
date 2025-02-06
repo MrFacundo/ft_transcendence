@@ -58,7 +58,7 @@ export class Auth {
             console.log("Access token successfully refreshed");
             return true;
         } catch (error) {
-            console.error("Error refreshing access token", error);
+            console.error("Error refreshing access token, logging out", error);
             this.logout();
             return false;
         }
@@ -100,26 +100,24 @@ export class Auth {
             throw new Error("Email and password are required");
         }
         try {
-            const otpToken = Cookies.get("otp_token");
-            const responseData = await this.app.api.login(email, password, otpToken ? otpToken : null);
-            if (responseData.success) {
+            const responseData = await this.app.api.login(email, password);
+            if (!responseData.two_factor_required) {
                 console.log("Login successful");
                 Cookies.set("access_token", responseData.access);
                 Cookies.set("refresh_token", responseData.refresh);
                 this.accessToken = responseData.access;
+                this.authenticated = true;
                 this.app.navigate("/home");
                 return responseData;
             } else {
                 console.log("2FA required");
-                Cookies.set("otp_token", responseData.otp_token);
+                localStorage.setItem("otp_oken", responseData.otp_token);
                 this.app.navigate("/two-factor-auth");
                 return responseData;
             }
         } catch (error) {
             if (error.response) {
-                console.error(
-                    `Login error\n${error.response.error}\n${error.message}`
-                );
+                console.error(error);
             } else {
                 console.error("Axios configuration error:", error.message);
             }
@@ -134,7 +132,8 @@ export class Auth {
      * @throws {Error} If OTP is missing or verification fails.
      */
     async verifyOtp(otp) {
-        if (!Cookies.get("otp_token")) {
+        const OtpToken = localStorage.getItem("otp_oken");
+        if (!OtpToken) {
             console.error("No OTP token found");
             return this.app.navigate("/login");
         }
@@ -142,23 +141,16 @@ export class Auth {
             throw new Error("Please enter your one-time password");
         }
         try {
-            const otpToken = Cookies.get("otp_token");
-            const responseData = await this.app.api.verifyOtp(otp, otpToken);
-            if (responseData.success) {
-                console.log("2FA successful");
-                Cookies.set("access_token", responseData.access);
-                Cookies.set("refresh_token", responseData.refresh);
-                this.accessToken = responseData.access;
-                this.authenticated = true;
-                Cookies.remove("otp_token");
-                return responseData;
-            } else {
-                throw new Error("An error occurred");
-            }
+            const responseData = await this.app.api.verifyOtp(otp, OtpToken);
+            console.log("2FA successful");
+            Cookies.set("access_token", responseData.access);
+            Cookies.set("refresh_token", responseData.refresh);
+            this.accessToken = responseData.access;
+            this.authenticated = true;
+            return responseData;
+
         } catch (error) {
-            console.error(
-                `OTP error\n${error.response.error}\n${error.message}`
-            );
+            console.error(error);
             throw error;
         }
     }
@@ -211,6 +203,11 @@ export class Auth {
      */
     logout() {
         console.log("Logging out");
+        if (this.app.ws) {
+            console.log("Closing WebSocket connection");
+            this.app.ws.close();
+            this.app.ws = null;
+        }
         Cookies.remove("access_token");
         Cookies.remove("refresh_token");
         this.accessToken = null;

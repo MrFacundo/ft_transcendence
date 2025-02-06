@@ -1,59 +1,78 @@
 import Page from "./Page.js";
 import "../customElements/UserProfileCardSm.js";
+import { formatDate, capitalizeFirstLetter } from "../utils.js";
 
 class ProfilePage extends Page {
     constructor(app) {
         super({
             name: "profilepage",
-            url: "/profile",
+            url: "/profile/:id",
             pageElement: "#Profile",
             isProtected: true,
             app: app,
         });
     }
-    getMatchHistory() {
-        return [{ opponent: "opponent1", result: "win", date: "2021-01-10" },
-        { opponent: "opponent2", result: "loss", date: "2021-01-15" },
-        { opponent: "opponent3", result: "win", date: "2021-01-20" },]
+
+    createMatchItem(match) {
+        const matchItem = document.createElement("li");
+        matchItem.className = "list-group-item";
+        const formattedDate = formatDate(match.date_played);
+        matchItem.textContent = `${match.opponent.username} - ${match.result} - ${formattedDate}`;
+        return matchItem;
+    }
+
+    setupFriendItem(friend) {
+        const friendItem = document.createElement("user-profile-small");
+        friendItem.page = this;
+        friendItem.setUser(friend);
+        friendItem.addEventListener("click", () => {
+            const selectedFriendEl = this.mainElement.querySelector("user-profile#selected-friend");
+            selectedFriendEl.page = this;
+            selectedFriendEl.setUser(friend);
+        });
+        return friendItem;
     }
 
     async render() {
-        const { auth, api } = this.app;
-        const user = auth.user;
-        console.log("user info", auth.user);
+        const { api } = this.app;
+        const { mainElement, params } = this;
+        const profileId = params["id"];
 
-        const UserProfileCard = this.mainElement.querySelector("user-profile#user");
+        const pageTitle = mainElement.querySelector("h1");
+        const UserProfileCard = mainElement.querySelector("user-profile");
+        const userJoinedEl = mainElement.querySelector("#profile-joined");
+        const matchHistoryEl = mainElement.querySelector("#match-history");
+        const friendListTitle = mainElement.querySelector("#friend-list-title");
+        const friendListEl = mainElement.querySelector("#friend-list");
+        const selectedFriendEl = this.mainElement.querySelector("user-profile#selected-friend");
+
+        const friends = await api.getFriends(profileId);
+        const matchHistory = await api.getMatchHistory(profileId);
+        const userProfile = await api.getProfile(profileId);
+
         UserProfileCard.page = this;
-        UserProfileCard.setUser(user);
+        UserProfileCard.setUser(userProfile);
+        pageTitle.textContent = profileId == this.app.auth.user.id ? "Your Profile" : capitalizeFirstLetter(userProfile.username) + "'s profile";
+        userJoinedEl.textContent = "joined: " + formatDate(userProfile.date_joined);
 
-        document.querySelector("#profile-joined").textContent = "joined: " + user.date_joined;
-        const matchHistoryElement = document.querySelector("#match-history");
-        this.getMatchHistory().forEach(match => {
-            const matchItem = document.createElement("li");
-            matchItem.className = "list-group-item";
-            matchItem.textContent = `${match.opponent} - ${match.result} - ${match.date}`;
-            matchHistoryElement.appendChild(matchItem);
-        });
-
-        const friendList = document.querySelector("#friend-list");
-        const selectedFriend = this.mainElement.querySelector("user-profile#selected-friend");
-        selectedFriend.page = this;
-
-        const setupFriendItem = (friend) => {
-            const friendItem = document.createElement("user-profile-small");
-            friendItem.page = this;
-            friendItem.setUser(friend);
-            friendItem.addEventListener("click", () => {
-                selectedFriend.setUser(friend);
+        if (matchHistory.length === 0) {
+            matchHistoryEl.textContent = "No matches played yet";
+        } else {
+            matchHistory.forEach(match => {
+                const matchItem = this.createMatchItem(match);
+                matchHistoryEl.appendChild(matchItem);
             });
-            return friendItem;
-        };
+        }
 
-        const friends = await api.getFriends();
-        friends.forEach(friend => {
-            const friendItem = setupFriendItem(friend);
-            friendList.appendChild(friendItem);
-        });
+        if (friends.length > 0) {
+            friendListTitle.textContent = profileId == this.app.auth.user.id ? "Your friends" : capitalizeFirstLetter(userProfile.username) + "'s friends";
+            friends.forEach(friend => {
+                const friendItem = this.setupFriendItem(friend);
+                friendListEl.appendChild(friendItem);
+            });
+        } else {
+            selectedFriendEl.remove();
+        }
     }
 }
 

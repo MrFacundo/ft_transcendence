@@ -10,6 +10,7 @@ import OneVsOne from "./OneVsOne.js";
 import TournamentPage from "./TournamentPage.js";
 import ProfilePage from "./ProfilePage.js";
 import AIPage from "./AIPage.js";
+import GamePage from "./GamePage.js";
 
 export { 
     LoginPage, 
@@ -23,5 +24,6 @@ export {
     OneVsOne,
     TournamentPage,
     ProfilePage,
-    AIPage
+    AIPage,
+    GamePage
 }

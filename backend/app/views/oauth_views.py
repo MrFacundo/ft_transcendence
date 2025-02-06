@@ -11,6 +11,7 @@ from .services import get_or_create_user_from_oauth
 
 logger = logging.getLogger(__name__)
 
+# Redirects the client to the 42 OAuth page
 class OAuth42View(APIView):
     permission_classes = [AllowAny]
 
@@ -25,6 +26,7 @@ class OAuth42View(APIView):
         )
         return redirect(auth_url)
 
+# Handles the callback from the 42 OAuth page
 class OAuth42CallbackView(APIView):
     permission_classes = [AllowAny]
 

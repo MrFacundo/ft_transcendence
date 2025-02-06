@@ -3,21 +3,23 @@ from rest_framework.generics import ListAPIView
 from rest_framework.views import APIView
 from django.contrib.auth import get_user_model
 from .serializers import UserSerializer
-
-User = get_user_model()
-
-class UserListView(ListAPIView):
-	queryset = User.objects.filter(email_is_verified=True)
-	serializer_class = UserSerializer
-
 from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
 from user.models import Friendship
 
+User = get_user_model()
+
+# Lists all users who have verified their email
+class UserListView(ListAPIView):
+	queryset = User.objects.filter(email_is_verified=True)
+	serializer_class = UserSerializer
+
 class FriendRequestView(APIView):
-    
+    """
+    Sends a friend request to the user with the given ID. Checks if the user is not sending a friend request to themselves, and if a friendship already exists.
+    """
     def post(self, request, friend_id):
         friend = get_object_or_404(User, id=friend_id)
         
@@ -73,8 +75,10 @@ class FriendAcceptView(APIView):
         )
         
 
-# Lists all users except the current user, their friends, and users who have sent a friend request to the current user.
 class FriendInvitableUsersListView(ListAPIView):
+    """
+    Lists all users except the current user, their friends, and users who have sent a friend request to the current user.
+    """
     serializer_class = UserSerializer
 
     def get_queryset(self):
@@ -98,8 +102,10 @@ class FriendInvitableUsersListView(ListAPIView):
             list(pending_received)
         ).union(User.objects.filter(id__in=pending_sent))
     
-# Lists all users who have sent a friend request to the current user (not yet accepted)
 class FriendRequestUsersListView(ListAPIView):
+    """
+    Lists all users who have sent a friend request to the current user (not yet accepted)
+    """
     serializer_class = UserSerializer
 
     def get_queryset(self):
@@ -113,9 +119,9 @@ class FriendsListView(ListAPIView):
     serializer_class = UserSerializer
 
     def get_queryset(self):
-        user = self.request.user
+        user_id = self.kwargs.get('user_id')
         friends = Friendship.objects.filter(
-            Q(user=user, status='accepted') | Q(friend=user, status='accepted')
+            Q(user_id=user_id, status='accepted') | Q(friend_id=user_id, status='accepted')
         ).values_list('user_id', 'friend_id')
-        friend_ids = [uid for pair in friends for uid in pair if uid != user.id]
+        friend_ids = [uid for pair in friends for uid in pair if uid != int(user_id)]
         return User.objects.filter(id__in=friend_ids)

@@ -8,6 +8,7 @@ from rest_framework import serializers
 from rest_framework.exceptions import ValidationError, APIException
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from user.models import GameStats
+from app.models import GameInvitation, PongGame
 
 User = get_user_model()
 logger = logging.getLogger(__name__)
@@ -64,6 +65,11 @@ class UserSerializer(serializers.ModelSerializer):
             raise ValidationError("File too large. Size should not exceed 5 MB.")
         return value
     
+    def validate_two_factor_method(self, value):
+        if value == 'authenticator':
+            raise serializers.ValidationError("Authenticator 2FA method can't be set through this view.")
+        return value
+    
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         if instance.avatar_upload:
@@ -72,3 +78,37 @@ class UserSerializer(serializers.ModelSerializer):
                 settings.MEDIA_ROOT
             )
         return representation
+
+class GameInvitationSerializer(serializers.ModelSerializer):
+    sender = UserSerializer(read_only=True)
+    receiver = UserSerializer(read_only=True)
+
+    class Meta:
+        model = GameInvitation
+        fields = ['id', 'sender', 'receiver', 'status', 'game']
+
+
+class PongGameSerializer(serializers.ModelSerializer):
+    player1 = UserSerializer(read_only=True)
+    player2 = UserSerializer(read_only=True)
+    
+    class Meta:
+        model = PongGame
+        fields = '__all__'
+
+class MatchHistorySerializer(serializers.ModelSerializer):
+    opponent = serializers.SerializerMethodField()
+    result = serializers.SerializerMethodField()
+
+    class Meta:
+        model = PongGame
+        fields = ['opponent', 'result', 'date_played']
+
+    def get_opponent(self, obj):
+        user_id = self.context['request'].parser_context['kwargs']['id']
+        opponent = obj.player2 if obj.player1.id == user_id else obj.player1
+        return UserSerializer(opponent).data
+
+    def get_result(self, obj):
+        user_id = self.context['request'].parser_context['kwargs']['id']
+        return 'win' if obj.winner.id == user_id else 'loss'

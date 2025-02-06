@@ -70,14 +70,6 @@ class Navbar extends HTMLElement {
         `;
     }
 
-    set page(page) {
-        this._page = page;
-    }
-
-    get page() {
-        return this._page;
-    }
-
     setDisplay(elements, display) {
         elements.forEach(el => el.style.display = display);
     }
@@ -86,7 +78,6 @@ class Navbar extends HTMLElement {
         const { auth, api } = this.page.app;
         
         this.shadowRoot.querySelectorAll("[data-href]").forEach(element => {
-            element.removeEventListener("click", this.page.handleClick);
             element.addEventListener("click", this.page.handleClick);
         });
 
@@ -101,6 +92,7 @@ class Navbar extends HTMLElement {
             const avatar_upload = user.avatar_upload ? await api.fetchAvatarObjectUrl(user.avatar_upload) : null;
             profileEl.querySelector("img").src = avatar_upload || user.avatar_oauth || EMPTY_AVATAR_URL;
             profileEl.querySelector(".username").textContent = user.username;
+            profileEl.setAttribute('data-href', `/profile/${user.id}`);
             this.setDisplay([loginEl, registerEl], "none");
             this.setDisplay([settingsEl, logoutEl], "block");
             this.setDisplay([profileEl], "flex");
@@ -108,6 +100,12 @@ class Navbar extends HTMLElement {
             this.setDisplay([loginEl, registerEl], "block");
             this.setDisplay([profileEl, settingsEl, logoutEl], "none");
         }
+    }
+
+    disconnectedCallback() {
+        this.shadowRoot.querySelectorAll("[data-href]").forEach(element => {
+            element.removeEventListener("click", this.page.handleClick);
+        });
     }
 }
 

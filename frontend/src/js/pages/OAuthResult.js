@@ -8,7 +8,6 @@ class OAuthResultPage extends Page {
             pageElement: "#OAuthResult",
             isProtected: false,
             app: app,
-            preserveParams: true,
         });
     }
 

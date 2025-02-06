@@ -10,9 +10,8 @@ class Page {
      * @param {string} pageElement - The element of the where we can find the content of the page
      * @param {boolean} isProtected - The User must be authenticated to access the page
      * @param {object} app - The app object
-     * @param {boolean} [preserveParams=false] - Optional parameter to preserve URL parameters
      */
-    constructor({ name, url, pageElement, isProtected, app, preserveParams = false }) {
+    constructor({ name, url, pageElement, isProtected, app }) {
         this.name = name;
         this.url = url;
         this.pageElement = document.querySelector(pageElement);
@@ -20,7 +19,6 @@ class Page {
         this.mainElement = document.querySelector("#main");
         this.app = app;
         this.handleClick = this.handleClick.bind(this);
-        this.preserveParams = preserveParams; // TODO: workaround for OAuthResultPage, check if this is necessary
     }
 
     /**

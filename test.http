@@ -1,29 +1,56 @@
 ###
-POST http://localhost:8000/api/token HTTP/1.1
+POST http://localhost:8000/api/token/ HTTP/1.1
 Content-Type: application/json
 
 {
-	"email": "ftroitero@gmail.com",
-  	"password": "FACUFACU"
+	"email": "debra58@example.net",
+  	"password": "pass"
 }
 
 ###
 
-GET  http://localhost:8000/api/user/2 HTTP/1.1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMxNjk2NzQwLCJpYXQiOjE3MzE2OTMxNDAsImp0aSI6ImM0MDI0MjFkNzE1MDRhYWI4MjMyMzA2NDEzMmM5OTI2IiwidXNlcl9pZCI6MX0.9D6iOA3CqNipAFPfsZYft2sY3kSWWSGSPUN2ehzSRxA
+GET http://localhost:8000/api/match-history/9/ HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM0NjA2OTE2LCJpYXQiOjE3MzQ2MDMzMTYsImp0aSI6IjdhMGFjNTlhMzI5MTRlZTBhMjA4MzIzNTRlNzI0MTBmIiwidXNlcl9pZCI6NH0.Ohs8peDzZvl0LMnqJlM9V9RaV134u8HKurKN14dqDtY
 
 ###
 
-###
-
-DELETE  http://localhost:8000/api/user/2 HTTP/1.1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMxNjk2NzQwLCJpYXQiOjE3MzE2OTMxNDAsImp0aSI6ImM0MDI0MjFkNzE1MDRhYWI4MjMyMzA2NDEzMmM5OTI2IiwidXNlcl9pZCI6MX0.9D6iOA3CqNipAFPfsZYft2sY3kSWWSGSPUN2ehzSRxA
+POST  http://localhost:8000/api/game-invitation/1 HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMzODUxMjAxLCJpYXQiOjE3MzM4NDc2MDEsImp0aSI6IjRlMmZjN2YwNGNmYzQwMThhNmRlZjE1Yjg5MGI5MDUwIiwidXNlcl9pZCI6MTB9.MxVyN8xyQdJ1lqLagBsp9ba5o8VyTO5GPV6o666CNeQ
 
 ###
 
+GET  http://localhost:8000/api/game-invitations/sent/ HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMzODQ5MTcwLCJpYXQiOjE3MzM4NDU1NzAsImp0aSI6IjdjMmNhN2RkMjlmMTQ0OWU4YjQ3MDRlODU4OWI4NzNiIiwidXNlcl9pZCI6MTJ9.sKYUqXcJMDhfdvEVLVmeyvvJFtVm8J-KnFfwxwsWvSM
+
+
 ###
 
-POST  http://localhost:8000/api/friend-request/16 HTTP/1.1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMxODUxODAxLCJpYXQiOjE3MzE4NDgyMDEsImp0aSI6IjZjMGQ1MTgxNDYzZDRiZTQ5ZWUwZTY3YzQ0NjIzMTA2IiwidXNlcl9pZCI6MTV9.hxdUAOgaaOKVHoJW94RTHDbwX6zELSBHZsWj4oE_5Ns
+GET  http://localhost:8000/api/game-invitations/received/ HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMzODQ5MjM5LCJpYXQiOjE3MzM4NDU2MzksImp0aSI6ImJjZDM2M2FiYjYyZDRlMTE4NjRjZWRkN2E5MjIwYjEyIiwidXNlcl9pZCI6MX0._tCjuUziczV3kUOSP14_DbThG5wSGSZ13eavhoSCTRs
+
+###
+
+GET  http://localhost:8000/api/2fa/setup/ HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyMjk0OTc3LCJpYXQiOjE3MzIyOTEzNzcsImp0aSI6IjJmZjQ4Mjk1MGYwODQyNjJiYmM5ZWRhYzFhOGM5MDU0IiwidXNlcl9pZCI6M30.A8s3N6Ob8qGe87L6AXFINw9A0zoISd5FrtcLmn_IXq0
+
+###
+
+POST  http://localhost:8000/api/2fa/verify-setup/ HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMyMjk0OTc3LCJpYXQiOjE3MzIyOTEzNzcsImp0aSI6IjJmZjQ4Mjk1MGYwODQyNjJiYmM5ZWRhYzFhOGM5MDU0IiwidXNlcl9pZCI6M30.A8s3N6Ob8qGe87L6AXFINw9A0zoISd5FrtcLmn_IXq0
+Content-Type: application/json
+
+{
+	"otp": "772566"
+}
+
+###
+
+POST  http://localhost:8000/api/verify-otp HTTP/1.1
+Content-Type: application/json
+
+{
+	"otp": "503412",
+	"email": "michaelhall@example.com"
+}
 
 ###

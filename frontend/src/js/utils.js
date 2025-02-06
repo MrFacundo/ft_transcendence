@@ -20,3 +20,32 @@ export function showMessage(message) {
         }, 500);
     }, 3000);
 }
+
+export function parsePath(path, pages) {
+    const requestedPath = path.replace(/\/+$/, "");
+
+    return Object.values(pages).reduce((match, page) => {
+        if (match) return match; // If a match is found, skip further processing
+        const pagePath = page.url.replace(/\/+$/, "");
+        const pageParts = pagePath.split("/").filter(Boolean);
+        const requestedParts = requestedPath.split("/").filter(Boolean);
+
+        if (pageParts.length !== requestedParts.length) return null;
+
+        const params = {};
+        const isMatch = pageParts.every((part, i) => {
+            if (part.startsWith(":")) {
+                params[part.slice(1)] = requestedParts[i];
+                return true;
+            }
+            return part === requestedParts[i];
+        });
+        const queryParams = requestedPath.split("?")[1];
+        return isMatch ? { page, params } : null;
+    }, null);
+}
+
+export function formatDate(dateString) {
+    const date = new Date(dateString);
+    return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear().toString().slice(-2)}`;
+}
