@@ -9,7 +9,7 @@ class Command(BaseCommand):
     help = "Create a group of users with associated game stats"
 
     def handle(self, *args, **kwargs):
-        if CustomUser.objects.exists():
+        if CustomUser.objects.count() >=10:
             self.stdout.write(self.style.WARNING("Users already exist. Exiting script."))
             return
 

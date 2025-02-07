@@ -86,7 +86,7 @@
                         </button>
                         <a class="d-inline-block text-center w-100 mt-3" data-href="/login">already with us?</a>
                     </custom-form>
-                    <p id="login-success" class="text-success"></p>
+                    <p id="register-success" class="text-success"></p>
                 </main>
             </div>
         </div>
@@ -375,25 +375,59 @@
 
     <section id="Tournament" class="container mt-5">
         <h1 class="mb-4">Tournament</h1>
-        <div class="tournament-dashboard row">
-            <div class="col-md-4">
-                <p>Open tournaments</p>
-                <ul class="list-group" id="tournament-list">
-                </ul>
-            </div>
-            <div class="col-md-8 d-flex flex-column align-items-center text-center">
-                <p>Create new tournament</p>
-                <form id="create-tournament-form" class="w-50">
-                    <div class="form-group mb-3">
-                        <label for="tournament-name">Tournament Name</label>
-                        <input type="text" class="form-control" id="tournament-name"
-                            placeholder="Enter tournament name">
+        <div class="row justify-content-around">
+            <div class="col-md-4" data-href="/tournament-create">
+                <div class="card bg-light my-4 shadow-sm" style="min-height: 250px; cursor: pointer;">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Create</h5>
+                        <img src="/static/images/robot.svg" alt="Robot Icon" width="130" height="130">
+                        <p class="card-text mt-4">Create a new tournament.</p>
                     </div>
-                    <button type="submit" class="btn btn-primary">Create</button>
-                </form>
+                </div>
+            </div>
+            <div class="col-md-4" data-href="/tournament-join">
+                <div class="card bg-light my-4 shadow-sm" style="min-height: 250px; cursor: pointer;">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Join</h5>
+                        <img src="/static/images/trophy.svg" alt="Robot Icon" width="130" height="130">
+                        <p class="card-text mt-4">Join an existing tournament.</p>
+                    </div>
+                </div>
             </div>
         </div>
-        <tournament-bracket class="d-none"></tournament-bracket>
+    </section>
+
+    <section id="TournamentCreate" class="container mt-5">
+        <h1 class="mb-4">Create Tournament</h1>
+        <div class="row justify-content-around">
+            <custom-form class="col-md-8">
+                <h1 class="h3 mb-3 fw-normal">Enter your tournament settings</h1>
+                <div class="form-check mb-3">
+                    <label for="tournament_name">Tournament Name</label>
+                    <input type="text" class="form-control" data-id="tournament_name" />
+                </div>
+                <div class="form-check mb-3">
+                    <label for="participants_amount">Max Players</label>
+                    <input type="number" class="form-control" data-id="participants_amount" />
+                </div>
+                <button class="btn btn-primary w-100 py-2" type="submit">
+                    Create
+                </button>
+            </custom-form>
+            <div class="col-md-4">
+                <p id="create-success" class="text-success"></p>
+                <h3 id="tournament-created-name"></h3>
+                <p id="tournament-created-participants"></p>
+            </div>
+        </div>
+    </section>
+
+    <section id="TournamentJoin" class="container mt-5">
+        <h1 class="mb-4">Join a Tournament</h1>
+        <div class="row justify-content-around">
+            <ol class="list-group col-md-6 mx-auto" id="tournament-list">
+            </ol>
+        </div>
     </section>
 
     <section id="Profile" class="container mt-5">

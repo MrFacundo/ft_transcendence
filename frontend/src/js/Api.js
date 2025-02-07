@@ -236,6 +236,47 @@ export class Api {
         return this.request("get", `/match-history/${userId}/`);
     }
 
+    /* Tournaments */
+
+    /**
+     *  Creates a new tournament.
+     * @param {string} tournamentName - The name of the tournament.
+     * @param {number} participantsAmount - The number of participants in the tournament.
+     * @returns {Promise<Object>} A tournament object.
+     */
+    async createTournament(tournament_name, participants_amount) {
+        return this.request("post", "/tournament/", {
+                name: tournament_name,
+                participants_amount: participants_amount
+            });
+    }
+
+    /**
+     *  Joins an existing tournament.
+     * @param {string} tournamentId - The ID of the tournament.
+     * @returns {Promise<Object>} A tournament object.
+     */
+    async joinTournament(tournamentId) {
+        return this.request("patch", `/tournament/${tournamentId}/`, {});
+    }
+
+    /**
+     * Retrieves a tournament by ID.
+     * @param {string} tournamentId - The ID of the tournament.
+     * @returns {Promise<Object>} A tournament object.
+     */
+    async getTournament(tournamentId) {
+        return this.request("get", `/tournament/${tournamentId}/`);
+    }
+
+    /**
+     * Retrieves a list of all tournaments.
+     * @returns {Promise<Object>} A list of tournaments.
+     * */
+    async getTournaments() {
+        return this.request("get", "/tournaments/");
+    }
+
     /* Media */
 
     /**

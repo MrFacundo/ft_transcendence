@@ -1,19 +1,5 @@
 import { parsePath } from "./utils.js";
-import {
-    LoginPage,
-    NotFoundPage,
-    RegisterPage,
-    VerifyEmailPage,
-    OAuthResultPage,
-    TwoFactorAuthPage,
-    UserSettingsPage,
-    HomePage,
-    OneVsOne,
-    TournamentPage,
-    ProfilePage,
-    AIPage,
-    GamePage,
-} from "./pages/index.js";
+import * as Pages from "./pages/index.js";
 import "../scss/styles.scss";
 import { Api } from "./Api.js";
 import { Auth } from "./Auth.js";
@@ -30,19 +16,21 @@ class App {
         this.auth = new Auth(this);
         this.api = new Api(this.auth);
         this.pages = {
-            login: new LoginPage(this),
-            register: new RegisterPage(this),
-            404: new NotFoundPage(this),
-            verifyEmail: new VerifyEmailPage(this),
-            OAuthResult: new OAuthResultPage(this),
-            twoFactorAuth: new TwoFactorAuthPage(this),
-            settings: new UserSettingsPage(this),
-            home: new HomePage(this),
-            oneVsOne: new OneVsOne(this),
-            tournament: new TournamentPage(this),
-            profile: new ProfilePage(this),
-            AI: new AIPage(this),
-            game: new GamePage(this),
+            login: new Pages.LoginPage(this),
+            register: new Pages.RegisterPage(this),
+            404: new Pages.NotFoundPage(this),
+            verifyEmail: new Pages.VerifyEmailPage(this),
+            OAuthResult: new Pages.OAuthResultPage(this),
+            twoFactorAuth: new Pages.TwoFactorAuthPage(this),
+            settings: new Pages.UserSettingsPage(this),
+            home: new Pages.HomePage(this),
+            oneVsOne: new Pages.OneVsOne(this),
+            tournament: new Pages.TournamentPage(this),
+            tournamentCreate: new Pages.TournamentCreatePage(this),
+            tournamentJoin: new Pages.TournamentJoinPage(this),
+            profile: new Pages.ProfilePage(this),
+            AI: new Pages.AIPage(this),
+            game: new Pages.GamePage(this),
         };
         this.currentGame = false;
         this.currentPage = null;
