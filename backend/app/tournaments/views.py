@@ -27,16 +27,21 @@ class TournamentJoinView(RetrieveUpdateAPIView):
     serializer_class = TournamentSerializer
 
     def update(self, request, *args, **kwargs):
-        tournament = self.get_object()
-        
-        if tournament.participants.count() >= tournament.participants_amount:
-            return Response({"detail": "The tournament is full."}, status=status.HTTP_400_BAD_REQUEST)
-
         user = request.user
+
+        ongoing_tournaments = Tournament.objects.filter(participants=user, end_date__isnull=True).distinct()
+        if ongoing_tournaments.exists():
+            return Response({"message": "You are already a participant in an ongoing tournament."}, status=status.HTTP_400_BAD_REQUEST)
+
+        tournament = self.get_object()
+
+        if tournament.participants.count() >= tournament.participants_amount:
+            return Response({"message": "The tournament is full."}, status=status.HTTP_400_BAD_REQUEST)
+
         if user not in tournament.participants.all():
             tournament.participants.add(user)
         else:
-            return Response({"detail": "You are already a participant in this tournament."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"message": "You are already a participant in this tournament."}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response(TournamentSerializer(tournament).data, status=status.HTTP_200_OK)
 

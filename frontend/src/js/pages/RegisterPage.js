@@ -1,4 +1,5 @@
 import Page from "./Page";
+import { formatErrorMessages } from "../utils.js";
 
 class RegisterPage extends Page {
     constructor(app) {
@@ -25,31 +26,19 @@ class RegisterPage extends Page {
                 );
                 const successMessage = "User registered successfully. Please verify your email.";
                 form.showFormSuccess(successMessage);
-                this.mainElement.querySelector("#login-success").textContent = successMessage;
+                this.mainElement.querySelector("#register-success").textContent = successMessage;
                 form.style.display = "none";
             } catch (error) {
                 console.error("error", error);
                 let errorMessage = "An unknown error occurred";
                 if (error.response && error.response.data) {
-                    errorMessage = this.formatErrorMessages(error.response.data);
+                    errorMessage = formatErrorMessages(error.response.data);
                 } else {
                     errorMessage = error.message || errorMessage;
                 }
                 form.showFormError(errorMessage);
             }
         };
-    }
-
-    formatErrorMessages(errorData) {
-        if (errorData.detail) {
-            return errorData.detail;
-        } else {
-            const firstKey = Object.keys(errorData)[0];
-            if (errorData[firstKey].length > 0) {
-                const msg = errorData[firstKey][0];
-                return msg.charAt(0).toUpperCase() + msg.slice(1);
-            }
-        }
     }
 }
 

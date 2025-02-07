@@ -11,6 +11,8 @@ import TournamentPage from "./TournamentPage.js";
 import ProfilePage from "./ProfilePage.js";
 import AIPage from "./AIPage.js";
 import GamePage from "./GamePage.js";
+import TournamentCreatePage from "./TournamentCreatePage.js";
+import TournamentJoinPage from "./TournamentJoinPage.js";
 
 export { 
     LoginPage, 
@@ -23,7 +25,9 @@ export {
     HomePage,
     OneVsOne,
     TournamentPage,
+    TournamentCreatePage,
+    TournamentJoinPage,
     ProfilePage,
     AIPage,
-    GamePage
+    GamePage,
 }
