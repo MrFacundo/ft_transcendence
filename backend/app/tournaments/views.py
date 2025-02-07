@@ -1,6 +1,6 @@
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.generics import CreateAPIView, RetrieveUpdateAPIView, ListAPIView
+from rest_framework.generics import CreateAPIView, RetrieveUpdateAPIView, ListAPIView, RetrieveAPIView
 from django.contrib.auth import get_user_model
 from .models import Tournament
 from .serializers import TournamentSerializer
@@ -49,5 +49,22 @@ class TournamentListView(ListAPIView):
 	"""
 	List all tournaments.
 	"""
-	queryset = Tournament.objects.all()
+	queryset = Tournament.objects.filter(end_date__isnull=True)
 	serializer_class = TournamentSerializer
+
+class CurrentTournamentView(RetrieveAPIView):
+    """
+    Retrieve the current tournament the user is participating in.
+    """
+    serializer_class = TournamentSerializer
+
+    def get_object(self):
+        user = self.request.user
+        return user.get_current_tournament()
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if instance is None:
+            return Response({"message": "User not participating in any ongoing tournament."}, status=status.HTTP_200_OK)
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)

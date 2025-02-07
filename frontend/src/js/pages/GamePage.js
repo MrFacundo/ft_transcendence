@@ -26,7 +26,7 @@ export default class GamePage extends Page {
             if (gameInstance.status === "not_started") {
                 gameEl.startGame(gameId);
                 gameEl.addEventListener("gameOver", async () => {
-                    this.app.currentGame = false;
+                    this.app.stateManager.currentGame = null;
                     this.showScoreBoard();
                 });
             } else if (gameInstance.status === "completed" || gameInstance.status === "interrupted") {

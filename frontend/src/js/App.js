@@ -3,9 +3,9 @@ import * as Pages from "./pages/index.js";
 import "../scss/styles.scss";
 import { Api } from "./Api.js";
 import { Auth } from "./Auth.js";
-import { logConstants } from "./constants.js";
+import { logSettings } from "./constants.js";
 import { WebSocketManager } from './WebSocketManager.js';
-import { OnlineStatusManager } from './OnlineStatusManager.js';
+import { StateManager } from './StateManager.js';
 
 /**
  * App class initializes the application, manages page navigation, and handles authentication.
@@ -32,10 +32,9 @@ class App {
             AI: new Pages.AIPage(this),
             game: new Pages.GamePage(this),
         };
-        this.currentGame = false;
         this.currentPage = null;
         this.wsManager = new WebSocketManager(this);
-        this.onlineStatusManager = new OnlineStatusManager(this);
+        this.stateManager = new StateManager(this);
         this.init();
         if (document.getElementById("noScript"))
             document.getElementById("noScript").remove();
@@ -68,14 +67,14 @@ class App {
         this.mainElement.setAttribute("data-page", page.name);
         this.currentPage = page;
 
-        // Avoid modifying the history stack on popstate navigation
         if (!replaceHistory) {
             history.pushState({}, page.name, path + (queryParams || ''));
         }
 
         await page.open(this);
         if (this.auth.authenticated) {
-            this.wsManager.setupConnections();
+            await this.stateManager.init();
+            await this.wsManager.init();
         }
     }
 
@@ -83,7 +82,7 @@ class App {
      * Initializes the application, sets up event listeners, and handles initial navigation.
      */
     init() {
-        logConstants();
+        logSettings();
         window.addEventListener("popstate", () => {
             this.navigate(window.location.pathname.toLowerCase(), true);
         });
@@ -93,9 +92,10 @@ class App {
         });
         window.addEventListener("beforeunload", () => {
             this.wsManager.closeConnections();
+            this.stateManager.close();
         });
         window.addEventListener("online-status-update", (event) => {
-            this.onlineStatusManager.updateUI(event);
+            this.stateManager.updateOnlineStatusUI(event);
         });
     }
 }

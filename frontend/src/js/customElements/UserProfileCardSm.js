@@ -99,8 +99,8 @@ class UserProfileCardSm extends HTMLElement {
     }
 
     updateOnlineStatus() {
-        const { onlineStatusManager} = this.page.app;
-        let onlineStatus = onlineStatusManager.statuses.get(this.user.id)?.is_online;
+        const { stateManager} = this.page.app;
+        let onlineStatus = stateManager.onlineStatuses.get(this.user.id)?.is_online;
         if (onlineStatus) {
             this.shadowRoot.querySelector(".status-indicator").style.backgroundColor = "#e0a800";
         } else {

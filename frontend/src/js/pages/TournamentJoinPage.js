@@ -23,7 +23,7 @@ class TournamentPage extends Page {
     }
 
     async render() {
-        const { api } = this.app;
+        const { api, wsManager, stateManager } = this.app;
         const openTournaments = await api.getTournaments();
         const tournamentListElement = document.querySelector("#tournament-list");
 
@@ -39,11 +39,14 @@ class TournamentPage extends Page {
 
             tournamentItem.addEventListener("click", async () => {
                 try {
-                    await api.joinTournament(tournament.id);
+                    const response = await api.joinTournament(tournament.id);
+                    stateManager.setCurrentTournament(response);
+                    wsManager.setupTournamentWebSocket();
                     showMessage(`Joined tournament: ${tournament.name}`);
                     this.appendPendingButton(tournamentItem);
                 } catch (error) {
-                    showMessage(error.response.data.message, "error");
+                    console.error("error", error);
+                    showMessage(error.response?.data?.message ? error.response.data.message : error, "error");
                 }
             });
         });

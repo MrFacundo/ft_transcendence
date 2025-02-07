@@ -4,7 +4,7 @@ export const MEDIA_URL = "http://localhost:8000/media";
 export const WS_URL = "ws://localhost:8000/ws";
 export const DEBUG = process.env.DEBUG === 'True';
 
-export function logConstants() {
+export function logSettings() {
 	if (!DEBUG)return;
 	const constants = {
 		"EMPTY_AVATAR_URL": EMPTY_AVATAR_URL,

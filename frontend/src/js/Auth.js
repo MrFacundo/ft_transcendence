@@ -208,6 +208,7 @@ export class Auth {
     logout() {
         console.log("Logging out");
         this.app.wsManager.closeConnections();
+        this.app.stateManager.close();
         Cookies.remove("access_token");
         Cookies.remove("refresh_token");
         this.accessToken = null;

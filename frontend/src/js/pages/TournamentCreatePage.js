@@ -14,7 +14,7 @@ class TournamentCreatePage extends Page {
     }
 
     render() {
-        const { api } = this.app;
+        const { api, wsManager, stateManager } = this.app;
         const form = this.mainElement.querySelector("custom-form");
         const successMsg = this.mainElement.querySelector("#create-success");
         const createdName = this.mainElement.querySelector("#tournament-created-name");
@@ -27,6 +27,8 @@ class TournamentCreatePage extends Page {
                 }
                 const response = await api.createTournament(formData.tournament_name, formData.participants_amount);
                 const successMessage = "Tournament created successfully.";
+                stateManager.setCurrentTournament(response);
+                wsManager.setupTournamentWebSocket();
                 form.showFormSuccess(successMessage);
                 successMsg.textContent = successMessage;
                 createdName.textContent = response.name;
