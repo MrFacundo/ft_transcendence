@@ -66,7 +66,6 @@ Icon?
 .Spotlight-V100
 .Trashes
 ehthumbs.db
-Thumbs.db
 
 #dbs
 backend/db.sqlite3
@@ -75,7 +74,6 @@ backend/db.sqlite3
 backend/app/__pycache__/
 backend/backend/__pycache__/
 
-.env
 notes
 
 #migrations
