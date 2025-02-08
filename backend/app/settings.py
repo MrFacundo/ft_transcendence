@@ -77,7 +77,8 @@ INSTALLED_APPS = [
     'channels',
     'corsheaders',
     'rest_framework_simplejwt.token_blacklist',
-    'silk'
+    'silk',
+    'drf_yasg'
 ]
 
 ASGI_APPLICATION = 'app.asgi.application'
