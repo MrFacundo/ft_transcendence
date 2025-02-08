@@ -205,8 +205,9 @@ EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')
 
-ADMIN_USER_NAME = config('ADMIN_USER_NAME', default='admin')
-ADMIN_EMAIL = config('ADMIN_EMAIL', default='')
+ADMIN_USER_NAME = config('DJANGO_SUPERUSER_USERNAME', default='admin')
+ADMIN_EMAIL = config('DJANGO_SUPERUSER_EMAIL', default='admin@admin.com')
+ADMIN_PASSWORD = config('DJANGO_SUPERUSER_PASSWORD', default='admin')
 
 MANAGERS = []
 ADMINS = []
