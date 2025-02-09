@@ -375,7 +375,7 @@
 
     <section id="Tournament" class="container mt-5">
         <h1 class="mb-4">Tournament</h1>
-        <div class="row justify-content-around">
+        <div id="cards-container" class="row justify-content-around d-none">
             <div class="col-md-4" data-href="/tournament-create">
                 <div class="card bg-light my-4 shadow-sm" style="min-height: 250px; cursor: pointer;">
                     <div class="card-body text-center">
@@ -393,6 +393,21 @@
                         <p class="card-text mt-4">Join an existing tournament.</p>
                     </div>
                 </div>
+            </div>
+        </div>
+        <div id="tournament-details" class="row justify-content-center d-none">
+            <h2  id="tournament-name" class="mb-4"></h2>
+            <div id="participants-info" class="d-none">
+                <div class="col-md-4">
+                    <p>Participants</p>
+                    <user-list id="tournament-participants"></user-list>
+                </div>
+                <div class="col-md-4 d-flex flex-column align-items-center text-center">
+                    <user-profile id="selected-participant"></user-profile>
+                </div>
+            </div>
+            <div id="tournament-bracket" class="d-none">
+                <p>Tournament will start here</p>
             </div>
         </div>
     </section>

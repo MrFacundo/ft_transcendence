@@ -277,6 +277,14 @@ export class Api {
         return this.request("get", "/tournaments/");
     }
 
+    /**
+     * Retrieves the tournament the current user is participating in.
+     * @returns {Promise<Object>} A tournament object.
+     * */
+    async getCurrentTournament() {
+        return this.request("get", "/tournament/current/");
+    }
+
     /* Media */
 
     /**

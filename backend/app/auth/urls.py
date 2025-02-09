@@ -4,7 +4,6 @@ from rest_framework_simplejwt.views import TokenRefreshView
 # Authentication views
 from app.auth.views.auth_views import (
     LoginView,
-    UserDetailView,
     VerifyEmailView,
 )
 

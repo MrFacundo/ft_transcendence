@@ -33,6 +33,8 @@ class UserList extends HTMLElement {
         `;
         this.selectedUser = null;
         this.actionButton = null;
+        this.actionText = null;
+        this.actionCallback = null;
         this.page = null;
     }
 
@@ -43,23 +45,14 @@ class UserList extends HTMLElement {
 
     async populateList({ users, actionText, actionCallback }) {
         const listGroup = this.shadowRoot.querySelector(".list-group");
-    
+        this.actionText = actionText;
+        this.actionCallback = actionCallback;
         users.forEach((user) => {
-            const listItem = document.createElement("li");
-            listItem.className = "list-group-item";
-            const userCardSm = this.createUserCard(user, actionText, async () => {
-                try {
-                    await actionCallback(user, userCardSm);
-                } catch (error) {
-                    console.error("Action failed:", error);
-                }
-            });
-            listItem.appendChild(userCardSm);
-            listGroup.appendChild(listItem);
+            this.addCard(user);
         });
     }
 
-    createUserCard(user, actionText, actionCallback) {
+    createUserCard(user) {
         const userCardSm = document.createElement("user-profile-small");
         userCardSm.page = this.page;
         userCardSm.setUser(user);
@@ -71,15 +64,24 @@ class UserList extends HTMLElement {
         userCardSm.addEventListener("click", () => {
             this.actionButton && this.actionButton.classList.add("d-none");
             this.updateSelectedStyle(userCardSm);
-            this.selectedUserCard.setUser(user);
+            this.selectedUserCard && this.selectedUserCard.setUser(user);
     
-            if (this.actionButton && (actionText === "Accept" || !isPending)) {
+            if (this.actionButton && (this.actionText === "Accept" || !isPending)) {
                 this.actionButton.classList.remove("d-none");
-                this.actionButton.textContent = actionText;
-                this.actionButton.onclick = actionCallback;
+                this.actionButton.textContent = this.actionText;
+                this.actionButton.onclick = this.actionCallback;
             }
         });
         return userCardSm;
+    }
+
+    addCard(user) {
+        const listGroup = this.shadowRoot.querySelector(".list-group");
+        const listItem = document.createElement("li");
+        listItem.className = "list-group-item";
+        const userCardSm = this.createUserCard(user);
+        listItem.appendChild(userCardSm);
+        listGroup.appendChild(listItem);
     }
 
     removeCard(userId) {

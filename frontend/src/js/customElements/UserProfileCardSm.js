@@ -75,9 +75,9 @@ class UserProfileCardSm extends HTMLElement {
 
         const avatarEl = this.shadowRoot.getElementById("profile-avatar");
         const usernameEl = this.shadowRoot.getElementById("profile-username");
-        this.updateOnlineStatus();
         avatarEl.src = await getAvatarSrc(this.user, this.page.app.api.fetchAvatarObjectUrl);
         usernameEl.textContent = this.user.username;
+        this.updateOnlineStatus();
     }
 
     appendPendingButton(expiresAt = null) {
@@ -99,8 +99,8 @@ class UserProfileCardSm extends HTMLElement {
     }
 
     updateOnlineStatus() {
-        const { onlineStatusManager} = this.page.app;
-        let onlineStatus = onlineStatusManager.statuses.get(this.user.id)?.is_online;
+        const { stateManager} = this.page.app;
+        let onlineStatus = stateManager.onlineStatuses.get(this.user.id)?.is_online;
         if (onlineStatus) {
             this.shadowRoot.querySelector(".status-indicator").style.backgroundColor = "#e0a800";
         } else {

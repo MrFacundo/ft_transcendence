@@ -1,8 +1,7 @@
 from django.urls import path
 
-from app.auth.views.auth_views import UserDetailView
-
 from app.users.views import (
+    UserDetailView,
     UserListView,
     FriendRequestView,
     FriendAcceptView,

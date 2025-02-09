@@ -21,7 +21,7 @@ export function showMessage(message, type = 'success') {
         setTimeout(() => {
             document.body.removeChild(messagePopup);
         }, 500);
-    }, 3000);
+    }, 6000);
 }
 
 export function parsePath(path, pages) {
@@ -55,10 +55,19 @@ export function formatDate(dateString) {
 
 export async function getAvatarSrc(user, apiFetchCallback) {
     if (!user) return null;
+    let avatar_upload = null;
 
-    const avatar_upload = DEBUG 
-    ? (user.avatar_upload ? `${MEDIA_URL}/${user.avatar_upload}` : null) 
-    : (user.avatar_upload ? await apiFetchCallback(user.avatar_upload) : null);
+    if (DEBUG) {
+        if (user.avatar_upload) {
+            avatar_upload = user.avatar_upload.includes(MEDIA_URL) 
+                ? user.avatar_upload 
+                : `${MEDIA_URL}/${user.avatar_upload}`;
+        }
+    } else {
+        if (user.avatar_upload) {
+            avatar_upload = await apiFetchCallback(user.avatar_upload);
+        }
+    }
 
     return avatar_upload || user.avatar_oauth || EMPTY_AVATAR_URL;
 }

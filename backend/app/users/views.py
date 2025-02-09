@@ -1,19 +1,62 @@
-
-from rest_framework.generics import ListAPIView
-from rest_framework.views import APIView
-from django.contrib.auth import get_user_model
-from .serializers import UserSerializer
-from app.games.serializers import UserOnlineStatusSerializer, FriendSerializer, UserListSerializer, FriendshipInvitationSerializer
-from rest_framework.response import Response
-from rest_framework import status
-from django.shortcuts import get_object_or_404
 from django.db.models import Q
-from app.users.models import Friendship, UserOnlineStatus
+from django.contrib.auth import get_user_model
+from django.shortcuts import get_object_or_404
 from django.db import transaction
+
+from rest_framework.generics import ListAPIView, CreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.permissions import AllowAny, IsAuthenticated, BasePermission
+from rest_framework.views import APIView
+from rest_framework import status
+from rest_framework.response import Response
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 
+from .serializers import UserSerializer
+from app.games.serializers import UserOnlineStatusSerializer, FriendSerializer, UserListSerializer, FriendshipInvitationSerializer
+from app.users.models import Friendship, UserOnlineStatus
+
 User = get_user_model()
+
+class IsOwnerOrReadOnly(BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return obj == request.user
+
+class UserDetailView(CreateAPIView, RetrieveUpdateDestroyAPIView):
+    serializer_class = UserSerializer
+
+    def get_object(self): # check permissions
+        user_id = self.kwargs.get('pk')
+        if user_id:
+            obj = get_object_or_404(User, pk=user_id)
+            self.check_object_permissions(self.request, obj)
+            return obj
+        return self.request.user
+
+    def perform_create(self, serializer): # send verification email
+        user = serializer.save()
+        logger.info(f"User with ID {user.id} registered successfully")
+        self._handle_verification_email(user, is_creation=True)
+
+    def perform_update(self, serializer): # send verification email
+        user = serializer.save()
+        if serializer.validated_data.get('new_email'):
+            self._handle_verification_email(user)
+
+    def _handle_verification_email(self, user, is_creation=False):
+        try:
+            send_verification_email(user)
+        except Exception as e:
+            logger.error(f"Verification email failed: {str(e)}")
+            if is_creation:
+                user.delete()
+            raise APIException(f"Failed to send verification email. User was not {('created' if is_creation else 'updated')}.")
+
+    def get_permissions(self):  # set permissions
+        if self.request.method == 'POST':
+            return [AllowAny()]
+        if self.request.method == 'GET' and 'pk' in self.kwargs:
+            return [IsAuthenticated()]
+        return [IsAuthenticated(), IsOwnerOrReadOnly()]
 
 class UserListView(ListAPIView):
     """

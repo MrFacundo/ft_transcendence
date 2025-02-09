@@ -15,7 +15,7 @@ class OneVsOne extends Page {
     }
 
     async render() {
-        const { api, auth, onlineStatusManager } = this.app;
+        const { api, auth, stateManager } = this.app;
         const sendList = document.querySelector("#send-list");
         const receiveList = document.querySelector("#receive-list");
         const actionBtn = document.querySelector("#action-friend");
@@ -51,13 +51,13 @@ class OneVsOne extends Page {
             users: receiveListData,
             actionText: "Accept",
             actionCallback: async (user) => {
-                if (!onlineStatusManager.statuses.get(user.id)?.is_online) {
+                if (!stateManager.onlineStatuses.get(user.id)?.is_online) {
                     alert(`${user.username} is offline, try again later.`);
                     return;
                 }
                 const response = await api.gameAccept(user.game_invite.id);
                 console.log(`Game invite accepted from: ${user.username}`);
-                this.app.currentGame = true;
+                this.app.stateManager.currentGame = true;
                 this.app.navigate(response.game_url);
                 return response;
             },

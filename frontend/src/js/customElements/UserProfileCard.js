@@ -18,11 +18,11 @@ class UserProfileCard extends HTMLElement {
                     object-fit: cover;
                     border: 1px solid #dee2e6;
                     transition: opacity 0.3s;
+                    cursor: pointer;
                 }
                 .profile-info, .profile-stats {
                     margin-bottom: 1rem;
                     transition: opacity 0.3s;
-                    cursor: pointer;
                 }
                 p {
                     margin: 0;
@@ -53,7 +53,6 @@ class UserProfileCard extends HTMLElement {
     async setUser(user) {
         if (!user) return;
 
-        const infoEl = this.shadowRoot.getElementById("profile-info");
         const avatarEl = this.shadowRoot.getElementById("profile-avatar");
         const usernameEl = this.shadowRoot.getElementById("profile-username");
         const winsEl = this.shadowRoot.getElementById("profile-wins");
@@ -61,14 +60,14 @@ class UserProfileCard extends HTMLElement {
         const profileStats = this.shadowRoot.getElementById("profile-stats");
         const onlineStatusEl = this.shadowRoot.getElementById("online-status");
 
-        const { api, onlineStatusManager } = this.page.app;
-        infoEl.setAttribute('data-href', `/profile/${user.id}`);
+        const { api, stateManager } = this.page.app;
+        avatarEl.setAttribute('data-href', `/profile/${user.id}`);
 
         this.shadowRoot.querySelectorAll("[data-href]").forEach(element => {
             element.addEventListener("click", this.page.handleClick);
         });
 
-        let onlineStatus = onlineStatusManager.statuses.get(user.id);
+        let onlineStatus = stateManager.onlineStatuses.get(user.id);
         if (onlineStatus) {
             if (onlineStatus.is_online) {
                 onlineStatusEl.textContent = "Online";

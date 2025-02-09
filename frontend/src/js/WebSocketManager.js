@@ -7,151 +7,125 @@ export class WebSocketManager {
         this.gameWs = null;
         this.friendWs = null;
         this.onlineStatusWs = null;
+        this.tournamentWs = null;
     }
 
-    setupConnections() {
+    async init() {
         if (!this.app.auth || !this.app.auth.user) {
             console.warn("Cannot establish WebSocket connections: User is not authenticated.");
             return;
         }
 
         const userId = this.app.auth.user.id;
-        
-        if (!this.gameWs) {
-            this.setupGameInvitationWebSocket(userId);
-        }
-
-        if (!this.friendWs) {
-            this.setupFriendInvitationWebSocket(userId);
-        }
-
-        if (!this.onlineStatusWs) {
-            this.setupOnlineStatusWebSocket(userId);
-        }
+        this.gameWs || this.setupGameInvitationWebSocket(userId);
+        this.friendWs || this.setupFriendInvitationWebSocket(userId);
+        this.onlineStatusWs || this.setupOnlineStatusWebSocket(userId);
+        this.tournamentWs || this.setupTournamentWebSocket();
     }
 
     setupGameInvitationWebSocket(userId) {
-        const { auth, api } = this.app;
-        this.gameWs = new WebSocket(`${WS_URL}/game-invitation/${userId}/?token=${auth.accessToken}`);
-
-        this.gameWs.onopen = () => {
-            console.log("WebSocket Game Invitation connection established for user:", userId);
-        };
-
-        this.gameWs.onmessage = async (event) => {
-            const data = JSON.parse(event.data);
-            if (data.type === "game_accepted") {
-                console.log("Game invitation accepted:", data);
-                if (this.app.currentGame) {
-                    console.log("Game already in progress, can not start new game now");
-                    return;
-                }
-                console.log(`Redirecting to game: ${data.game_url}`);
-                this.app.currentGame = true;
-                this.app.navigate(data.game_url);
-            } else if (data.type === "game_invited") {
-                console.log("Game invitation received:", data);
-                if (this.app.currentGame) {
-                    console.log("Game already in progress, can not start new game now");
-                    return;
-                }
-                if (confirm(`You have been challenged by ${data.invitation.sender.username}. Do you accept?`)) {
-                    try {
-                        const response = await api.gameAccept(data.invitation.id);
-                        console.log("Starting game", response);
-                        this.app.currentGame = true;
-                        this.app.navigate(response.game_url);
-                    } catch (error) {
-                        console.error(error);
-                    }
-                }
-            }
-        };
-
-        this.gameWs.onerror = (error) => {
-            console.error("WebSocket error:", error);
-            this.gameWs = null;
-        };
-
-        this.gameWs.onclose = () => {
-            console.warn("WebSocket connection closed.");
-            this.gameWs = null;
-        };
+        this.gameWs = this.setupWebSocket(`game-invitation/${userId}`, this.handleGameMessage.bind(this));
     }
 
     setupFriendInvitationWebSocket(userId) {
-        this.friendWs = new WebSocket(`${WS_URL}/friend-invitation/${userId}/?token=${this.app.auth.accessToken}`);
-        
-        this.friendWs.onopen = () => {
-            console.log("Friend WebSocket connection established for user:", userId);
-        };
-        
-        this.friendWs.onmessage = async (event) => {
-            const data = JSON.parse(event.data);
-            
-            if (data.type === "friend_invited") {
-                console.log("Friend invitation received:", data);
-                if (confirm(`${data.friendship.sender.username} wants to be your friend. Do you accept?`)) {
-                    try {
-                        await this.app.api.friendAccept(data.friendship.sender.id);
-                        showMessage(`${data.friendship.sender.username} is now your friend.`);
-                    } catch (error) {
-                        console.error("Error accepting friendship:", error);
-                    }
-                }
-            } else if (data.type === "friend_accepted") {
-                showMessage(`${data.friendship.receiver.username} is now your friend.`);
-            }
-        };
-        
-        this.friendWs.onerror = (error) => {
-            console.error("Friend WebSocket error:", error);
-            this.friendWs = null;
-        };
-        
-        this.friendWs.onclose = () => {
-            console.warn("Friend WebSocket connection closed.");
-            this.friendWs = null;
-        };
+        this.friendWs = this.setupWebSocket(`friend-invitation/${userId}`, this.handleFriendMessage.bind(this));
     }
 
     setupOnlineStatusWebSocket() {
-        this.onlineStatusWs = new WebSocket(`${WS_URL}/online-status/?token=${this.app.auth.accessToken}`);
-
-        this.onlineStatusWs.onopen = async ()  => {
-            console.log("Online status WebSocket connection established.");
-            this.app.onlineStatusManager.fetchInitialStatuses();
-        };
-
-        this.onlineStatusWs.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-            this.app.onlineStatusManager.updateStatus(data);
-        };
-
-        this.onlineStatusWs.onerror = (error) => {
-            console.error("Online status WebSocket error:", error);
-            this.onlineStatusWs = null;
-        };
-
-        this.onlineStatusWs.onclose = () => {
-            console.warn("Online status WebSocket connection closed.");
-            this.onlineStatusWs = null;
-        };
-    
+        this.onlineStatusWs = this.setupWebSocket('online-status', this.handleOnlineStatusMessage.bind(this));
     }
 
+    setupTournamentWebSocket() {
+        const tournamentId = this.app.stateManager.currentTournament?.id;
+        if (!tournamentId) return;
+        this.tournamentWs = this.setupWebSocket(`tournament/${tournamentId}`, this.handleTournamentMessage.bind(this));
+    }
+
+    setupWebSocket(path, messageHandler) {
+        const ws = new WebSocket(`${WS_URL}/${path}/?token=${this.app.auth.accessToken}`);
+        ws.onopen = () => console.log(`${path} WebSocket connection established.`);
+        ws.onmessage = messageHandler;
+        ws.onerror = (error) => {
+            console.error(`${path} WebSocket error:`, error);
+            this[`${path.split('/')[0]}Ws`] = null;
+        };
+        ws.onclose = () => {
+            console.warn(`${path} WebSocket connection closed.`);
+            this[`${path.split('/')[0]}Ws`] = null;
+        };
+        return ws;
+    }
+
+    async handleGameMessage(event) {
+        const data = JSON.parse(event.data);
+        if (data.type === "game_accepted") {
+            if (this.app.stateManager.currentGame) return;
+            this.app.stateManager.currentGame = true;
+            this.app.navigate(data.game_url);
+        } else if (data.type === "game_invited") {
+            if (this.app.stateManager.currentGame) return;
+            if (confirm(`You have been challenged by ${data.invitation.sender.username}. Do you accept?`)) {
+                try {
+                    const response = await this.app.api.gameAccept(data.invitation.id);
+                    this.app.stateManager.currentGame = true;
+                    this.app.navigate(response.game_url);
+                } catch (error) {
+                    console.error(error);
+                }
+            }
+        }
+    }
+
+    async handleFriendMessage(event) {
+        const data = JSON.parse(event.data);
+        if (data.type === "friend_invited") {
+            if (confirm(`${data.friendship.sender.username} wants to be your friend. Do you accept?`)) {
+                try {
+                    await this.app.api.friendAccept(data.friendship.sender.id);
+                    showMessage(`${data.friendship.sender.username} is now your friend.`);
+                } catch (error) {
+                    console.error("Error accepting friendship:", error);
+                }
+            }
+        } else if (data.type === "friend_accepted") {
+            showMessage(`${data.friendship.receiver.username} is now your friend.`);
+        }
+    }
+
+    handleOnlineStatusMessage(event) {
+        const data = JSON.parse(event.data);
+        this.app.stateManager.updateIndividualOnlineStatus(data);
+        this.app.currentPage.updateIndividualOnlineStatusUI(data);
+    }
+
+    async handleTournamentMessage(event) {
+        const { stateManager, currentPage, pages, auth } = this.app;
+        const data = JSON.parse(event.data);
+        console.log("Tournament WS message:", data);
+        if (data.type === "join") {
+            stateManager.updateCurrentTournament(data.tournament);
+
+            if (stateManager.currentTournament.participants.length < stateManager.currentTournament.participants_amount) {
+                if (currentPage.name === "tournament-join") {
+                    pages.tournamentJoin.updateCurrentTournamentUI();
+                } else if (currentPage.name === "tournament") {
+                    pages.tournament.updateCurrentTournamentUI(Number(parseInt(data.participant_id)));
+                }
+                if (data.participant_id !== auth.user.id) {
+                    showMessage(`${data.tournament.participants.find(p => p.id === Number(data.participant_id)).username} joined the tournament.`);
+                }
+            } else {
+                this.app.navigate("/tournament");
+            }
+        }
+    }
+    
     closeConnections() {
-        if (this.gameWs) {
-            this.gameWs.close();
-            this.gameWs = null;
-        }
-        if (this.friendWs) {
-            this.friendWs.close();
-            this.friendWs = null;
-        }
-        if (this.onlineStatusWs) {
-            this.onlineStatusWs.close();
-            this.onlineStatusWs = null;
-        }
+        ['gameWs', 'friendWs', 'onlineStatusWs', 'tournamentWs'].forEach(ws => {
+            if (this[ws]) {
+                this[ws].close();
+                this[ws] = null;
+            }
+        });
     }
 }
