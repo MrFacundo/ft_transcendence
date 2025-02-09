@@ -1,13 +1,20 @@
-import logging
-
 from rest_framework import serializers
-from app.users.serializers import UserSerializer
 from app.tournaments.models import Tournament
+from django.contrib.auth import get_user_model
+from app.users.models import GameStats
+from app.games.serializers import GameStatsSerializer
 
-logger = logging.getLogger(__name__)
+User = get_user_model()
+
+class ParticipantSerializer(serializers.ModelSerializer):
+    game_stats = GameStatsSerializer(read_only=True)
+
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'avatar_oauth', 'avatar_upload', 'game_stats']
 
 class TournamentSerializer(serializers.ModelSerializer):
-    participants = UserSerializer(many=True, read_only=True)
+    participants = ParticipantSerializer(many=True, read_only=True)
 
     class Meta:
         model = Tournament

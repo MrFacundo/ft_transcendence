@@ -94,12 +94,22 @@ export class WebSocketManager {
 
     handleOnlineStatusMessage(event) {
         const data = JSON.parse(event.data);
-        this.app.stateManager.updateOnlineStatus(data);
+        this.app.stateManager.updateIndividualOnlineStatus(data);
+        this.app.currentPage.updateIndividualOnlineStatusUI(data);
     }
 
-    handleTournamentMessage(event) {
+    async handleTournamentMessage(event) {
         const data = JSON.parse(event.data);
         console.log("Tournament WS message:", data);
+        if (data.type === "join") {
+            this.app.stateManager.updateCurrentTournament(data.tournament);
+            if (this.app.currentPage === "tournament-join") {
+                this.app.pages.tournamentJoin.updateCurrentTournamentUI();
+            }
+            if (data.participant_id !== this.app.auth.user.id) {
+                showMessage(`${data.tournament.participants.find(p => p.id === data.participant_id).username} joined the tournament.`);
+            }
+        }
     }
 
     closeConnections() {

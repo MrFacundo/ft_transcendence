@@ -65,6 +65,6 @@ class CurrentTournamentView(RetrieveAPIView):
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
         if instance is None:
-            return Response({"message": "User not participating in any ongoing tournament."}, status=status.HTTP_200_OK)
+            return Response(None, status=status.HTTP_200_OK)
         serializer = self.get_serializer(instance)
         return Response(serializer.data)

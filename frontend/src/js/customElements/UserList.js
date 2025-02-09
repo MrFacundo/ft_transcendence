@@ -71,7 +71,7 @@ class UserList extends HTMLElement {
         userCardSm.addEventListener("click", () => {
             this.actionButton && this.actionButton.classList.add("d-none");
             this.updateSelectedStyle(userCardSm);
-            this.selectedUserCard.setUser(user);
+            this.selectedUserCard && this.selectedUserCard.setUser(user);
     
             if (this.actionButton && (actionText === "Accept" || !isPending)) {
                 this.actionButton.classList.remove("d-none");

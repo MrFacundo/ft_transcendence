@@ -12,44 +12,49 @@ class TournamentPage extends Page {
         });
     }
 
-    appendPendingButton(tournamentItem) {
-        if (!tournamentItem.querySelector(".pending")) {
-            const pendingButton = document.createElement("button");
-            pendingButton.className = "pending btn btn-warning text-white";
-            pendingButton.textContent = "Joined";
-            const spans = tournamentItem.querySelectorAll("span");
-            tournamentItem.insertBefore(pendingButton, spans[1]);
-        }
-    }
-
     async render() {
         const { api, wsManager, stateManager } = this.app;
         const openTournaments = await api.getTournaments();
         const tournamentListElement = document.querySelector("#tournament-list");
 
-        openTournaments.forEach((tournament) => {
+        openTournaments.forEach(({ id, name, participants, participants_amount }) => {
             const tournamentItem = document.createElement("li");
+            tournamentItem.id = `tournament-${id}`;
             tournamentItem.className = "list-group-item d-flex justify-content-between align-items-center shadow-lg p-4 my-3 rounded cursor-pointer";
-            tournamentItem.innerHTML = `<span>${tournament.name}</span><span class="badge bg-light text-dark">${tournament.participants.length} / ${tournament.participants_amount}</span>`;
+            tournamentItem.innerHTML = `<span>${name}</span><span class="badge bg-light text-dark">${participants.length} / ${participants_amount}</span>`;
             tournamentListElement.appendChild(tournamentItem);
-
-            if (tournament.participants.some(participant => participant.id === this.app.auth.user.id)) {
-                this.appendPendingButton(tournamentItem);
-            }
 
             tournamentItem.addEventListener("click", async () => {
                 try {
-                    const response = await api.joinTournament(tournament.id);
+                    const response = await api.joinTournament(id);
                     stateManager.setCurrentTournament(response);
                     wsManager.setupTournamentWebSocket();
-                    showMessage(`Joined tournament: ${tournament.name}`);
-                    this.appendPendingButton(tournamentItem);
+                    showMessage(`Joined tournament: ${name}`);
                 } catch (error) {
                     console.error("error", error);
-                    showMessage(error.response?.data?.message ? error.response.data.message : error, "error");
+                    showMessage(error.response?.data?.message || error, "error");
                 }
             });
         });
+    }
+
+    updateCurrentTournamentUI() {
+        const { stateManager } = this.app;
+        const currentTournament = stateManager.currentTournament;
+        if (!currentTournament) return;
+
+        const tournamentItem = document.querySelector(`#tournament-${currentTournament.id}`);
+        if (tournamentItem) {
+            const badge = tournamentItem.querySelector(".badge");
+            if (badge) badge.textContent = `${currentTournament.participants.length} / ${currentTournament.participants_amount}`;
+
+            if (!tournamentItem.querySelector(".pending")) {
+                const pendingButton = document.createElement("button");
+                pendingButton.className = "pending btn btn-warning text-white";
+                pendingButton.textContent = "Joined";
+                tournamentItem.insertBefore(pendingButton, tournamentItem.querySelectorAll("span")[1]);
+            }
+        }
     }
 }
 

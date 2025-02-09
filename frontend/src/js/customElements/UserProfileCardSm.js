@@ -75,9 +75,9 @@ class UserProfileCardSm extends HTMLElement {
 
         const avatarEl = this.shadowRoot.getElementById("profile-avatar");
         const usernameEl = this.shadowRoot.getElementById("profile-username");
-        this.updateOnlineStatus();
         avatarEl.src = await getAvatarSrc(this.user, this.page.app.api.fetchAvatarObjectUrl);
         usernameEl.textContent = this.user.username;
+        this.updateOnlineStatus();
     }
 
     appendPendingButton(expiresAt = null) {

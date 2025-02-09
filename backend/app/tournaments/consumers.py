@@ -1,6 +1,7 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from app.tournaments.models import Tournament
+from app.tournaments.serializers import TournamentSerializer
 import json
 
 """
@@ -48,7 +49,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             self.room_group_name,
             {
                 'type': 'tournament_connected',
-                'user': self.user.username
+                'user': self.user.id
             }
         )
 
@@ -68,9 +69,12 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         )
 
     async def tournament_connected(self, event):
-        user = event['user']
+        tournament_data = await self.get_tournament_data(self.tournament_id)
+        
         await self.send(text_data=json.dumps({
-            'message': f'{user} connected to the tournament.'
+            'type': 'join',
+            'tournament': tournament_data,
+            'participant_id': event['user']
         }))
 
     async def tournament_disconnected(self, event):
@@ -94,3 +98,9 @@ class TournamentConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
     def is_tournament_full(self, tournament):
         return tournament.participants.count() >= tournament.participants_amount
+
+    @database_sync_to_async
+    def get_tournament_data(self, tournament_id):
+        tournament = Tournament.objects.get(id=tournament_id)
+        return TournamentSerializer(tournament).data
+

@@ -70,12 +70,12 @@ class App {
         if (!replaceHistory) {
             history.pushState({}, page.name, path + (queryParams || ''));
         }
-
-        await page.open(this);
+        await this.auth.authenticate();
         if (this.auth.authenticated) {
             await this.stateManager.init();
             await this.wsManager.init();
         }
+        await page.open(this);
     }
 
     /**
@@ -93,9 +93,6 @@ class App {
         window.addEventListener("beforeunload", () => {
             this.wsManager.closeConnections();
             this.stateManager.close();
-        });
-        window.addEventListener("online-status-update", (event) => {
-            this.stateManager.updateOnlineStatusUI(event);
         });
     }
 }
