@@ -99,15 +99,18 @@ export class WebSocketManager {
     }
 
     async handleTournamentMessage(event) {
+        const { stateManager, currentPage, pages, auth } = this.app;
         const data = JSON.parse(event.data);
         console.log("Tournament WS message:", data);
         if (data.type === "join") {
-            this.app.stateManager.updateCurrentTournament(data.tournament);
-            if (this.app.currentPage === "tournament-join") {
-                this.app.pages.tournamentJoin.updateCurrentTournamentUI();
+            stateManager.updateCurrentTournament(data.tournament);
+            if (currentPage.name === "tournament-join") {
+                pages.tournamentJoin.updateCurrentTournamentUI();
+            } else if (currentPage.name === "tournament") {
+                pages.tournament.updateCurrentTournamentUI(Number(parseInt(data.participant_id)));
             }
-            if (data.participant_id !== this.app.auth.user.id) {
-                showMessage(`${data.tournament.participants.find(p => p.id === data.participant_id).username} joined the tournament.`);
+            if (data.participant_id !== auth.user.id) {
+                showMessage(`${data.tournament.participants.find(p => p.id === Number(data.participant_id)).username} joined the tournament.`);
             }
         }
     }

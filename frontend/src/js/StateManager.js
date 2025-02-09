@@ -63,9 +63,7 @@ export class StateManager {
 	}
 
 	updateCurrentTournament(tournament) {
-		if (!this.currentTournament || this.currentTournament.id !== tournament.id) {
 			this.setCurrentTournament(tournament);
-		}
 	}
 
 	close() {

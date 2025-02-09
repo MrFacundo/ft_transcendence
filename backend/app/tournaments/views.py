@@ -4,6 +4,7 @@ from rest_framework.generics import CreateAPIView, RetrieveUpdateAPIView, ListAP
 from django.contrib.auth import get_user_model
 from .models import Tournament
 from .serializers import TournamentSerializer
+from app.tournaments.matchmaker import MatchMaker
 
 User = get_user_model()
 
@@ -42,7 +43,10 @@ class TournamentJoinView(RetrieveUpdateAPIView):
             tournament.participants.add(user)
         else:
             return Response({"message": "You are already a participant in this tournament."}, status=status.HTTP_400_BAD_REQUEST)
-
+   
+        if tournament.participants.count() == tournament.participants_amount:
+            MatchMaker.create_matches(tournament)
+        
         return Response(TournamentSerializer(tournament).data, status=status.HTTP_200_OK)
 
 class TournamentListView(ListAPIView):

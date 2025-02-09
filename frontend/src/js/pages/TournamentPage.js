@@ -39,6 +39,21 @@ class TournamentPage extends Page {
             });
         }
     }
+
+    updateCurrentTournamentUI(participant_id) {
+        const participantsListEl = document.querySelector("#tournament-participants");
+        if (!participantsListEl || participantsListEl.shadowRoot.querySelector(`user-profile-small[data-user-id="${participant_id}"]`)) return;
+        
+        const { stateManager } = this.app;
+        const currentTournament = stateManager.currentTournament;
+        if (!currentTournament) return;
+        
+        const participant = currentTournament.participants.find(p => p.id === participant_id);
+        
+        if (!participant) return;
+        participantsListEl.addCard(participant);
+    }
 }
+
 
 export default TournamentPage;
