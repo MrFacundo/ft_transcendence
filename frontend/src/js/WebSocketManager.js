@@ -104,17 +104,22 @@ export class WebSocketManager {
         console.log("Tournament WS message:", data);
         if (data.type === "join") {
             stateManager.updateCurrentTournament(data.tournament);
-            if (currentPage.name === "tournament-join") {
-                pages.tournamentJoin.updateCurrentTournamentUI();
-            } else if (currentPage.name === "tournament") {
-                pages.tournament.updateCurrentTournamentUI(Number(parseInt(data.participant_id)));
-            }
-            if (data.participant_id !== auth.user.id) {
-                showMessage(`${data.tournament.participants.find(p => p.id === Number(data.participant_id)).username} joined the tournament.`);
+
+            if (stateManager.currentTournament.participants.length < stateManager.currentTournament.participants_amount) {
+                if (currentPage.name === "tournament-join") {
+                    pages.tournamentJoin.updateCurrentTournamentUI();
+                } else if (currentPage.name === "tournament") {
+                    pages.tournament.updateCurrentTournamentUI(Number(parseInt(data.participant_id)));
+                }
+                if (data.participant_id !== auth.user.id) {
+                    showMessage(`${data.tournament.participants.find(p => p.id === Number(data.participant_id)).username} joined the tournament.`);
+                }
+            } else {
+                this.app.navigate("/tournament");
             }
         }
     }
-
+    
     closeConnections() {
         ['gameWs', 'friendWs', 'onlineStatusWs', 'tournamentWs'].forEach(ws => {
             if (this[ws]) {

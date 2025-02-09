@@ -18,25 +18,31 @@ class TournamentPage extends Page {
         const cardsContainerEl = document.querySelector("#cards-container");
         const tournamentDetailsEl = document.querySelector("#tournament-details");
         const tournamentNameEl = document.querySelector("#tournament-name");
+        const participantsInfoEl = document.querySelector("#participants-info");
         const partcipantsListEl = document.querySelector("#tournament-participants");
         const selectedParticipantEl = document.querySelector("#selected-participant");
+        const tournamentBracketEl = document.querySelector("#tournament-bracket");
 
         if (!tournament) {
             cardsContainerEl.classList.remove("d-none");
-            tournamentDetailsEl.classList.add("d-none");
         } else {
-            cardsContainerEl.classList.add("d-none");
             tournamentDetailsEl.classList.remove("d-none");
+            const isTournamentFull = tournament.participants.length === tournament.participants_amount;
             
             tournamentNameEl.textContent = tournament.name + " 🏆";
         
-            [partcipantsListEl, selectedParticipantEl].forEach(el => (el.page = this));
-            partcipantsListEl.initialize(selectedParticipantEl);
-            partcipantsListEl.populateList({
-                users: tournament.participants,
-                actionText: null,
-                actionCallback: null,
-            });
+            if (!isTournamentFull) {
+                participantsInfoEl.classList.remove("d-none");
+                [partcipantsListEl, selectedParticipantEl].forEach(el => (el.page = this));
+                partcipantsListEl.initialize(selectedParticipantEl);
+                partcipantsListEl.populateList({
+                    users: tournament.participants,
+                    actionText: null,
+                    actionCallback: null,
+                });
+            } else {
+                tournamentBracketEl.classList.remove("d-none");
+            }
         }
     }
 
