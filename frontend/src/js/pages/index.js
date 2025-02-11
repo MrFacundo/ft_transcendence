@@ -12,18 +12,18 @@ import ProfilePage from "./ProfilePage.js";
 import AIPage from "./AIPage.js";
 import GamePage from "./GamePage.js";
 
-export { 
-    LoginPage, 
-    NotFoundPage, 
-    RegisterPage, 
-    VerifyEmailPage, 
-    OAuthResultPage, 
-    TwoFactorAuthPage, 
-    UserSettingsPage,
-    HomePage,
-    OneVsOne,
-    TournamentPage,
-    ProfilePage,
-    AIPage,
-    GamePage
-}
+export {
+  LoginPage,
+  NotFoundPage,
+  RegisterPage,
+  VerifyEmailPage,
+  OAuthResultPage,
+  TwoFactorAuthPage,
+  UserSettingsPage,
+  HomePage,
+  OneVsOne,
+  TournamentPage,
+  ProfilePage,
+  AIPage,
+  GamePage
+};

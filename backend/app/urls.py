@@ -29,10 +29,11 @@ from app.views.user_views import (
 )
 
 from app.views.game_views import (
-	CreateGameInvitationView,
-	AcceptGameInvitationView,
-	PongGameDetailView,
-	MatchHistoryListView
+    CreateGameInvitationView,
+    AcceptGameInvitationView,
+    PongGameDetailView,
+    MatchHistoryListView,
+    CreateAIGameView,
 )
 
 urlpatterns = [
@@ -61,4 +62,7 @@ urlpatterns = [
 	path('games/<int:id>/', PongGameDetailView.as_view(), name='pong-game-detail'),
 	# Match history
 	path('match-history/<int:id>/', MatchHistoryListView.as_view(), name='match-history'),
+	# Ai game
+     path('games/ai/', CreateAIGameView.as_view(), name='create-ai-game'),
+
 ]

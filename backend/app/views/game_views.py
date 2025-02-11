@@ -124,3 +124,19 @@ class MatchHistoryListView(ListAPIView):
     def get_queryset(self):
         user_id = self.kwargs.get('id')
         return PongGame.objects.filter(player1_id=user_id, status="completed") | PongGame.objects.filter(player2_id=user_id, status="completed")
+
+
+class CreateAIGameView(APIView):
+    def post(self, request):
+        try:
+            game = PongGame.objects.create(
+                player1=request.user, player2=None, status="not_started"
+            )
+            return Response(
+                {"id": game.id, "status": game.status}, status=status.HTTP_201_CREATED
+            )
+        except Exception as e:
+            return Response(
+                {"message": "Failed to create AI game", "error": str(e)},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
