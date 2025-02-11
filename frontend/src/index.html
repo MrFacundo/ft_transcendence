@@ -396,7 +396,7 @@
             </div>
         </div>
         <div id="tournament-details" class="row justify-content-center d-none">
-            <h2  id="tournament-name" class="mb-4"></h2>
+            <h2  id="tournament-name" class="mb-4 text-center text-warning display-6"></h2>
             <div id="participants-info" class="d-none">
                 <div class="col-md-4">
                     <p>Participants</p>
@@ -406,8 +406,8 @@
                     <user-profile id="selected-participant"></user-profile>
                 </div>
             </div>
-            <div id="tournament-bracket" class="d-none">
-                <p>Tournament will start here</p>
+            <div id="tournament-bracket-container" class="d-none">
+                <tournament-bracket></tournament-bracket>
             </div>
         </div>
     </section>

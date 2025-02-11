@@ -107,9 +107,9 @@ export class WebSocketManager {
 
             if (stateManager.currentTournament.participants.length < stateManager.currentTournament.participants_amount) {
                 if (currentPage.name === "tournament-join") {
-                    pages.tournamentJoin.updateCurrentTournamentUI();
+                    pages.tournamentJoin.updateTournamentsList();
                 } else if (currentPage.name === "tournament") {
-                    pages.tournament.updateCurrentTournamentUI(Number(parseInt(data.participant_id)));
+                    pages.tournament.updateParticipantsList(Number(parseInt(data.participant_id)));
                 }
                 if (data.participant_id !== auth.user.id) {
                     showMessage(`${data.tournament.participants.find(p => p.id === Number(data.participant_id)).username} joined the tournament.`);
