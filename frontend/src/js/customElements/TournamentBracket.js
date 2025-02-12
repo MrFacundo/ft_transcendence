@@ -238,15 +238,15 @@ class TournamentBracket extends HTMLElement {
     async setTournament(tournament) {
         if (!tournament) return;
 
-        const { semifinal_1_game1, semifinal_1_game2, final_game } = tournament;
+        const { semifinal_1_game, semifinal_2_game, final_game } = tournament;
 
-        await this.updateParticipant("semi1-player1", semifinal_1_game1.player1);
-        await this.updateParticipant("semi1-player2", semifinal_1_game1.player2);
-        await this.updateParticipant("semi2-player1", semifinal_1_game2.player1);
-        await this.updateParticipant("semi2-player2", semifinal_1_game2.player2);
+        await this.updateParticipant("semi1-player1", semifinal_1_game.player1);
+        await this.updateParticipant("semi1-player2", semifinal_1_game.player2);
+        await this.updateParticipant("semi2-player1", semifinal_2_game.player1);
+        await this.updateParticipant("semi2-player2", semifinal_2_game.player2);
 
-        if (semifinal_1_game1.winner) this.updateGame(semifinal_1_game1, "semi1");
-        if (semifinal_1_game2.winner) this.updateGame(semifinal_1_game2, "semi2");
+        if (semifinal_1_game.winner) this.updateGame(semifinal_1_game, "semi1");
+        if (semifinal_2_game.winner) this.updateGame(semifinal_2_game, "semi2");
         if (final_game?.winner) this.updateGame(final_game, "final");
 
         this.shadowRoot.querySelector(".start-button-container button")

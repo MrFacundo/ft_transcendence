@@ -13,6 +13,6 @@ class MatchMaker:
         game1 = PongGame.objects.create(player1=participants[0], player2=participants[1], tournament=tournament)
         game2 = PongGame.objects.create(player1=participants[2], player2=participants[3], tournament=tournament)
 
-        tournament.semifinal_1_game1 = game1
-        tournament.semifinal_1_game2 = game2
+        tournament.semifinal_1_game = game1
+        tournament.semifinal_2_game = game2
         tournament.save()

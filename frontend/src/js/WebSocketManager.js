@@ -102,24 +102,32 @@ export class WebSocketManager {
         const { stateManager, currentPage, pages, auth } = this.app;
         const data = JSON.parse(event.data);
         console.log("Tournament WS message:", data);
+    
+        if (data.tournament) stateManager.updateCurrentTournament(data.tournament);
+        const currentTournament = stateManager.currentTournament;
+    
         if (data.type === "join") {
-            stateManager.updateCurrentTournament(data.tournament);
-
-            if (stateManager.currentTournament.participants.length < stateManager.currentTournament.participants_amount) {
+            if (currentTournament.participants.length < currentTournament.participants_amount) {
                 if (currentPage.name === "tournament-join") {
                     pages.tournamentJoin.updateTournamentsList();
                 } else if (currentPage.name === "tournament") {
-                    pages.tournament.updateParticipantsList(Number(parseInt(data.participant_id)));
+                    pages.tournament.updateParticipantsList(Number(data.participant_id));
                 }
                 if (data.participant_id !== auth.user.id) {
-                    showMessage(`${data.tournament.participants.find(p => p.id === Number(data.participant_id)).username} joined the tournament.`);
+                    const participant = data.tournament.participants.find(p => p.id === Number(data.participant_id));
+                    showMessage(`${participant.username} joined the tournament.`);
                 }
             } else {
                 this.app.navigate("/tournament");
             }
+        } else if (data.type === "start_game") {
+            if (auth.user.id === data.participant_id) {
+                stateManager.currentGame = true;
+                this.app.navigate(data.game_url);
+            }
         }
     }
-    
+
     closeConnections() {
         ['gameWs', 'friendWs', 'onlineStatusWs', 'tournamentWs'].forEach(ws => {
             if (this[ws]) {

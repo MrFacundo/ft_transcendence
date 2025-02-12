@@ -1,76 +1,88 @@
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from app.tournaments.models import Tournament
+from app.games.models import PongGame
 from app.tournaments.serializers import TournamentSerializer
 import json
 
-"""
-
-Tournament Consumer
-
-"""
-
 class TournamentConsumer(AsyncWebsocketConsumer):
+    start_messages = {
+        'semifinal_1': set(),
+        'semifinal_2': set(),
+        'final': set()
+    }
+
     async def connect(self):
         self.user = self.scope["user"]
         if not self.user.is_authenticated:
-            await self.close()
-            return
+            return await self.close()
 
         self.tournament_id = self.scope["url_route"]["kwargs"].get("tournament_id")
         if not self.tournament_id:
-            await self.close()
-            return
-        
+            return await self.close()
+
         self.tournament_db = await self.get_tournament(self.tournament_id)
-        
-        is_participant = await self.is_user_participant(self.user, self.tournament_db)
-        if not is_participant:
-            await self.close()
-            return
+        if not await self.is_user_participant(self.user, self.tournament_db) or not await self.is_tournament_ongoing(self.tournament_db):
+            return await self.close()
 
-        is_ongoing = await self.is_tournament_ongoing(self.tournament_db)
-        if not is_ongoing:
-            await self.close()
-            return
-
-        self.room_name = self.tournament_id
-        self.room_group_name = f"tournament_{self.room_name}"
-
-        await self.channel_layer.group_add(
-            self.room_group_name,
-            self.channel_name
-        )
+        self.room_group_name = f"tournament_{self.tournament_id}"
+        await self.channel_layer.group_add(self.room_group_name, self.channel_name)
         await self.accept()
 
-        print(f"Connected to tournament room: {self.room_name}, group: {self.room_group_name}")
-
-        await self.channel_layer.group_send(
-            self.room_group_name,
-            {
-                'type': 'tournament_connected',
-                'user': self.user.id
-            }
-        )
+        await self.channel_layer.group_send(self.room_group_name, {
+            'type': 'tournament_connected',
+            'user': self.user.id
+        })
 
     async def disconnect(self, close_code):
-        await self.channel_layer.group_discard(
-            self.room_group_name,
-            self.channel_name
-        )
-        print(f"Disconnected from tournament room: {self.room_name}, group: {self.room_group_name}")
+        await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
+        await self.channel_layer.group_send(self.room_group_name, {
+            'type': 'tournament_disconnected',
+            'user': self.user.username
+        })
 
-        await self.channel_layer.group_send(
-            self.room_group_name,
-            {
-                'type': 'tournament_disconnected',
-                'user': self.user.username
-            }
-        )
+    async def receive(self, text_data):
+        data = json.loads(text_data)
+        if data.get("type") == "start":
+            await self.handle_start_message()
+
+    async def handle_start_message(self):
+        game_stage = await self.get_game_stage()
+        if not game_stage:
+            return
+        print("message received from ", self.user.id)
+        print("game stage: ", game_stage)
+        self.start_messages[game_stage].add(self.user.id)
+        participants = await self.get_game_participants(game_stage)
+
+        if self.start_messages[game_stage] == set(participants):
+            game_id = await self.get_game_id(self.tournament_db, game_stage)
+            for user_id in participants:
+                await self.channel_layer.group_send(self.room_group_name, {
+                    "type": "start_game",
+                    "user_id": user_id,
+                    "game_id": game_id
+                })
+            self.start_messages[game_stage].clear()
+
+    async def endGame(self, event): #this comes from the game consumer
+        tournament_data = await self.get_tournament_data(self.tournament_id)
+        await self.send(text_data=json.dumps({
+            "type": "game_over",
+            "game_id": event["game_id"],
+            "tournament": tournament_data,
+        }))
+
+    async def start_game(self, event):
+        if event["user_id"] == self.user.id:
+            await self.send(text_data=json.dumps({
+                "type": "start_game",
+                "game_url": f"/game/{event['game_id']}",
+                "participant_id": event["user_id"]
+            }))
 
     async def tournament_connected(self, event):
         tournament_data = await self.get_tournament_data(self.tournament_id)
-        
         await self.send(text_data=json.dumps({
             'type': 'join',
             'tournament': tournament_data,
@@ -78,9 +90,8 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         }))
 
     async def tournament_disconnected(self, event):
-        user = event['user']
         await self.send(text_data=json.dumps({
-            'message': f'{user} disconnected from the tournament.'
+            'message': f'{event["user"]} disconnected from the tournament.'
         }))
 
     @database_sync_to_async
@@ -94,13 +105,43 @@ class TournamentConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
     def is_tournament_ongoing(self, tournament):
         return tournament.end_date is None
-    
-    @database_sync_to_async
-    def is_tournament_full(self, tournament):
-        return tournament.participants.count() >= tournament.participants_amount
 
     @database_sync_to_async
     def get_tournament_data(self, tournament_id):
         tournament = Tournament.objects.get(id=tournament_id)
         return TournamentSerializer(tournament).data
 
+    @database_sync_to_async
+    def get_game_participants(self, game):
+        game_map = {
+            'semifinal_1': self.tournament_db.semifinal_1_game,
+            'semifinal_2': self.tournament_db.semifinal_2_game,
+            'final': self.tournament_db.final_game
+        }
+        game_instance = game_map.get(game)
+        if not game_instance:
+            return []
+        return [game_instance.player1.id, game_instance.player2.id]
+
+    @database_sync_to_async
+    def get_game_id(self, tournament, game_type):
+        game_map = {
+            'semifinal_1': tournament.semifinal_1_game,
+            'semifinal_2': tournament.semifinal_2_game,
+            'final': tournament.final_game
+        }
+        game_instance = game_map.get(game_type)
+        if game_type == 'final' and not game_instance:
+            game_instance = PongGame.objects.create()
+            tournament.final_game = game_instance
+            tournament.save()
+        return game_instance.id if game_instance else None
+
+    async def get_game_stage(self):
+        if self.user.id in await self.get_game_participants('semifinal_1'):
+            return 'semifinal_1'
+        elif self.user.id in await self.get_game_participants('semifinal_2'):
+            return 'semifinal_2'
+        elif self.user.id in await self.get_game_participants('final'):
+            return 'final'
+        return None

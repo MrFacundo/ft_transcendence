@@ -49,7 +49,7 @@ const dummyTournament = {
             }
         }
     ],
-    "semifinal_1_game1": {
+    "semifinal_1_game": {
         "id": 1,
         "player1": {
             "id": 3,
@@ -92,7 +92,7 @@ const dummyTournament = {
         "winner": 3,
         "tournament": 1
     },
-    "semifinal_1_game2": {
+    "semifinal_1_game": {
         "id": 2,
         "player1": {
             "id": 1,
@@ -139,8 +139,8 @@ const dummyTournament = {
     "start_date": "2025-02-09T23:49:22.871239Z",
     "end_date": null,
     "participants_amount": 4,
-    "semifinal_2_game1": null,
-    "semifinal_2_game2": null,
+    "semifinal_2_game": null,
+    "semifinal_2_game": null,
     "final_game": {
         "id": 3,
         "player1": {
@@ -233,7 +233,7 @@ class TournamentPage extends Page {
                 // Show tournament bracket
                 tournamentBracketContainerEl.classList.remove("d-none");
                 tournamentBracketEl.page = this;
-                tournamentBracketEl.setTournament(dummyTournament);
+                tournamentBracketEl.setTournament(tournament);
             }
         }
     }
