@@ -194,6 +194,7 @@ class TournamentBracket extends HTMLElement {
                 </div>
             </div>
         `;
+        this.startButton = null;
     }
 
     updateParticipant = async (elementId, player) => {
@@ -235,6 +236,26 @@ class TournamentBracket extends HTMLElement {
         this.updateParticipant(`${type === "semi1" ? "final-player1" : "final-player2"}`, finalPlayer);
     }
 
+    updateStartButton(tournament) {
+        const { auth } = this.page.app;
+        if (!tournament || !auth.user) return;
+    
+        const games = [tournament.semifinal_1_game, tournament.semifinal_2_game, tournament.final_game];
+    
+        const isParticipant = games.some(game =>
+            game && (game.player1.id === auth.user.id || game.player2.id === auth.user.id) && game.status === "not_started"
+        );
+    
+        if (isParticipant) {
+            this.startButton.textContent = "START";
+            this.startButton.disabled = false;
+            this.startButton.style.cursor = "pointer";
+            this.startButton.style.display = "block";
+        } else {
+            this.startButton.style.display = "none";
+        }
+    }
+    
     async setTournament(tournament) {
         if (!tournament) return;
 
@@ -249,29 +270,32 @@ class TournamentBracket extends HTMLElement {
         if (semifinal_2_game.winner) this.updateGame(semifinal_2_game, "semi2");
         if (final_game?.winner) this.updateGame(final_game, "final");
 
-        this.shadowRoot.querySelector(".start-button-container button")
-            .addEventListener("click", this.handleStartButtonClick.bind(this));
+        this.updateStartButton(tournament);
+        this.setTournamentOver(tournament);
     }
 
     handleStartButtonClick() {
-        const button = this.shadowRoot.querySelector(".start-button-container button");
-        button.textContent = "Waiting for opponent...";
-        button.disabled = true;
-        button.style.cursor = "default";
+        this.startButton.textContent = "Waiting for opponent...";
+        this.startButton.disabled = true;
+        this.startButton.style.cursor = "default";
         this.page.handleStartButtonClick();
     }
 
-    setTournamentOver(winner) {
-        this.shadowRoot.querySelector(".start-button-container button").remove();
+    setTournamentOver(tournament) {
+        if (!tournament.final_game.winner) return;
         const headerEl = this.shadowRoot.querySelector(".header h3");
         headerEl.textContent = `Winner: ${winner.username}`;
     }
 
-    disconnectedCallback() {
-        const button = this.shadowRoot.querySelector(".start-button-container button");
-        if (button) {
-            button.removeEventListener("click", this.handleStartButtonClick);
+    connectedCallback() {
+        this.startButton = this.shadowRoot.querySelector(".start-button-container button");
+        if (this.startButton) {
+            this.startButton.addEventListener("click", this.handleStartButtonClick);
         }
+    }
+
+    disconnectedCallback() {
+        this.startButton.removeEventListener("click", this.handleStartButtonClick);
     }
 }
 

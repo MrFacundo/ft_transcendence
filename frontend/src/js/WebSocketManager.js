@@ -102,10 +102,10 @@ export class WebSocketManager {
         const { stateManager, currentPage, pages, auth } = this.app;
         const data = JSON.parse(event.data);
         console.log("Tournament WS message:", data);
-    
+
         if (data.tournament) stateManager.updateCurrentTournament(data.tournament);
         const currentTournament = stateManager.currentTournament;
-    
+
         if (data.type === "join") {
             if (currentTournament.participants.length < currentTournament.participants_amount) {
                 if (currentPage.name === "tournament-join") {
@@ -122,8 +122,13 @@ export class WebSocketManager {
             }
         } else if (data.type === "start_game") {
             if (auth.user.id === data.participant_id) {
-                stateManager.currentGame = true;
                 this.app.navigate(data.game_url);
+            }
+        } else if (data.type === "end_game") {
+            if (auth.user.id === data.participant_id) {
+                this.app.navigate("/tournament");
+            } else if (currentPage.name === "tournament") {
+                pages.tournament.setTournament(data.tournament);
             }
         }
     }

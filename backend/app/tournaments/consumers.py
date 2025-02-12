@@ -3,6 +3,7 @@ from channels.db import database_sync_to_async
 from app.tournaments.models import Tournament
 from app.games.models import PongGame
 from app.tournaments.serializers import TournamentSerializer
+from django.utils import timezone
 import json
 
 class TournamentConsumer(AsyncWebsocketConsumer):
@@ -55,7 +56,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         self.start_messages[game_stage].add(self.user.id)
         participants = await self.get_game_participants(game_stage)
 
-        if self.start_messages[game_stage] == set(participants):
+        if participants.count() == 2 and self.start_messages[game_stage] == set(participants):
             game_id = await self.get_game_id(self.tournament_db, game_stage)
             for user_id in participants:
                 await self.channel_layer.group_send(self.room_group_name, {
@@ -66,6 +67,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             self.start_messages[game_stage].clear()
 
     async def endGame(self, event): #this comes from the game consumer
+        await self.update_final_game(event)
         tournament_data = await self.get_tournament_data(self.tournament_id)
         await self.send(text_data=json.dumps({
             "type": "game_over",
@@ -145,3 +147,13 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         elif self.user.id in await self.get_game_participants('final'):
             return 'final'
         return None
+    
+    @database_sync_to_async
+    def update_final_game(self, event):
+        final_game = self.tournament_db.final_game
+        if (event["game_id"] == self.tournament_db.semifinal_1_game.id):
+            final_game.player1 = self.tournament_db.semifinal_1_game.winner
+        elif (event["game_id"] == self.tournament_db.semifinal_2_game.id):
+            final_game.player2 = self.tournament_db.semifinal_2_game.winner
+        elif (event["game_id"] == self.tournament_db.final_game.id):
+            self.tournament_db.end_date = timezone.now()

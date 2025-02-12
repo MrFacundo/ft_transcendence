@@ -35,9 +35,9 @@ class Game:
 
             if self.score[0] >= 5 or self.score[1] >= 5:
                 winner = 0 if self.score[0] >= 5 else 1
-                await self.comm.send_game_over()
                 await self.db.update_stats(winner)
                 await self.db.set_winner(winner)
+                await self.comm.send_game_over()
                 return
 
             self._update_game_state()
