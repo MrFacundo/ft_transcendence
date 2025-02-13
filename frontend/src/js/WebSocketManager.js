@@ -124,8 +124,8 @@ export class WebSocketManager {
             if (auth.user.id === data.participant_id) {
                 this.app.navigate(data.game_url);
             }
-        } else if (data.type === "end_game") {
-            if (auth.user.id === data.participant_id) {
+        } else if (data.type === "game_over") {
+            if (currentPage.name === "game") {
                 this.app.navigate("/tournament");
             } else if (currentPage.name === "tournament") {
                 pages.tournament.setTournament(data.tournament);

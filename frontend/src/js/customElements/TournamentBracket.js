@@ -243,7 +243,10 @@ class TournamentBracket extends HTMLElement {
         const games = [tournament.semifinal_1_game, tournament.semifinal_2_game, tournament.final_game];
     
         const isParticipant = games.some(game =>
-            game && (game.player1.id === auth.user.id || game.player2.id === auth.user.id) && game.status === "not_started"
+            game && 
+            ((game.player1 && game.player1.id === auth.user.id) || 
+            (game.player2 && game.player2.id === auth.user.id)) && 
+            game.status === "not_started"
         );
     
         if (isParticipant) {
@@ -290,7 +293,7 @@ class TournamentBracket extends HTMLElement {
     connectedCallback() {
         this.startButton = this.shadowRoot.querySelector(".start-button-container button");
         if (this.startButton) {
-            this.startButton.addEventListener("click", this.handleStartButtonClick);
+            this.startButton.addEventListener("click", this.handleStartButtonClick.bind(this));            
         }
     }
 

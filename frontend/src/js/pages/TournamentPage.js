@@ -260,5 +260,11 @@ class TournamentPage extends Page {
             }));
         }
     }
+
+    setTournament(tournament) {
+        const tournamentBracketEl = document.querySelector("tournament-bracket");
+        tournamentBracketEl.setTournament(tournament);
+    }
 }
 export default TournamentPage;
+
