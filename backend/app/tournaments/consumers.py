@@ -15,8 +15,10 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         if not (self.user.is_authenticated and self.tournament_id):
             return await self.close()
 
-        self.tournament_db = await self.get_tournament(self.tournament_id)
-        if not (await self.is_user_participant(self.user, self.tournament_db) and await self.is_tournament_ongoing(self.tournament_db)):
+        self.tournament_db = await self.get_tournament()
+        self.tournament_participants = await self.get_tournament_participants()
+
+        if not (await self.is_user_participant() and await self.is_tournament_ongoing()):
             return await self.close()
 
         self.room_group_name = f"tournament_{self.tournament_id}"
@@ -40,7 +42,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         print("game stage:", game_stage)
         
         self.start_messages[game_stage].add(self.user.id)
-        participants = await self.get_game_participants(game_stage)
+        participants = self.get_game_participants(game_stage)
         
         if len(participants) == 2 and self.start_messages[game_stage] == set(participants):
             game_id = await self.get_game_id(game_stage)
@@ -63,39 +65,44 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps({"message": f"{event['user']} disconnected from the tournament."}))
 
     @database_sync_to_async
-    def get_tournament(self, tournament_id):
-        return Tournament.objects.get(id=tournament_id)
+    def get_tournament(self):
+        return Tournament.objects.get(id=self.tournament_id)
 
     @database_sync_to_async
-    def is_user_participant(self, user, tournament):
-        return tournament.participants.filter(id=user.id).exists()
+    def get_tournament_participants(self):
+        return list(self.tournament_db.participants.all())
 
     @database_sync_to_async
-    def is_tournament_ongoing(self, tournament):
-        return tournament.end_date is None
+    def is_user_participant(self):
+        return self.tournament_db.participants.filter(id=self.user.id).exists()
+
+    @database_sync_to_async
+    def is_tournament_ongoing(self):
+        return self.tournament_db.end_date is None
 
     @database_sync_to_async
     def get_tournament_data(self):
         return TournamentSerializer(Tournament.objects.get(id=self.tournament_id)).data
 
-    @database_sync_to_async
     def get_game_participants(self, game):
-        game_instance = getattr(Tournament.objects.get(id=self.tournament_id), f"{game}_game", None)
-        return [game_instance.player1.id, game_instance.player2.id] if game_instance else []
+        game_instance = getattr(self.tournament_db, f"{game}_game", None)
+        if game_instance:
+            player1_id = game_instance.player1.id if game_instance.player1 else None
+            player2_id = game_instance.player2.id if game_instance.player2 else None
+            return [player1_id, player2_id]
+        return []
 
     @database_sync_to_async
     def get_game_id(self, game_type):
-        tournament = Tournament.objects.get(id=self.tournament_id)
-        game_instance = getattr(tournament, f"{game_type}_game", None)
-        if game_type == "final" and not game_instance:
-            game_instance = PongGame.objects.create()
-            tournament.final_game = game_instance
-            tournament.save()
+        game_instance = getattr(self.tournament_db, f"{game_type}_game", None)
         return game_instance.id if game_instance else None
 
     async def get_game_stage(self):
-        for stage in ["semifinal_1", "semifinal_2", "final"]:
-            if self.user.id in await self.get_game_participants(stage):
+        self.tournament_db = await self.get_tournament()
+        if self.user.id in self.get_game_participants("final"):
+            return "final"
+        for stage in ["semifinal_1", "semifinal_2"]:
+            if self.user.id in self.get_game_participants(stage):
                 return stage
         return None
 
@@ -104,9 +111,12 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         tournament = Tournament.objects.get(id=self.tournament_id)
         final_game = tournament.final_game
 
-        if event["game_id"] in [tournament.semifinal_1_game.id, tournament.semifinal_2_game.id]:
-            setattr(final_game, "player1" if event["game_id"] == tournament.semifinal_1_game.id else "player2", getattr(tournament, f"{event['game_id']}_game").winner)
-            final_game.save()
+        if event["game_id"] == tournament.semifinal_1_game.id:
+            final_game.player1 = tournament.semifinal_1_game.winner
+        elif event["game_id"] == tournament.semifinal_2_game.id:
+            final_game.player2 = tournament.semifinal_2_game.winner
         elif event["game_id"] == tournament.final_game.id:
             tournament.end_date = timezone.now()
             tournament.save()
+        
+        final_game.save()

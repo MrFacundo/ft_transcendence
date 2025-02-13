@@ -26,11 +26,14 @@ class TournamentBracket extends HTMLElement {
                 .header h3 {
                     font-size: 2.5em;
                     margin: 0;
-					color: #ffd700;
+                    color: #ffd700;
                 }
 
                 .start-button-container {
                     text-align: center;
+                    display: flex;
+                    width: 100%;
+                    justify-content: center;
                 }
 
                 .start-button-container button {
@@ -57,9 +60,9 @@ class TournamentBracket extends HTMLElement {
                     gap: 60px;
                 }
 
-				.final {
-					flex-direction: row;
-				}
+                .final {
+                    flex-direction: row;
+                }
 
                 .participant {
                     width: 250px;
@@ -71,7 +74,7 @@ class TournamentBracket extends HTMLElement {
                     justify-content: space-between;
                     position: relative;
                     overflow: hidden;
-                    transition: opacity 0.3s;
+                    transition: all 0.3s;
                 }
 
                 .avatar {
@@ -103,6 +106,106 @@ class TournamentBracket extends HTMLElement {
                     padding-right: 15px;
                 }
 
+                /* Responsive styles */
+                @media (max-width: 1200px) {
+                    .participant {
+                        width: 200px;
+                        height: 45px;
+                    }
+                    
+                    .avatar {
+                        width: 45px;
+                        height: 45px;
+                    }
+                    
+                    .tournament-bracket {
+                        gap: 30px;
+                    }
+                    
+                    .round {
+                        gap: 45px;
+                    }
+                }
+
+                @media (max-width: 900px) {
+                    :host {
+                        padding: 20px;
+                    }
+                    
+                    .participant {
+                        width: 160px;
+                        height: 40px;
+                    }
+                    
+                    .avatar {
+                        width: 40px;
+                        height: 40px;
+                    }
+                    
+                    .participant-info {
+                        padding: 0 10px;
+                        font-size: 0.9em;
+                    }
+                    
+                    .tournament-bracket {
+                        gap: 20px;
+                    }
+                    
+                    .round {
+                        gap: 30px;
+                    }
+                    
+                    .header h3 {
+                        font-size: 2em;
+                    }
+                    
+                    .start-button-container button {
+                        font-size: 2em;
+                        padding: 12px;
+                    }
+                }
+
+                @media (max-width: 600px) {
+                    :host {
+                        padding: 10px;
+                    }
+                    
+                    .participant {
+                        width: 120px;
+                        height: 35px;
+                    }
+                    
+                    .avatar {
+                        width: 35px;
+                        height: 35px;
+                    }
+                    
+                    .participant-info {
+                        padding: 0 8px;
+                        font-size: 0.8em;
+                    }
+                    
+                    .score {
+                        padding-right: 8px;
+                    }
+                    
+                    .tournament-bracket {
+                        gap: 15px;
+                    }
+                    
+                    .round {
+                        gap: 20px;
+                    }
+                    
+                    .header h3 {
+                        font-size: 1.5em;
+                    }
+                    
+                    .start-button-container button {
+                        font-size: 1.5em;
+                        padding: 10px;
+                    }
+}
             </style>
 
             <div class="tournament-container">
@@ -285,9 +388,12 @@ class TournamentBracket extends HTMLElement {
     }
 
     setTournamentOver(tournament) {
-        if (!tournament.final_game.winner) return;
+        const { final_game } = tournament;
+        const winner = final_game?.winner;
+        if (!winner) return;
         const headerEl = this.shadowRoot.querySelector(".header h3");
-        headerEl.textContent = `Winner: ${winner.username}`;
+        const winnerUsername = winner === final_game.player1.id ? final_game.player1.username : final_game.player2.username;
+        headerEl.textContent = `Winner: ${winnerUsername}`;
     }
 
     connectedCallback() {
