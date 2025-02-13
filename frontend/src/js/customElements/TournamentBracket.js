@@ -4,300 +4,8 @@ import { getAvatarSrc } from "../utils.js";
 class TournamentBracket extends HTMLElement {
     constructor() {
         super().attachShadow({ mode: "open" });
-        this.shadowRoot.innerHTML = `
-            <style>
-                :host {
-                    display: block;
-                    padding: 40px;
-                }
-
-                .tournament-container {
-                    width: 100%;
-                    max-width: 1500px;
-                    margin: 0 auto;
-                }
-
-                .header {
-                    text-align: center;
-                    margin-bottom: 40px;
-                    color: white;
-                }
-
-                .header h3 {
-                    font-size: 2.5em;
-                    margin: 0;
-                    color: #ffd700;
-                }
-
-                .start-button-container {
-                    text-align: center;
-                    display: flex;
-                    width: 100%;
-                    justify-content: center;
-                }
-
-                .start-button-container button {
-                    font-size: 2.5em;
-                    margin: 0;
-                    color: #ffd700;
-                    padding: 17px;
-                    background: white;
-                    border-radius: 15px;
-                    transition: all 0.3s;
-                    cursor: pointer;
-                }
-
-                .tournament-bracket {
-                    display: flex;
-                    justify-content: space-between;
-                    align-items: center;
-                    gap: 40px;
-                }
-
-                .round {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 60px;
-                }
-
-                .final {
-                    flex-direction: row;
-                }
-
-                .participant {
-                    width: 250px;
-                    height: 50px;
-                    background: #2a4189;
-                    border-radius: 25px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: space-between;
-                    position: relative;
-                    overflow: hidden;
-                    transition: all 0.3s;
-                }
-
-                .avatar {
-                    width: 50px;
-                    height: 50px;
-                    border-radius: 25px;
-                    overflow: hidden;
-                    flex-shrink: 0;
-                }
-
-                .avatar img {
-                    width: 100%;
-                    height: 100%;
-                    object-fit: cover;
-                }
-
-                .participant-info {
-                    padding: 0 15px;
-                    color: white;
-                }
-
-                .username {
-                    font-weight: bold;
-                    margin-bottom: 2px;
-                }
-
-                .score {
-                    color: white;
-                    padding-right: 15px;
-                }
-
-                /* Responsive styles */
-                @media (max-width: 1200px) {
-                    .participant {
-                        width: 200px;
-                        height: 45px;
-                    }
-                    
-                    .avatar {
-                        width: 45px;
-                        height: 45px;
-                    }
-                    
-                    .tournament-bracket {
-                        gap: 30px;
-                    }
-                    
-                    .round {
-                        gap: 45px;
-                    }
-                }
-
-                @media (max-width: 900px) {
-                    :host {
-                        padding: 20px;
-                    }
-                    
-                    .participant {
-                        width: 160px;
-                        height: 40px;
-                    }
-                    
-                    .avatar {
-                        width: 40px;
-                        height: 40px;
-                    }
-                    
-                    .participant-info {
-                        padding: 0 10px;
-                        font-size: 0.9em;
-                    }
-                    
-                    .tournament-bracket {
-                        gap: 20px;
-                    }
-                    
-                    .round {
-                        gap: 30px;
-                    }
-                    
-                    .header h3 {
-                        font-size: 2em;
-                    }
-                    
-                    .start-button-container button {
-                        font-size: 2em;
-                        padding: 12px;
-                    }
-                }
-
-                @media (max-width: 600px) {
-                    :host {
-                        padding: 10px;
-                    }
-                    
-                    .participant {
-                        width: 120px;
-                        height: 35px;
-                    }
-                    
-                    .avatar {
-                        width: 35px;
-                        height: 35px;
-                    }
-                    
-                    .participant-info {
-                        padding: 0 8px;
-                        font-size: 0.8em;
-                    }
-                    
-                    .score {
-                        padding-right: 8px;
-                    }
-                    
-                    .tournament-bracket {
-                        gap: 15px;
-                    }
-                    
-                    .round {
-                        gap: 20px;
-                    }
-                    
-                    .header h3 {
-                        font-size: 1.5em;
-                    }
-                    
-                    .start-button-container button {
-                        font-size: 1.5em;
-                        padding: 10px;
-                    }
-}
-            </style>
-
-            <div class="tournament-container">
-                <div class="header">
-                    <h3></h3>
-                </div>
-                
-                <div class="tournament-bracket">
-                    <!-- Left Semifinals -->
-                    <div class="round">
-                        <div class="participant" id="semi1-player1">
-                            <div class="avatar">
-                                <img src="${EMPTY_AVATAR_URL}" alt="Player 1">
-                            </div>
-                            <div class="participant-info">
-                                <div class="username">TBD</div>
-                            </div>
-                            <div class="score">
-                                <span></span>
-                            </div>
-                        </div>
-                        <div class="participant" id="semi1-player2">
-                            <div class="avatar">
-                                <img src="${EMPTY_AVATAR_URL}" alt="Player 2">
-                            </div>
-                            <div class="participant-info">
-                                <div class="username">TBD</div>
-                            </div>
-                            <div class="score">
-                                <span></span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Finals -->
-                    <div class="round final">
-                        <div class="participant" id="final-player1">
-                            <div class="avatar">
-                                <img src="${EMPTY_AVATAR_URL}" alt="Finalist 1">
-                            </div>
-                            <div class="participant-info">
-                                <div class="username">TBD</div>
-                            </div>
-                            <div class="score">
-                                <span></span>
-                            </div>
-                        </div>
-						<div class="participant" id="final-player2">
-							<div class="avatar">
-								<img src="${EMPTY_AVATAR_URL}" alt="Finalist 2">
-							</div>
-							<div class="participant-info">
-								<div class="username">TBD</div>
-							</div>
-                            <div class="score">
-                                <span></span>
-                            </div>
-                    	</div>
-                    </div>
-                    
-                    <!-- Right Semifinals -->
-                    <div class="round">
-                        <div class="participant" id="semi2-player1">
-                            <div class="avatar">
-                                <img src="${EMPTY_AVATAR_URL}" alt="Player 3">
-                            </div>
-                            <div class="participant-info">
-                                <div class="username">TBD</div>
-                            </div>
-                                                        <div class="score">
-                                <span></span>
-                            </div>
-                        </div>
-                        <div class="participant" id="semi2-player2">
-                            <div class="avatar">
-                                <img src="${EMPTY_AVATAR_URL}" alt="Player 4">
-                            </div>
-                            <div class="participant-info">
-                                <div class="username">TBD</div>
-                            </div>
-                            <div class="score">
-                                <span></span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="start-button-container">
-                    <button>START</button>
-                </div>
-            </div>
-        `;
         this.startButton = null;
+        this.setupTemplate();
     }
 
     updateParticipant = async (elementId, player) => {
@@ -405,6 +113,302 @@ class TournamentBracket extends HTMLElement {
 
     disconnectedCallback() {
         this.startButton.removeEventListener("click", this.handleStartButtonClick);
+    }
+
+    setupTemplate() {
+        this.shadowRoot.innerHTML = `
+        <style>
+            :host {
+                display: block;
+                padding: 40px;
+            }
+
+            .tournament-container {
+                width: 100%;
+                max-width: 1500px;
+                margin: 0 auto;
+            }
+
+            .header {
+                text-align: center;
+                margin-bottom: 40px;
+                color: white;
+            }
+
+            .header h3 {
+                font-size: 2.5em;
+                margin: 0;
+                color: #ffd700;
+            }
+
+            .start-button-container {
+                text-align: center;
+                display: flex;
+                width: 100%;
+                justify-content: center;
+            }
+
+            .start-button-container button {
+                font-size: 2.5em;
+                margin: 0;
+                color: #ffd700;
+                padding: 17px;
+                background: white;
+                border-radius: 15px;
+                transition: all 0.3s;
+                cursor: pointer;
+            }
+
+            .tournament-bracket {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: 40px;
+            }
+
+            .round {
+                display: flex;
+                flex-direction: column;
+                gap: 60px;
+            }
+
+            .final {
+                flex-direction: row;
+            }
+
+            .participant {
+                width: 250px;
+                height: 50px;
+                background: #2a4189;
+                border-radius: 25px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                position: relative;
+                overflow: hidden;
+                transition: all 0.3s;
+            }
+
+            .avatar {
+                width: 50px;
+                height: 50px;
+                border-radius: 25px;
+                overflow: hidden;
+                flex-shrink: 0;
+            }
+
+            .avatar img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+            .participant-info {
+                padding: 0 15px;
+                color: white;
+            }
+
+            .username {
+                font-weight: bold;
+                margin-bottom: 2px;
+            }
+
+            .score {
+                color: white;
+                padding-right: 15px;
+            }
+
+            /* Responsive styles */
+            @media (max-width: 1200px) {
+                .participant {
+                    width: 200px;
+                    height: 45px;
+                }
+                
+                .avatar {
+                    width: 45px;
+                    height: 45px;
+                }
+                
+                .tournament-bracket {
+                    gap: 30px;
+                }
+                
+                .round {
+                    gap: 45px;
+                }
+            }
+
+            @media (max-width: 900px) {
+                :host {
+                    padding: 20px;
+                }
+                
+                .participant {
+                    width: 160px;
+                    height: 40px;
+                }
+                
+                .avatar {
+                    width: 40px;
+                    height: 40px;
+                }
+                
+                .participant-info {
+                    padding: 0 10px;
+                    font-size: 0.9em;
+                }
+                
+                .tournament-bracket {
+                    gap: 20px;
+                }
+                
+                .round {
+                    gap: 30px;
+                }
+                
+                .header h3 {
+                    font-size: 2em;
+                }
+                
+                .start-button-container button {
+                    font-size: 2em;
+                    padding: 12px;
+                }
+            }
+
+            @media (max-width: 600px) {
+                :host {
+                    padding: 10px;
+                }
+                
+                .participant {
+                    width: 120px;
+                    height: 35px;
+                }
+                
+                .avatar {
+                    width: 35px;
+                    height: 35px;
+                }
+                
+                .participant-info {
+                    padding: 0 8px;
+                    font-size: 0.8em;
+                }
+                
+                .score {
+                    padding-right: 8px;
+                }
+                
+                .tournament-bracket {
+                    gap: 15px;
+                }
+                
+                .round {
+                    gap: 20px;
+                }
+                
+                .header h3 {
+                    font-size: 1.5em;
+                }
+                
+                .start-button-container button {
+                    font-size: 1.5em;
+                    padding: 10px;
+                }
+        }
+        </style>
+
+        <div class="tournament-container">
+            <div class="header">
+                <h3></h3>
+            </div>
+            
+            <div class="tournament-bracket">
+                <!-- Left Semifinals -->
+                <div class="round">
+                    <div class="participant" id="semi1-player1">
+                        <div class="avatar">
+                            <img src="${EMPTY_AVATAR_URL}" alt="Player 1">
+                        </div>
+                        <div class="participant-info">
+                            <div class="username">TBD</div>
+                        </div>
+                        <div class="score">
+                            <span></span>
+                        </div>
+                    </div>
+                    <div class="participant" id="semi1-player2">
+                        <div class="avatar">
+                            <img src="${EMPTY_AVATAR_URL}" alt="Player 2">
+                        </div>
+                        <div class="participant-info">
+                            <div class="username">TBD</div>
+                        </div>
+                        <div class="score">
+                            <span></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Finals -->
+                <div class="round final">
+                    <div class="participant" id="final-player1">
+                        <div class="avatar">
+                            <img src="${EMPTY_AVATAR_URL}" alt="Finalist 1">
+                        </div>
+                        <div class="participant-info">
+                            <div class="username">TBD</div>
+                        </div>
+                        <div class="score">
+                            <span></span>
+                        </div>
+                    </div>
+                    <div class="participant" id="final-player2">
+                        <div class="avatar">
+                            <img src="${EMPTY_AVATAR_URL}" alt="Finalist 2">
+                        </div>
+                        <div class="participant-info">
+                            <div class="username">TBD</div>
+                        </div>
+                        <div class="score">
+                            <span></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Right Semifinals -->
+                <div class="round">
+                    <div class="participant" id="semi2-player1">
+                        <div class="avatar">
+                            <img src="${EMPTY_AVATAR_URL}" alt="Player 3">
+                        </div>
+                        <div class="participant-info">
+                            <div class="username">TBD</div>
+                        </div>
+                                                    <div class="score">
+                            <span></span>
+                        </div>
+                    </div>
+                    <div class="participant" id="semi2-player2">
+                        <div class="avatar">
+                            <img src="${EMPTY_AVATAR_URL}" alt="Player 4">
+                        </div>
+                        <div class="participant-info">
+                            <div class="username">TBD</div>
+                        </div>
+                        <div class="score">
+                            <span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="start-button-container">
+                <button>START</button>
+            </div>
+        </div>
+`;
     }
 }
 
