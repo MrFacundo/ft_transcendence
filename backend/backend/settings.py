@@ -28,7 +28,7 @@ SECRET_KEY = 'django-insecure-sm^l$qx=e&7q13f(o7&^@e$(^2ta7plc+b6&1yq-bdi4u=m%^%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "172.22.0.1"]
 
 # jwt settings
 SIMPLE_JWT = {
@@ -106,6 +106,7 @@ MIDDLEWARE = [
 ]
 
 FRONTEND_URL = "http://localhost:8080"
+WAF_URL = "http://localhost:8081"
 
 CORS_ALLOWED_ORIGINS = [
     FRONTEND_URL,
