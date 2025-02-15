@@ -1,4 +1,4 @@
-import { EMPTY_AVATAR_URL, DEBUG, MEDIA_URL } from "./constants.js";
+import { EMPTY_AVATAR_URL, DEBUG, MEDIA_URL } from "./settings.js";
 
 export function capitalizeFirstLetter(message) {
 	return message.charAt(0).toUpperCase() + message.slice(1);

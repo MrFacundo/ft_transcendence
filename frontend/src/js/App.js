@@ -3,7 +3,7 @@ import * as Pages from "./pages/index.js";
 import "../scss/styles.scss";
 import { Api } from "./Api.js";
 import { Auth } from "./Auth.js";
-import { logSettings } from "./constants.js";
+import { logSettings } from "./settings.js";
 import { WebSocketManager } from './WebSocketManager.js';
 import { StateManager } from './StateManager.js';
 

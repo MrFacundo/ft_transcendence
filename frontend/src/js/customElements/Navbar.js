@@ -1,10 +1,68 @@
-import { EMPTY_AVATAR_URL } from "../constants.js";
+import { EMPTY_AVATAR_URL } from "../settings.js";
 import { getAvatarSrc } from "../utils.js";
 
 class Navbar extends HTMLElement {
     constructor() {
         super().attachShadow({ mode: "open" });
-        this._page = null;
+        this.state = { user: null, authenticated: false };
+        this.setupTemplate();
+    }
+
+    setState(newState) {
+        this.state = { ...this.state, ...newState };
+        this.render();
+    }
+
+    setDisplay(elements, display) {
+        elements.forEach(el => el.style.display = display);
+    }
+
+    render() {
+        const loginEl = this.shadowRoot.querySelector(".login");
+        const registerEl = this.shadowRoot.querySelector(".register");
+        const profileEl = this.shadowRoot.querySelector(".profile");
+        const settingsEl = this.shadowRoot.querySelector(".settings");
+        const logoutEl = this.shadowRoot.querySelector(".logout");
+
+        if (this.state.authenticated) {
+            const { user } = this.state;
+            profileEl.querySelector("img").src = user.avatarUrl || EMPTY_AVATAR_URL;
+            profileEl.querySelector(".username").textContent = user.username;
+            profileEl.setAttribute("data-href", `/profile/${user.id}`);
+            this.setDisplay([loginEl, registerEl], "none");
+            this.setDisplay([settingsEl, logoutEl], "block");
+            this.setDisplay([profileEl], "flex");
+        } else {
+            this.setDisplay([loginEl, registerEl], "block");
+            this.setDisplay([profileEl, settingsEl, logoutEl], "none");
+        }
+
+        this.shadowRoot.querySelectorAll("[data-href]").forEach(element => {
+            element.addEventListener("click", this.page.handleClick);
+        });
+    }
+
+    async updateAuthValues() {
+        const { auth, api } = this.page.app;
+
+        if (auth.authenticated) {
+            const avatarUrl = await getAvatarSrc(auth.user, api.fetchAvatarObjectUrl);
+            this.setState({
+                authenticated: true,
+                user: { ...auth.user, avatarUrl }
+            });
+        } else {
+            this.setState({ authenticated: false, user: null });
+        }
+    }
+
+    disconnectedCallback() {
+        this.shadowRoot.querySelectorAll("[data-href]").forEach(element => {
+            element.removeEventListener("click", this.page.handleClick);
+        });
+    }
+
+    setupTemplate() {
         this.shadowRoot.innerHTML = `
             <style>
                 .navbar {
@@ -69,43 +127,6 @@ class Navbar extends HTMLElement {
                 </ul>
             </nav>
         `;
-    }
-
-    setDisplay(elements, display) {
-        elements.forEach(el => el.style.display = display);
-    }
-
-    async updateAuthValues() {
-        const { auth, api } = this.page.app;
-        
-        this.shadowRoot.querySelectorAll("[data-href]").forEach(element => {
-            element.addEventListener("click", this.page.handleClick);
-        });
-
-        const loginEl = this.shadowRoot.querySelector(".login");
-        const registerEl = this.shadowRoot.querySelector(".register");
-        const profileEl = this.shadowRoot.querySelector(".profile");
-        const settingsEl = this.shadowRoot.querySelector(".settings");
-        const logoutEl = this.shadowRoot.querySelector(".logout");
-
-        if (auth.authenticated) {
-            const { user } = auth;
-            profileEl.querySelector("img").src = await getAvatarSrc(user, api.fetchAvatarObjectUrl);
-            profileEl.querySelector(".username").textContent = user.username;
-            profileEl.setAttribute('data-href', `/profile/${user.id}`);
-            this.setDisplay([loginEl, registerEl], "none");
-            this.setDisplay([settingsEl, logoutEl], "block");
-            this.setDisplay([profileEl], "flex");
-        } else {
-            this.setDisplay([loginEl, registerEl], "block");
-            this.setDisplay([profileEl, settingsEl, logoutEl], "none");
-        }
-    }
-
-    disconnectedCallback() {
-        this.shadowRoot.querySelectorAll("[data-href]").forEach(element => {
-            element.removeEventListener("click", this.page.handleClick);
-        });
     }
 }
 

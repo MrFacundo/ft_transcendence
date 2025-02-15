@@ -193,14 +193,12 @@ class GameInvitationConsumer(AsyncWebsocketConsumer):
             self.channel_name
         )
         await self.accept()
-        print(f"Connected to room: {self.room_name}, group: {self.room_group_name}")
 
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard(
             self.room_group_name,
             self.channel_name
         )
-        print(f"Disconnected from room: {self.room_name}, group: {self.room_group_name}")
 
     async def game_accepted(self, event):
         game_url = event['game_url']
@@ -208,7 +206,6 @@ class GameInvitationConsumer(AsyncWebsocketConsumer):
             'type': 'game_accepted',
             'game_url': game_url
         }))
-        print(f"Sent game URL: {game_url} to room: {self.room_name}, group: {self.room_group_name}")
 
     async def game_invited(self, event):
         invitation = event['invitation']

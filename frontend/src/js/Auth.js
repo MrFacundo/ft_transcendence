@@ -1,5 +1,5 @@
 import Cookies from "js-cookie";
-import { API_URL } from "./constants.js"; // TODO: handle oauth in Api.js
+import { API_URL } from "./settings.js"; // TODO: handle oauth in Api.js
 
 /**
  * Auth class handles user authentication, including login, registration, token management, and OAuth.

@@ -38,7 +38,7 @@ class TournamentPage extends Page {
         });
     }
 
-    updateCurrentTournamentUI() {
+    updateTournamentsList() {
         const { stateManager } = this.app;
         const currentTournament = stateManager.currentTournament;
         if (!currentTournament) return;

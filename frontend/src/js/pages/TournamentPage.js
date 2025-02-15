@@ -1,5 +1,5 @@
 import Page from "./Page.js";
-import "../customElements/Bracket.js";
+import TournamentBracket from "../customElements/TournamentBracket.js";
 
 class TournamentPage extends Page {
     constructor(app) {
@@ -10,6 +10,7 @@ class TournamentPage extends Page {
             isProtected: true,
             app: app,
         });
+        this.handleStartButtonClick = this.handleStartButtonClick.bind(this);
     }
 
     render() {
@@ -20,46 +21,61 @@ class TournamentPage extends Page {
         const tournamentNameEl = document.querySelector("#tournament-name");
         const participantsInfoEl = document.querySelector("#participants-info");
         const partcipantsListEl = document.querySelector("#tournament-participants");
-        const selectedParticipantEl = document.querySelector("#selected-participant");
-        const tournamentBracketEl = document.querySelector("#tournament-bracket");
+        const selectedUserCard = document.querySelector("user-profile#selected-participant");
+        const tournamentBracketContainerEl = document.querySelector("#tournament-bracket-container");
+        const tournamentBracketEl = document.querySelector("tournament-bracket");
 
         if (!tournament) {
+            // Show Join/create cards 
             cardsContainerEl.classList.remove("d-none");
         } else {
             tournamentDetailsEl.classList.remove("d-none");
             const isTournamentFull = tournament.participants.length === tournament.participants_amount;
-            
+
             tournamentNameEl.textContent = tournament.name + " 🏆";
-        
+
             if (!isTournamentFull) {
+                // Show participants list
                 participantsInfoEl.classList.remove("d-none");
-                [partcipantsListEl, selectedParticipantEl].forEach(el => (el.page = this));
-                partcipantsListEl.initialize(selectedParticipantEl);
-                partcipantsListEl.populateList({
-                    users: tournament.participants,
-                    actionText: null,
-                    actionCallback: null,
-                });
+                [partcipantsListEl, selectedUserCard].forEach(el => (el.page = this));
+
+                partcipantsListEl.config = { selectedUserCard };
+                partcipantsListEl.populateList(tournament.participants);
             } else {
-                tournamentBracketEl.classList.remove("d-none");
+                // Show tournament bracket
+                tournamentBracketContainerEl.classList.remove("d-none");
+                tournamentBracketEl.page = this;
+                tournamentBracketEl.setTournament(tournament);
             }
         }
     }
 
-    updateCurrentTournamentUI(participant_id) {
+    updateParticipantsList(participant_id) {
         const participantsListEl = document.querySelector("#tournament-participants");
-        if (!participantsListEl || participantsListEl.shadowRoot.querySelector(`user-profile-small[data-user-id="${participant_id}"]`)) return;
-        
         const { stateManager } = this.app;
         const currentTournament = stateManager.currentTournament;
-        if (!currentTournament) return;
+        
+        if (!participantsListEl || !currentTournament) return;
         
         const participant = currentTournament.participants.find(p => p.id === participant_id);
-        
         if (!participant) return;
-        participantsListEl.addCard(participant);
+        
+        participantsListEl.addUser(participant);
+    }
+
+    handleStartButtonClick() {
+        const { wsManager } = this.app;
+        if (wsManager.tournamentWs) {
+            wsManager.tournamentWs.send(JSON.stringify({
+                type: "start",
+            }));
+        }
+    }
+
+    setTournament(tournament) {
+        const tournamentBracketEl = document.querySelector("tournament-bracket");
+        tournamentBracketEl.setTournament(tournament);
     }
 }
-
-
 export default TournamentPage;
+

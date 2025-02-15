@@ -1,56 +1,29 @@
-import { EMPTY_AVATAR_URL } from "../constants.js";
+import { EMPTY_AVATAR_URL } from "../settings.js";
 import { getAvatarSrc } from "../utils.js";
 
 class UserProfileCard extends HTMLElement {
     constructor() {
         super().attachShadow({ mode: "open" });
-        this.shadowRoot.innerHTML = `
-            <style>
-                .profile-container {
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    text-align: center;
-                    margin-bottom: 1rem;
-                }
-                .profile-avatar {
-                    border-radius: 50%;
-                    object-fit: cover;
-                    border: 1px solid #dee2e6;
-                    transition: opacity 0.3s;
-                    cursor: pointer;
-                }
-                .profile-info, .profile-stats {
-                    margin-bottom: 1rem;
-                    transition: opacity 0.3s;
-                }
-                p {
-                    margin: 0;
-                }
-                .profile-stats {
-                    visibility: hidden;
-                    opacity: 0;
-                }
-                .profile-stats.visible {
-                    visibility: visible;
-                    opacity: 1;
-                }
-            </style>
-            <div class="profile-container">
-                <div id="profile-info" class="profile-info">
-                    <img id="profile-avatar" src="${EMPTY_AVATAR_URL}" alt="User Avatar" class="profile-avatar" width="150" height="150">
-                    <p id="profile-username"></p>
-                    <p id="online-status"></p>
-                </div>
-                <div id="profile-stats" class="profile-stats">
-                    <p>Wins: <span id="profile-wins"></span></p>
-                    <p>Losses: <span id="profile-losses"></span></p>
-                </div>
-            </div>
-        `;
+        this.setupTemplate();
+        this.state = { user: null };
+    }
+
+    set state(newState) {
+        this._state = { ...this._state, ...newState };
+        this.render();
+    }
+
+    get state() {
+        return this._state;
     }
 
     async setUser(user) {
+        if (!user) return;
+        this.state = { user };
+    }
+
+    async render() {
+        const { user } = this.state;
         if (!user) return;
 
         const avatarEl = this.shadowRoot.getElementById("profile-avatar");
@@ -101,6 +74,53 @@ class UserProfileCard extends HTMLElement {
         this.shadowRoot.querySelectorAll("[data-href]").forEach(element => {
             element.removeEventListener("click", this.page.handleClick);
         });
+    }
+
+    setupTemplate() {
+        this.shadowRoot.innerHTML = `
+        <style>
+            .profile-container {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                margin-bottom: 1rem;
+            }
+            .profile-avatar {
+                border-radius: 50%;
+                object-fit: cover;
+                border: 1px solid #dee2e6;
+                transition: opacity 0.3s;
+                cursor: pointer;
+            }
+            .profile-info, .profile-stats {
+                margin-bottom: 1rem;
+                transition: opacity 0.3s;
+            }
+            p {
+                margin: 0;
+            }
+            .profile-stats {
+                visibility: hidden;
+                opacity: 0;
+            }
+            .profile-stats.visible {
+                visibility: visible;
+                opacity: 1;
+            }
+        </style>
+        <div class="profile-container">
+            <div id="profile-info" class="profile-info">
+                <img id="profile-avatar" src="${EMPTY_AVATAR_URL}" alt="User Avatar" class="profile-avatar" width="150" height="150">
+                <p id="profile-username"></p>
+                <p id="online-status"></p>
+            </div>
+            <div id="profile-stats" class="profile-stats">
+                <p>Wins: <span id="profile-wins"></span></p>
+                <p>Losses: <span id="profile-losses"></span></p>
+            </div>
+        </div>
+    `;
     }
 }
 

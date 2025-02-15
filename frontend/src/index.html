@@ -337,7 +337,7 @@
                 </div>
             <div class="col-md-4 d-flex flex-column align-items-center text-center">
                 <user-profile></user-profile>
-                <button class="btn btn-primary mt-3" id="action-friend">Invite</button>
+                <button class="btn btn-primary mt-3 d-none" id="action-friend"></button>
             </div>
         </div>
     </section>
@@ -396,8 +396,8 @@
             </div>
         </div>
         <div id="tournament-details" class="row justify-content-center d-none">
-            <h2  id="tournament-name" class="mb-4"></h2>
-            <div id="participants-info" class="d-none">
+            <h2  id="tournament-name" class="mb-4 text-center text-warning display-6"></h2>
+            <div id="participants-info" class="row d-none">
                 <div class="col-md-4">
                     <p>Participants</p>
                     <user-list id="tournament-participants"></user-list>
@@ -406,8 +406,8 @@
                     <user-profile id="selected-participant"></user-profile>
                 </div>
             </div>
-            <div id="tournament-bracket" class="d-none">
-                <p>Tournament will start here</p>
+            <div id="tournament-bracket-container" class="d-none">
+                <tournament-bracket></tournament-bracket>
             </div>
         </div>
     </section>
@@ -422,8 +422,10 @@
                     <input type="text" class="form-control" data-id="tournament_name" />
                 </div>
                 <div class="form-check mb-3">
-                    <label for="participants_amount">Max Players</label>
-                    <input type="number" class="form-control" data-id="participants_amount" />
+                    <label for="participants_amount">Participants</label>
+                    <select class="form-control" data-id="participants_amount">
+                        <option value="4">4</option>
+                    </select>
                 </div>
                 <button class="btn btn-primary w-100 py-2" type="submit">
                     Create

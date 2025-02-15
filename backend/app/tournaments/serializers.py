@@ -20,8 +20,9 @@ class ParticipantSerializer(serializers.ModelSerializer, AvatarUploadMixin):
 
 class TournamentSerializer(serializers.ModelSerializer):
     participants = ParticipantSerializer(many=True, read_only=True)
-    semifinal_1_game1 = PongGameSerializer(read_only=True)
-    semifinal_1_game2 = PongGameSerializer(read_only=True)
+    semifinal_1_game = PongGameSerializer(read_only=True)
+    semifinal_2_game = PongGameSerializer(read_only=True)
+    final_game = PongGameSerializer(read_only=True)
 
     class Meta:
         model = Tournament
