@@ -42,7 +42,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         print("game stage:", game_stage)
         
         self.start_messages[game_stage].add(self.user.id)
-        participants = self.get_game_participants(game_stage)
+        participants = await self.get_game_participants(game_stage)
         
         if len(participants) == 2 and self.start_messages[game_stage] == set(participants):
             game_id = await self.get_game_id(game_stage)
@@ -84,6 +84,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
     def get_tournament_data(self):
         return TournamentSerializer(Tournament.objects.get(id=self.tournament_id)).data
 
+    @database_sync_to_async
     def get_game_participants(self, game):
         game_instance = getattr(self.tournament_db, f"{game}_game", None)
         if game_instance:
@@ -99,10 +100,10 @@ class TournamentConsumer(AsyncWebsocketConsumer):
 
     async def get_game_stage(self):
         self.tournament_db = await self.get_tournament()
-        if self.user.id in self.get_game_participants("final"):
+        if self.user.id in await self.get_game_participants("final"):
             return "final"
         for stage in ["semifinal_1", "semifinal_2"]:
-            if self.user.id in self.get_game_participants(stage):
+            if self.user.id in await self.get_game_participants(stage):
                 return stage
         return None
 
