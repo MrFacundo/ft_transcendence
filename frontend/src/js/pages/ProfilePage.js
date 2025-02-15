@@ -54,12 +54,8 @@ class ProfilePage extends Page {
 
         if (friends.length > 0) {
             friendListTitle.textContent = profileId == auth.user.id ? "Your friends" : capitalizeFirstLetter(userProfile.username) + "'s friends";
-            friendListEl.initialize(selectedUserCard);
-            friendListEl.populateList({
-                users: friends,
-                actionText: null,
-                actionCallback: null,
-            });
+            friendListEl.config = { selectedUserCard};
+            friendListEl.populateList(friends);
         } else {
             selectedUserCard.remove();
         }

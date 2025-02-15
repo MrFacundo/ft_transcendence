@@ -59,7 +59,7 @@ export class StateManager {
 				console.error("Error fetching current tournament data:", error);
 			}
 		}
-		console.log("Current tournament:", this.currentTournament);
+		//console.log("Current tournament:", this.currentTournament);
 	}
 
 	updateCurrentTournament(tournament) {

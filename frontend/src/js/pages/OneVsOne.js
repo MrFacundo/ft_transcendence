@@ -18,13 +18,10 @@ class OneVsOne extends Page {
         const { api, auth, stateManager } = this.app;
         const sendList = document.querySelector("#send-list");
         const receiveList = document.querySelector("#receive-list");
-        const actionBtn = document.querySelector("#action-friend");
+        const actionButton = document.querySelector("#action-friend");
         const selectedUserCard = document.querySelector("user-profile");
 
-
         [sendList, receiveList, selectedUserCard].forEach(el => (el.page = this));
-        sendList.initialize(selectedUserCard, actionBtn);
-        receiveList.initialize(selectedUserCard, actionBtn);
 
         const friendList = await api.getFriends(auth.user.id);
 
@@ -36,20 +33,23 @@ class OneVsOne extends Page {
             user.game_invite && user.game_invite.sender === user.id
         );
 
-        await sendList.populateList({
-            users: sendListData,
-            actionText: "Invite",
+        sendList.config = {
+			selectedUserCard,
+			actionButton,
+			actionText: "Invite",
             actionCallback: async (user, userCardSm) => {
                 const response = await api.gameRequest(user.id);
                 userCardSm.appendPendingButton(Date.now() + 10 * 60 * 1000);
                 console.log(`Game invite sent to: ${user.username}`);
                 return response;
             },
-        });
+		};
+		await sendList.populateList(sendListData);
 
-        await receiveList.populateList({
-            users: receiveListData,
-            actionText: "Accept",
+        receiveList.config = {
+			selectedUserCard,
+			actionButton,
+			actionText: "Accept",
             actionCallback: async (user) => {
                 if (!stateManager.onlineStatuses.get(user.id)?.is_online) {
                     alert(`${user.username} is offline, try again later.`);
@@ -61,9 +61,8 @@ class OneVsOne extends Page {
                 this.app.navigate(response.game_url);
                 return response;
             },
-        });
-
-        actionBtn.classList.add("d-none");
+		};
+		await receiveList.populateList(receiveListData);
     }
 }
 

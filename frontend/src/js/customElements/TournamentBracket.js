@@ -1,16 +1,79 @@
-import { EMPTY_AVATAR_URL } from "../constants.js";
+import { EMPTY_AVATAR_URL } from "../settings.js";
 import { getAvatarSrc } from "../utils.js";
 
 class TournamentBracket extends HTMLElement {
     constructor() {
         super().attachShadow({ mode: "open" });
-        this.startButton = null;
         this.setupTemplate();
+        this.state = {
+            tournament: null,
+            startButtonEnabled: false,
+            participants: {
+                semi1Player1: null,
+                semi1Player2: null,
+                semi2Player1: null,
+                semi2Player2: null,
+                finalPlayer1: null,
+                finalPlayer2: null
+            }
+        };
     }
 
-    updateParticipant = async (elementId, player) => {
-        const { auth } = this.page.app;
+    set state(newState) {
+        this._state = { ...this._state, ...newState };
+        this.render();
+    }
 
+    get state() {
+        return this._state;
+    }
+
+    checkIsParticipant(tournament) {
+        const { auth } = this.page.app;
+        if (!tournament || !auth.user) return false;
+
+        const games = [tournament.semifinal_1_game, tournament.semifinal_2_game, tournament.final_game];
+        return games.some(game =>
+            game && 
+            ((game.player1 && game.player1.id === auth.user.id) || 
+            (game.player2 && game.player2.id === auth.user.id)) && 
+            game.status === "not_started"
+        );
+    }
+
+    async setTournament(tournament) {
+        if (!tournament) return;
+
+        const { semifinal_1_game, semifinal_2_game, final_game } = tournament;
+        
+        const startButtonEnabled = this.checkIsParticipant(tournament);
+
+        const participants = {
+            semi1Player1: semifinal_1_game.player1,
+            semi1Player2: semifinal_1_game.player2,
+            semi2Player1: semifinal_2_game.player1,
+            semi2Player2: semifinal_2_game.player2,
+            finalPlayer1: final_game.player1,
+            finalPlayer2: final_game.player2
+        };
+
+        this.state = {
+            tournament,
+            startButtonEnabled,
+            participants
+        };
+    }
+
+    async render() {
+        if (!this.page) return;
+        await this.renderParticipants();
+        this.renderGames();
+        this.renderStartButton();
+        this.renderWinner();
+    }
+
+    async renderParticipant(elementId, player) {
+        const { auth } = this.page.app;
         const participantEl = this.shadowRoot.getElementById(elementId);
         if (!participantEl || !player) return;
 
@@ -28,9 +91,22 @@ class TournamentBracket extends HTMLElement {
         if (player.id === auth.user.id) {
             participantEl.style.backgroundColor = "#0d6efd";
         }
-    };
+    }
 
-    updateGame(game, type) {
+    async renderParticipants() {
+        const { participants } = this.state;
+        
+        await Promise.all([
+            this.renderParticipant("semi1-player1", participants.semi1Player1),
+            this.renderParticipant("semi1-player2", participants.semi1Player2),
+            this.renderParticipant("semi2-player1", participants.semi2Player1),
+            this.renderParticipant("semi2-player2", participants.semi2Player2),
+            this.renderParticipant("final-player1", participants.finalPlayer1),
+            this.renderParticipant("final-player2", participants.finalPlayer2)
+        ]);
+    }
+
+    renderGame(game, type) {
         if (!game?.winner) return;
 
         const player1El = this.shadowRoot.getElementById(`${type}-player1`);
@@ -42,77 +118,66 @@ class TournamentBracket extends HTMLElement {
 
         const winnerEl = game.winner === game.player1.id ? player1El : player2El;
         winnerEl.style.backgroundColor = "#4CAF50";
-
-        const finalPlayer = game.winner === game.player1.id ? game.player1 : game.player2;
-        this.updateParticipant(`${type === "semi1" ? "final-player1" : "final-player2"}`, finalPlayer);
     }
 
-    updateStartButton(tournament) {
-        const { auth } = this.page.app;
-        if (!tournament || !auth.user) return;
-    
-        const games = [tournament.semifinal_1_game, tournament.semifinal_2_game, tournament.final_game];
-    
-        const isParticipant = games.some(game =>
-            game && 
-            ((game.player1 && game.player1.id === auth.user.id) || 
-            (game.player2 && game.player2.id === auth.user.id)) && 
-            game.status === "not_started"
-        );
-    
-        if (isParticipant) {
-            this.startButton.textContent = "START";
-            this.startButton.disabled = false;
-            this.startButton.style.cursor = "pointer";
-            this.startButton.style.display = "block";
-        } else {
-            this.startButton.style.display = "none";
-        }
-    }
-    
-    async setTournament(tournament) {
+    renderGames() {
+        const { tournament } = this.state;
         if (!tournament) return;
 
         const { semifinal_1_game, semifinal_2_game, final_game } = tournament;
-
-        await this.updateParticipant("semi1-player1", semifinal_1_game.player1);
-        await this.updateParticipant("semi1-player2", semifinal_1_game.player2);
-        await this.updateParticipant("semi2-player1", semifinal_2_game.player1);
-        await this.updateParticipant("semi2-player2", semifinal_2_game.player2);
-
-        if (semifinal_1_game.winner) this.updateGame(semifinal_1_game, "semi1");
-        if (semifinal_2_game.winner) this.updateGame(semifinal_2_game, "semi2");
-        if (final_game?.winner) this.updateGame(final_game, "final");
-
-        this.updateStartButton(tournament);
-        this.setTournamentOver(tournament);
+        
+        if (semifinal_1_game?.winner) this.renderGame(semifinal_1_game, "semi1");
+        if (semifinal_2_game?.winner) this.renderGame(semifinal_2_game, "semi2");
+        if (final_game?.winner) this.renderGame(final_game, "final");
     }
 
-    handleStartButtonClick() {
-        this.startButton.textContent = "Waiting for opponent...";
-        this.startButton.disabled = true;
-        this.startButton.style.cursor = "default";
-        this.page.handleStartButtonClick();
+    renderStartButton() {
+        const { startButtonEnabled } = this.state;
+        const startButton = this.shadowRoot.querySelector(".start-button-container button");
+        if (!startButton) return;
+
+        if (startButtonEnabled) {
+            startButton.textContent = "START";
+            startButton.disabled = false;
+            startButton.style.cursor = "pointer";
+            startButton.style.display = "block";
+        } else {
+            startButton.style.display = "none";
+        }
     }
 
-    setTournamentOver(tournament) {
+    renderWinner() {
+        const { tournament } = this.state;
+        if (!tournament?.final_game?.winner) return;
+
         const { final_game } = tournament;
-        const winner = final_game?.winner;
-        if (!winner) return;
         const headerEl = this.shadowRoot.querySelector(".header h3");
-        const winnerUsername = winner === final_game.player1.id ? final_game.player1.username : final_game.player2.username;
+        const winnerUsername = final_game.winner === final_game.player1.id ? 
+            final_game.player1.username : 
+            final_game.player2.username;
         headerEl.textContent = `Winner: ${winnerUsername}`;
     }
 
+    handleStartButtonClick = () => {
+        const startButton = this.shadowRoot.querySelector(".start-button-container button");
+        startButton.textContent = "Waiting for opponent...";
+        startButton.disabled = true;
+        startButton.style.cursor = "default";
+        this.page.handleStartButtonClick();
+    };
+
     connectedCallback() {
-        this.startButton = this.shadowRoot.querySelector(".start-button-container button");
-        if (this.startButton) {
-            this.startButton.addEventListener("click", this.handleStartButtonClick.bind(this));            
+        const startButton = this.shadowRoot.querySelector(".start-button-container button");
+        if (startButton) {
+            startButton.addEventListener("click", this.handleStartButtonClick);
         }
     }
 
     disconnectedCallback() {
-        this.startButton.removeEventListener("click", this.handleStartButtonClick);
+        const startButton = this.shadowRoot.querySelector(".start-button-container button");
+        if (startButton) {
+            startButton.removeEventListener("click", this.handleStartButtonClick);
+        }
     }
 
     setupTemplate() {
@@ -187,6 +252,7 @@ class TournamentBracket extends HTMLElement {
                 position: relative;
                 overflow: hidden;
                 transition: all 0.3s;
+                box-shadow: 0 1rem 1rem rgba(0, 0, 0, .2);
             }
 
             .avatar {

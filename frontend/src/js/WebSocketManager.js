@@ -1,4 +1,4 @@
-import { WS_URL } from "./constants.js";
+import { WS_URL } from "./settings.js";
 import { showMessage } from "./utils.js";
 
 export class WebSocketManager {
@@ -24,7 +24,7 @@ export class WebSocketManager {
     }
 
     setupGameInvitationWebSocket(userId) {
-        this.gameWs = this.setupWebSocket(`game-invitation/${userId}`, this.handleGameMessage.bind(this));
+        this.gameWs = this.setupWebSocket(`game-invitation/${userId}`, this.handleGameInvitationMessage.bind(this));
     }
 
     setupFriendInvitationWebSocket(userId) {
@@ -56,7 +56,7 @@ export class WebSocketManager {
         return ws;
     }
 
-    async handleGameMessage(event) {
+    async handleGameInvitationMessage(event) {
         const data = JSON.parse(event.data);
         if (data.type === "game_accepted") {
             if (this.app.stateManager.currentGame) return;
@@ -89,6 +89,9 @@ export class WebSocketManager {
             }
         } else if (data.type === "friend_accepted") {
             showMessage(`${data.friendship.receiver.username} is now your friend.`);
+            if (this.app.currentPage.name === "home") {
+                this.app.currentPage.sendListElement.removeUser(data.friendship.receiver.id);
+            }
         }
     }
 
@@ -103,35 +106,57 @@ export class WebSocketManager {
         const data = JSON.parse(event.data);
         console.log("Tournament WS message:", data);
 
-        if (data.tournament) stateManager.updateCurrentTournament(data.tournament);
+        if (data.tournament) {
+            stateManager.updateCurrentTournament(data.tournament);
+        }
         const currentTournament = stateManager.currentTournament;
 
-        if (data.type === "join") {
-            if (currentTournament.participants.length < currentTournament.participants_amount) {
-                if (currentPage.name === "tournament-join") {
-                    pages.tournamentJoin.updateTournamentsList();
-                } else if (currentPage.name === "tournament") {
-                    pages.tournament.updateParticipantsList(Number(data.participant_id));
-                }
-                if (data.participant_id !== auth.user.id) {
-                    const participant = data.tournament.participants.find(p => p.id === Number(data.participant_id));
-                    showMessage(`${participant.username} joined the tournament.`);
-                }
-            } else {
-                this.app.navigate("/tournament");
-            }
-        } else if (data.type === "start_game") {
-            if (auth.user.id === data.participant_id) {
-                this.app.navigate(data.game_url);
-            }
-        } else if (data.type === "game_over") {
-            if (currentPage.name === "game") {
-                this.app.navigate("/tournament");
-            } else if (currentPage.name === "tournament") {
-                pages.tournament.setTournament(data.tournament);
-            }
+        switch (data.type) {
+            case "join":
+                this.handleJoinMessage(data, currentTournament, currentPage, pages, auth);
+                break;
+            case "start_game":
+                this.handleStartGameMessage(data, auth);
+                break;
+            case "game_over":
+                this.handleGameOverMessage(data, currentPage, pages);
+                break;
+            default:
+                console.warn("Unknown message type:", data.type);
         }
     }
+
+    /* Tournament WS message handlers START */
+    handleJoinMessage(data, currentTournament, currentPage, pages, auth) {
+        if (currentTournament.participants.length < currentTournament.participants_amount) {
+            if (currentPage.name === "tournament-join") {
+                pages.tournamentJoin.updateTournamentsList();
+            } else if (currentPage.name === "tournament") {
+                pages.tournament.updateParticipantsList(Number(data.participant_id));
+            }
+            if (data.participant_id !== auth.user.id) {
+                const participant = data.tournament.participants.find(p => p.id === Number(data.participant_id));
+                showMessage(`${participant.username} joined the tournament.`);
+            }
+        } else {
+            this.app.navigate("/tournament");
+        }
+    }
+
+    handleStartGameMessage(data, auth) {
+        if (auth.user.id === data.participant_id) {
+            this.app.navigate(data.game_url);
+        }
+    }
+
+    handleGameOverMessage(data, currentPage, pages) {
+        if (currentPage.name === "game") {
+            this.app.navigate("/tournament");
+        } else if (currentPage.name === "tournament") {
+            pages.tournament.setTournament(data.tournament);
+        }
+    }
+    /* Tournament WS messages handlers END */
 
     closeConnections() {
         ['gameWs', 'friendWs', 'onlineStatusWs', 'tournamentWs'].forEach(ws => {

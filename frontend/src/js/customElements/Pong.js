@@ -1,4 +1,4 @@
-import { WS_URL } from "../constants.js";
+import { WS_URL } from "../settings.js";
 
 class Pong extends HTMLElement {
     constructor() {

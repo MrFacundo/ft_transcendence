@@ -1,5 +1,5 @@
 import axios from "axios";
-import { API_URL, MEDIA_URL } from "./constants.js";
+import { API_URL, MEDIA_URL } from "./settings.js";
 
 /**
  * Handles all API requests.
