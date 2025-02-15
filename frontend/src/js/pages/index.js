@@ -13,6 +13,7 @@ import AIPage from "./AIPage.js";
 import GamePage from "./GamePage.js";
 import TournamentCreatePage from "./TournamentCreatePage.js";
 import TournamentJoinPage from "./TournamentJoinPage.js";
+import OfflinePage from "./OfflinePage.js";
 
 export { 
     LoginPage, 
@@ -30,4 +31,5 @@ export {
     ProfilePage,
     AIPage,
     GamePage,
+    OfflinePage,
 }
