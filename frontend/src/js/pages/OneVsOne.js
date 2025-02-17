@@ -44,7 +44,7 @@ class OneVsOne extends Page {
                 return response;
             },
 		};
-		await sendList.populateList(sendListData);
+		sendList.state = { users: sendListData };
 
         receiveList.config = {
 			selectedUserCard,
@@ -57,12 +57,11 @@ class OneVsOne extends Page {
                 }
                 const response = await api.gameAccept(user.game_invite.id);
                 console.log(`Game invite accepted from: ${user.username}`);
-                this.app.stateManager.currentGame = true;
                 this.app.navigate(response.game_url);
                 return response;
             },
 		};
-		await receiveList.populateList(receiveListData);
+		receiveList.state = { users: receiveListData };
     }
 }
 

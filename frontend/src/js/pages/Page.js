@@ -27,7 +27,7 @@ class Page {
     async open() {
         const { app } = this;
         if (this.isProtected) {
-            if (!app.auth.authenticated) return app.navigate("/login");
+            if (!app.auth.authenticated) return app.auth.logout();
         }
         document.querySelectorAll("section").forEach((section) => { section.remove() });
         const tempElement = document.createElement(this.pageElement.tagName);
@@ -86,20 +86,6 @@ class Page {
      */
     render() {
         console.warn(`TEST: Rendering ${this.name} page`);
-    }
-
-    /**
-     * Updates common UI elements related to online status
-     */
-    updateIndividualOnlineStatusUI(user) {
-        document.querySelectorAll("user-list").forEach(list => {
-            if (list.shadowRoot) {
-                const card = list.shadowRoot.querySelector(`[data-user-id="${user.user_id}"]`);
-                if (card) {
-                    card.updateOnlineStatus();
-                }
-            }
-        });
     }
 }
 

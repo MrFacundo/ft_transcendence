@@ -15,6 +15,8 @@ class App {
         this.mainElement = document.querySelector("#main");
         this.auth = new Auth(this);
         this.api = new Api(this.auth);
+        this.stateManager = new StateManager(this);
+        this.wsManager = new WebSocketManager(this);
         this.pages = {
             login: new Pages.LoginPage(this),
             register: new Pages.RegisterPage(this),
@@ -33,8 +35,6 @@ class App {
             game: new Pages.GamePage(this),
         };
         this.currentPage = null;
-        this.wsManager = new WebSocketManager(this);
-        this.stateManager = new StateManager(this);
         this.init();
         if (document.getElementById("noScript"))
             document.getElementById("noScript").remove();

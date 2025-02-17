@@ -214,5 +214,5 @@ export class Auth {
         this.accessToken = null;
         this.authenticated = false;
         this.app.navigate("/login");
-    }
+      }
 }

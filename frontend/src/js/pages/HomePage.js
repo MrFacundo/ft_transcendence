@@ -46,7 +46,7 @@ class HomePage extends Page {
 				userCardSm.appendPendingButton();
 			}
 		};
-		await sendList.populateList(sendListData);
+		sendList.state = { users: sendListData };
 		this.sendListElement = sendList;
 
 		receiveList.config = {
@@ -59,7 +59,7 @@ class HomePage extends Page {
 				showMessage(`${user.username} is now your friend.`);
 			}
 		};
-		await receiveList.populateList(receiveListData);
+		receiveList.state = { users: receiveListData };
 	}
 }
 

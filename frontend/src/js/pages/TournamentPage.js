@@ -15,7 +15,7 @@ class TournamentPage extends Page {
 
     render() {
         const { stateManager } = this.app;
-        const tournament = stateManager.currentTournament;
+        const tournament = stateManager.state.currentTournament;
         const cardsContainerEl = document.querySelector("#cards-container");
         const tournamentDetailsEl = document.querySelector("#tournament-details");
         const tournamentNameEl = document.querySelector("#tournament-name");
@@ -30,17 +30,16 @@ class TournamentPage extends Page {
             cardsContainerEl.classList.remove("d-none");
         } else {
             tournamentDetailsEl.classList.remove("d-none");
-            const isTournamentFull = tournament.participants.length === tournament.participants_amount;
-
             tournamentNameEl.textContent = tournament.name + " 🏆";
 
+            const isTournamentFull = tournament.participants.length === tournament.participants_amount;
             if (!isTournamentFull) {
                 // Show participants list
                 participantsInfoEl.classList.remove("d-none");
                 [partcipantsListEl, selectedUserCard].forEach(el => (el.page = this));
 
                 partcipantsListEl.config = { selectedUserCard };
-                partcipantsListEl.populateList(tournament.participants);
+                partcipantsListEl.state = { users: tournament.participants };
             } else {
                 // Show tournament bracket
                 tournamentBracketContainerEl.classList.remove("d-none");
@@ -48,19 +47,6 @@ class TournamentPage extends Page {
                 tournamentBracketEl.setTournament(tournament);
             }
         }
-    }
-
-    updateParticipantsList(participant_id) {
-        const participantsListEl = document.querySelector("#tournament-participants");
-        const { stateManager } = this.app;
-        const currentTournament = stateManager.currentTournament;
-        
-        if (!participantsListEl || !currentTournament) return;
-        
-        const participant = currentTournament.participants.find(p => p.id === participant_id);
-        if (!participant) return;
-        
-        participantsListEl.addUser(participant);
     }
 
     handleStartButtonClick() {
@@ -71,11 +57,7 @@ class TournamentPage extends Page {
             }));
         }
     }
-
-    setTournament(tournament) {
-        const tournamentBracketEl = document.querySelector("tournament-bracket");
-        tournamentBracketEl.setTournament(tournament);
-    }
 }
+
 export default TournamentPage;
 
