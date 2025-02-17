@@ -1,4 +1,6 @@
-class UserList extends HTMLElement {
+import BaseElement from "./BaseElement.js";
+
+class UserList extends BaseElement {
     constructor() {
         super();
         this.attachShadow({ mode: "open" });
@@ -8,6 +10,34 @@ class UserList extends HTMLElement {
             actionText: null,
             actionCallback: null
         };
+        this._pageSetCallback = () => {
+            this.unsubscribe = this.page.app.stateManager.subscribe(
+                'onlineStatuses',
+                (statuses, updatedUserId) => this.handleOnlineStatusUpdate(statuses, updatedUserId)
+            );
+            this.unsubscribe = this.page.app.stateManager.subscribe(
+                'currentTournament',
+                (currentTournament) => this.handleTournamentUpdate(currentTournament)
+            );
+        };
+    }
+
+    handleOnlineStatusUpdate(statuses, updatedUserId) {
+        const userCard = this.shadowRoot.querySelector(`[data-user-id="${updatedUserId}"]`);
+        if (userCard) {
+            const status = statuses.get(updatedUserId);
+            userCard.updateOnlineStatus(status.is_online);
+        }
+        const selectedUser = this.selectedUserCard?.state?.user?.id === updatedUserId;
+        if (selectedUser) {
+            this.selectedUserCard.updateOnlineStatus(statuses.get(updatedUserId));
+        }
+    }
+
+    handleTournamentUpdate(currentTournament) { //TODO: this shouldnt be here
+        if (this.page.name === "tournament") {
+            this.state = { users: currentTournament.participants };
+        }
     }
 
     set state(newState) {
@@ -23,10 +53,6 @@ class UserList extends HTMLElement {
         this.selectedUserCard = selectedUserCard;
         this.actionButton = actionButton;
         this.state = { actionText, actionCallback };
-    }
-
-    async populateList(users) {
-        this.state = { users };
     }
 
     addUser(user) {

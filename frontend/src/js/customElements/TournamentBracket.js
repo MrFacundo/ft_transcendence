@@ -17,6 +17,12 @@ class TournamentBracket extends HTMLElement {
                 finalPlayer2: null
             }
         };
+        this._pageSetCallback = () => {
+            this.unsubscribe = this.page.app.stateManager.subscribe(
+                'currentTournament',
+                (currentTournament) => this.setTournament(currentTournament)
+            );
+        };
     }
 
     set state(newState) {
@@ -42,8 +48,6 @@ class TournamentBracket extends HTMLElement {
     }
 
     async setTournament(tournament) {
-        if (!tournament) return;
-
         const { semifinal_1_game, semifinal_2_game, final_game } = tournament;
         
         const startButtonEnabled = this.checkIsParticipant(tournament);
@@ -62,6 +66,15 @@ class TournamentBracket extends HTMLElement {
             startButtonEnabled,
             participants
         };
+
+        const hasTournamentEnded = final_game.status === "completed";
+        if (hasTournamentEnded) {
+            if (typeof this.unsubscribe === 'function') {
+                this.unsubscribe();
+                this.unsubscribe = null;
+            }
+            this.page.app.stateManager.updateState('currentTournament', null);
+        }
     }
 
     async render() {
@@ -178,8 +191,11 @@ class TournamentBracket extends HTMLElement {
         if (startButton) {
             startButton.removeEventListener("click", this.handleStartButtonClick);
         }
+        if (this.unsubscribe) {
+            this.unsubscribe();
+        }
     }
-
+    
     setupTemplate() {
         this.shadowRoot.innerHTML = `
         <style>
