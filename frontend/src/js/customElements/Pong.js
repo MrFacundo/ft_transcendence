@@ -1,4 +1,4 @@
-import { WS_URL } from "../constants.js";
+import { WS_URL } from "../settings.js";
 
 class Pong extends HTMLElement {
     constructor() {
@@ -47,6 +47,7 @@ class Pong extends HTMLElement {
                 }
                 break;
             case "gameState":
+                //console.log("Received game state:", data);
                 this.setPositions({
                     leftPaddle: { top: `calc(${data.paddles[0].y * 100}%)` },
                     rightPaddle: { top: `calc(${data.paddles[1].y * 100}%)` },
@@ -95,6 +96,7 @@ class Pong extends HTMLElement {
     }
 
     async startGame(gameId) {
+        this.page.app.stateManager.updateState("currentGame", true);
         this.setWebsocket(gameId);
         while (this.ws?.readyState !== WebSocket.OPEN) {
             await new Promise((res) => setTimeout(res, 1000));
@@ -105,6 +107,7 @@ class Pong extends HTMLElement {
         this.removeEventListeners();
         this.ws = null;
         this.dispatchEvent(new CustomEvent("gameOver"));
+        this.page.app.stateManager.updateState("currentGame", false);
     }
 
     removeEventListeners() {

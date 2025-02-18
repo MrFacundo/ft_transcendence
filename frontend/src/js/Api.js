@@ -54,8 +54,8 @@ export class Api {
 
     /**
      * Creates a new user.
-     * @param {Object} data - The user data.
-     * @returns {Promise<Object>} The response data.
+     * @param {Object} data - The user email, password, and username.
+     * @returns {Promise<Object>} The created user.
      */
     async createUser(data) {
         return this.request("post", "/user", data);
@@ -63,7 +63,7 @@ export class Api {
 
     /**
      * Retrieves the authenticated user's data.
-     * @returns {Promise<Object>} The response data.
+     * @returns {Promise<Object>} The current user.
      */
     async getUser() {
         return this.request("get", "/user");
@@ -72,7 +72,7 @@ export class Api {
     /**
      * Retrieves a user's profile data.
      * @param {string} userId - The ID of the user.
-     * @returns {Promise<Object>} The response
+     * @returns {Promise<Object>} The id specified user.
      */
     async getProfile(userId) {
         return this.request("get", `/user/${userId}`);
@@ -80,8 +80,8 @@ export class Api {
 
     /**
      * Updates the authenticated user's data.
-     * @param {Object} data - The updated user data.
-     * @returns {Promise<Object>} The response data.
+     * @param {Object} data - The user data to update.
+     * @returns {Promise<Object>} The updated user.
      */
     async updateUser(data) {
         return this.request("patch", "/user", data);
@@ -89,7 +89,6 @@ export class Api {
 
     /**
      * Deletes the authenticated user's account.
-     * @returns {Promise<Object>} The response data.
      */
     async deleteUser() {
         return this.request("delete", "/user");
@@ -111,7 +110,7 @@ export class Api {
      */
     async login(email, password) {
         return this.request("post", "/token/", {
-            email: email,
+            email_or_username: email,
             password: password,
         });
     }
@@ -152,28 +151,21 @@ export class Api {
     /* User lists */
 
     /**
-     * Retrieves a list with all users.
+     * Retrieves a list with all users, along with Friendship data related to the current user.
      */
     async getUsers() {
         return this.request("get", "/users/");
     }
 
     /**
-     * Retrieves a list of friends that can be invited.
+     * Retrieves a list with online users only.
      */
-    async getFriendsInvitable() {
-        return this.request("get", "/friends-invitable/");
+    async getOnlineUsers() {
+        return this.request("get", "/online-users/");
     }
 
     /**
-     * Retrieves a list of friend requests.
-     */
-    async getFriendsRequests() {
-        return this.request("get", "/friends-requests/");
-    }
-
-    /**
-     * Retrieves a list of friends of the user specified by userId.
+     * Retrieves a list current the user friends, along with their Game Invitation data related to the current user.
      */
     async getFriends(userId) {
         return this.request("get", `/friends/${userId}/`);
@@ -197,6 +189,14 @@ export class Api {
         return this.request("post", `/friend-accept/${userId}`, {});
     }
 
+    /* Online Status */
+
+    /**
+     * Lists all online status objects.
+    */
+    async getOnlineStatuses() {
+        return this.request("get", "/online-status/");
+    }
 
     /* Games */
 
@@ -219,20 +219,6 @@ export class Api {
     }
 
     /**
-     * Retrieves a list of invitations sent by the authenticated user.
-     */
-    async getSentGameInvites() {
-        return this.request("get", "/game-invitations/sent/");
-    }
-
-    /**
-     * Retrieves a list of invitations sent to the authenticated user.
-     */
-    async getReceivedGameInvites() {
-        return this.request("get", "/game-invitations/received/");
-    }
-
-    /**
      * Retrieves a game by ID.
      * @param {string} gameId - The ID of the game.
      * @returns {Promise<Object>} A game object.
@@ -248,6 +234,55 @@ export class Api {
     */
     async getMatchHistory(userId) {
         return this.request("get", `/match-history/${userId}/`);
+    }
+
+    /* Tournaments */
+
+    /**
+     *  Creates a new tournament.
+     * @param {string} tournamentName - The name of the tournament.
+     * @param {number} participantsAmount - The number of participants in the tournament.
+     * @returns {Promise<Object>} A tournament object.
+     */
+    async createTournament(tournament_name, participants_amount) {
+        return this.request("post", "/tournament/", {
+                name: tournament_name,
+                participants_amount: participants_amount
+            });
+    }
+
+    /**
+     *  Joins an existing tournament.
+     * @param {string} tournamentId - The ID of the tournament.
+     * @returns {Promise<Object>} A tournament object.
+     */
+    async joinTournament(tournamentId) {
+        return this.request("patch", `/tournament/${tournamentId}/`, {});
+    }
+
+    /**
+     * Retrieves a tournament by ID.
+     * @param {string} tournamentId - The ID of the tournament.
+     * @returns {Promise<Object>} A tournament object.
+     */
+    async getTournament(tournamentId) {
+        return this.request("get", `/tournament/${tournamentId}/`);
+    }
+
+    /**
+     * Retrieves a list of all tournaments.
+     * @returns {Promise<Object>} A list of tournaments.
+     * */
+    async getTournaments() {
+        return this.request("get", "/tournaments/");
+    }
+
+    /**
+     * Retrieves the tournament the current user is participating in.
+     * @returns {Promise<Object>} A tournament object.
+     * */
+    async getCurrentTournament() {
+        return this.request("get", "/tournament/current/");
     }
 
     /* Media */
@@ -269,13 +304,14 @@ export class Api {
      * @param {string} path - The path to the avatar image.
      * @returns {Promise<string|null>} The object URL of the avatar image, or null if the request fails.
      */
-    async fetchAvatarObjectUrl(path) {
+    fetchAvatarObjectUrl = async (path) => {
         try {
             const response = await this.request("get", `${MEDIA_URL}/${path}`, null, {
                 responseType: "blob",
             });
             return URL.createObjectURL(response);
-        } catch {
+        } catch (error) {
+            console.error("Error fetching avatar object URL:", error);
             return null;
         }
     }

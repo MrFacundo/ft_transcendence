@@ -3,12 +3,13 @@
 const path = require("path");
 const autoprefixer = require("autoprefixer");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const Dotenv = require('dotenv-webpack');
 
 module.exports = {
     mode: "development",
-    entry: "./src/js/index.js",
+    entry: "./src/js/App.js",
     output: {
-        filename: "index.js",
+        filename: "App.js",
         path: path.resolve(__dirname, "dist"),
         publicPath: "/",
     },
@@ -29,6 +30,7 @@ module.exports = {
             template: "./src/index.html",
             filename: "index.html",
         }),
+        new Dotenv({systemvars: true}),
     ],
     module: {
         rules: [

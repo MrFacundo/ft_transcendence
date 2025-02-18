@@ -17,13 +17,16 @@ class OAuthResultPage extends Page {
 
     handleOAuthCallback() {
         const urlParams = new URLSearchParams(window.location.search);
-        const errorMessage = urlParams.get('error');
-    
-        if (errorMessage) {
-            const errorElement = document.getElementById('oauth-message');
-            errorElement.textContent = "An error occurred while trying to log in. Please close this window and try again.";
+        const error = urlParams.get("error");
+
+        const messageEl = document.getElementById("oauth-message");
+        if (error) {
+            messageEl.textContent = "An error occurred while logging in. Please close this window and try again.";
+            messageEl.classList.add("error-message", "alert", "alert-danger");
         } else {
-            setTimeout(window.close(), 3000);
+            messageEl.textContent = "Login successful! You can close this window.";
+            messageEl.classList.add("success-message", "alert", "alert-success");
+            setTimeout(() => window.close(), 2000);
         }
     }
 }

@@ -3,19 +3,35 @@ POST http://localhost:8000/api/token/ HTTP/1.1
 Content-Type: application/json
 
 {
-	"email": "debra58@example.net",
+	"email": "facu@mail.com",
   	"password": "pass"
 }
 
 ###
 
-GET http://localhost:8000/api/match-history/9/ HTTP/1.1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM0NjA2OTE2LCJpYXQiOjE3MzQ2MDMzMTYsImp0aSI6IjdhMGFjNTlhMzI5MTRlZTBhMjA4MzIzNTRlNzI0MTBmIiwidXNlcl9pZCI6NH0.Ohs8peDzZvl0LMnqJlM9V9RaV134u8HKurKN14dqDtY
+POST http://localhost:8000/api/tournament/ HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM4ODQ5OTE4LCJpYXQiOjE3Mzg4NDYzMTgsImp0aSI6IjZkNzJmMTY1ZWE3NDQzZjNhYzY1MDg4ZDdkMWNmZmQ2IiwidXNlcl9pZCI6MX0.SqC9OP5vsFb5WXhXtx4d5InMkuTdUKry5nlNcZS246A
+
+
+{
+	"name": "test",
+	"participants_amount": "4"
+}
+
 
 ###
 
-POST  http://localhost:8000/api/game-invitation/1 HTTP/1.1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMzODUxMjAxLCJpYXQiOjE3MzM4NDc2MDEsImp0aSI6IjRlMmZjN2YwNGNmYzQwMThhNmRlZjE1Yjg5MGI5MDUwIiwidXNlcl9pZCI6MTB9.MxVyN8xyQdJ1lqLagBsp9ba5o8VyTO5GPV6o666CNeQ
+
+GET http://localhost:8000/api/tournaments/ HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM4ODY2MTc3LCJpYXQiOjE3Mzg4NjI1NzcsImp0aSI6IjQxNGY1ZTJhNzRkZjQzMmZiMWMzMTliOWM1MGFhODdkIiwidXNlcl9pZCI6N30.eBDC5mbCD3ZPo94RfdihG_6T14TbvNtnIspniKjz8g8
+
+
+###
+
+POST  http://localhost:8000/api/game-invitation/1/ HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzM3NDc2MjIxLCJpYXQiOjE3Mzc0NzI2MjEsImp0aSI6ImZhZTVkN2I5ZGU0YjQxNWZiMmI5MWUyYWQ4ZGE0YTM3IiwidXNlcl9pZCI6MTB9.JKjFvu_OTAJoysTScwrO69xTtrIFMksQbx4sjmNSyLk
 
 ###
 

@@ -1,5 +1,5 @@
 import Cookies from "js-cookie";
-import { API_URL } from "./constants.js"; // TODO: handle oauth in Api.js
+import { API_URL } from "./settings.js"; // TODO: handle oauth in Api.js
 
 /**
  * Auth class handles user authentication, including login, registration, token management, and OAuth.
@@ -25,7 +25,7 @@ export class Auth {
                 this.authenticated = true;
                 return true;
             } catch (error) {
-                console.error(error.response.data);
+                console.error(error.response?.data || error.message);
                 this.accessToken = null;
                 Cookies.remove("access_token");
                 Cookies.remove("refresh_token");
@@ -156,62 +156,63 @@ export class Auth {
     }
 
     /**
-     * Initiates OAuth login process:
-     * - Checks if user is already authenticated.
-     * - Opens a new which calls the OAuth endpoint.
-     * - Checks for token cookie every second.
-     * @throws {Error} If popup is blocked by the browser.
-     */
+   * Initiates OAuth login process:
+   * - Checks if user is already authenticated.
+   * - Opens a new which calls the OAuth endpoint.
+   * - Checks for token cookie every second.
+   * @throws {Error} If popup is blocked by the browser.
+   */
     async oAuthLogin() {
         await this.authenticate();
         if (this.authenticated) {
             return this.app.navigate("/home");
         }
-
-        if (this.oauthPopup) return; // CORS policy prevents checking if popup is open
-
         this.oauthPopup = window.open(
             `${API_URL}/oauth/42`,
             "OAuth Login",
             "width=600,height=600"
         );
         if (!this.oauthPopup) {
-            throw new Error("Popup blocked by browser, please unblock.");
+            alert("Popup blocked by browser. Please unblock and try again.");
+            return;
         }
+        try {
+            await new Promise((resolve, reject) => {
+                let attempts = 0;
+                const maxAttempts = 30;
 
-        let attempts = 0;
-        const maxAttempts = 30;
+                const checkForTokenCookie = () => {
+                    this.accessToken = Cookies.get("access_token");
+                    console.log("this.accessToken", this.accessToken);
+                    if (this.accessToken) return resolve();
+                    if (++attempts >= maxAttempts) return reject("Token not received.");
+                    setTimeout(checkForTokenCookie, 1000);
+                };
 
-        const checkForTokenCookie = () => {
-            // Automatically login if token is received
-            const token = Cookies.get("access_token");
-            if (token) {
-                this.oauthPopup = null;
-                return this.app.navigate("/home");
-            }
-            if (++attempts < maxAttempts) {
-                return setTimeout(checkForTokenCookie, 1000);
-            }
-            console.log("Token not received. Max attempts reached");
+                checkForTokenCookie();
+            });
+
+            this.oauthPopup.close();
             this.oauthPopup = null;
-        };
-        checkForTokenCookie();
-    }
+            this.app.navigate("/home");
+        } catch (error) {
+            console.error(error);
+            if (this.oauthPopup) this.oauthPopup.close();
+            this.oauthPopup = null;
+        }
+    } 
 
     /**
      * Logs out the user by removing tokens and navigating to the login page.
      */
     logout() {
         console.log("Logging out");
-        if (this.app.ws) {
-            console.log("Closing WebSocket connection");
-            this.app.ws.close();
-            this.app.ws = null;
-        }
+        this.app.wsManager.closeConnections();
+        this.app.stateManager.close();
         Cookies.remove("access_token");
         Cookies.remove("refresh_token");
         this.accessToken = null;
         this.authenticated = false;
         this.app.navigate("/login");
-    }
+      }
 }
