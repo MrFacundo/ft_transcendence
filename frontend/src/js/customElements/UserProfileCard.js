@@ -1,25 +1,12 @@
 import { EMPTY_AVATAR_URL } from "../settings.js";
 import { getAvatarSrc } from "../utils.js";
+import BaseElement from "./BaseElement.js";
 
-class UserProfileCard extends HTMLElement {
+class UserProfileCard extends BaseElement {
     constructor() {
         super().attachShadow({ mode: "open" });
         this.setupTemplate();
         this.state = { user: null };
-    }
-
-    set state(newState) {
-        this._state = { ...this._state, ...newState };
-        this.render();
-    }
-
-    get state() {
-        return this._state;
-    }
-
-    async setUser(user) {
-        if (!user) return;
-        this.state = { user };
     }
 
     async render() {
@@ -31,7 +18,6 @@ class UserProfileCard extends HTMLElement {
         const winsEl = this.shadowRoot.getElementById("profile-wins");
         const lossesEl = this.shadowRoot.getElementById("profile-losses");
         const profileStats = this.shadowRoot.getElementById("profile-stats");
-        const onlineStatusEl = this.shadowRoot.getElementById("online-status");
 
         const { api, stateManager } = this.page.app;
         avatarEl.setAttribute('data-href', `/profile/${user.id}`);
@@ -40,22 +26,10 @@ class UserProfileCard extends HTMLElement {
             element.addEventListener("click", this.page.handleClick);
         });
 
-        let onlineStatus = stateManager.onlineStatuses.get(user.id);
-        if (onlineStatus) {
-            if (onlineStatus.is_online) {
-                onlineStatusEl.textContent = "Online";
-            } else {
-                const lastSeenDate = new Date(onlineStatus.last_seen);
-                const formattedLastSeen = `${lastSeenDate.getHours()}:${lastSeenDate.getMinutes()} ${lastSeenDate.getDate()}/${lastSeenDate.getMonth() + 1}`;
-                onlineStatusEl.textContent = `Offline, last seen: ${formattedLastSeen}`;
-            }
-        } else {
-            onlineStatusEl.textContent = "Offline";
-        }
-
         avatarEl.style.opacity = 0;
         usernameEl.style.opacity = 0;
         profileStats.style.opacity = 0;
+        this.updateOnlineStatus(stateManager.state.onlineStatuses?.get(user.id));
 
         setTimeout(async () => {
             avatarEl.src = await getAvatarSrc(user, api.fetchAvatarObjectUrl);
@@ -70,6 +44,17 @@ class UserProfileCard extends HTMLElement {
         }, 100);
     }
 
+    updateOnlineStatus(onlineStatus) {
+        const statusIndicator = this.shadowRoot.getElementById("online-status");
+        if (!onlineStatus) {
+            statusIndicator.textContent = "Offline";
+            return;
+        }
+        statusIndicator.textContent = onlineStatus.is_online 
+            ? "Online" 
+            : `Offline, last seen: ${new Date(onlineStatus.last_seen).toLocaleString()}`;
+    }
+    
     disconnectedCallback() {
         this.shadowRoot.querySelectorAll("[data-href]").forEach(element => {
             element.removeEventListener("click", this.page.handleClick);

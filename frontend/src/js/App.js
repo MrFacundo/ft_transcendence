@@ -8,13 +8,15 @@ import { WebSocketManager } from './WebSocketManager.js';
 import { StateManager } from './StateManager.js';
 
 /**
- * App class initializes the application, manages page navigation, and handles authentication.
+ * Initializes the application, manages page navigation, and handles authentication.
  */
 class App {
     constructor() {
         this.mainElement = document.querySelector("#main");
         this.auth = new Auth(this);
         this.api = new Api(this.auth);
+        this.stateManager = new StateManager(this);
+        this.wsManager = new WebSocketManager(this);
         this.pages = {
             login: new Pages.LoginPage(this),
             register: new Pages.RegisterPage(this),
@@ -33,8 +35,6 @@ class App {
             game: new Pages.GamePage(this),
         };
         this.currentPage = null;
-        this.wsManager = new WebSocketManager(this);
-        this.stateManager = new StateManager(this);
         this.init();
         if (document.getElementById("noScript"))
             document.getElementById("noScript").remove();
@@ -45,6 +45,8 @@ class App {
      * @param {boolean} replaceHistory - Whether to replace the current history entry instead of pushing a new one.
      */
     async navigate(path, replaceHistory = false) {
+        if (this.currentPage?.url === path) return;
+
         if (path === "/") {
             path = "/home";
         } else if (path === "/logout") {

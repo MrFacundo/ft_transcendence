@@ -1,51 +1,61 @@
-class UserList extends HTMLElement {
+import BaseElement from "./BaseElement.js";
+
+class UserList extends BaseElement {
     constructor() {
         super();
         this.attachShadow({ mode: "open" });
         this.setupTemplate();
-        this.state = {
-            users: [],
-            actionText: null,
-            actionCallback: null
+        this.state = { users: [] };
+        this._pageSetCallback = () => {
+            this.unsubscribe = this.page.app.stateManager.subscribe(
+                'onlineStatuses',
+                (statuses, updatedUserId) => this.handleOnlineStatusUpdate(statuses, updatedUserId)
+            );
+            this.unsubscribe = this.page.app.stateManager.subscribe(
+                'currentTournament',
+                (currentTournament) => this.handleTournamentUpdate(currentTournament)
+            );
         };
     }
 
-    set state(newState) {
-        this._state = { ...this._state, ...newState };
-        this.render();
+    handleOnlineStatusUpdate(statuses, updatedUserId) {
+        const userCard = this.shadowRoot.querySelector(`[data-user-id="${updatedUserId}"]`);
+        if (userCard) {
+            const status = statuses.get(updatedUserId);
+            userCard.updateOnlineStatus(status.is_online);
+        }
+        const selectedUser = this.selectedUserCard?.state?.user?.id === updatedUserId;
+        if (selectedUser) {
+            this.selectedUserCard.updateOnlineStatus(statuses.get(updatedUserId));
+        }
     }
 
-    get state() {
-        return this._state;
+    handleTournamentUpdate(currentTournament) { //TODO: this should be done by the page, not the component
+        if (this.page.name === "tournament") {
+            this.setState({ users: currentTournament.participants });
+        }
     }
 
     set config({ selectedUserCard, actionButton, actionText, actionCallback }) {
         this.selectedUserCard = selectedUserCard;
         this.actionButton = actionButton;
-        this.state = { actionText, actionCallback };
-    }
-
-    async populateList(users) {
-        this.state = { users };
+        this.actionText = actionText;
+        this.actionCallback = actionCallback;
     }
 
     addUser(user) {
-        const users = [...this.state.users];
-        if (!users.find(u => u.id === user.id)) {
-            users.push(user);
-            this.state = { users };
+        if (!this.state.users.find(u => u.id === user.id)) {
+            this.setState({ users: [...this.state.users, user] });
         }
     }
 
     removeUser(userId) {
-        const users = this.state.users.filter(user => user.id !== userId);
-        this.state = { users };
+        this.setState({ users: this.state.users.filter(user => user.id !== userId) });
     }
 
     render() {
         const listGroup = this.shadowRoot.querySelector(".list-group");
         listGroup.innerHTML = '';
-
         this.state.users.forEach(user => {
             const listItem = document.createElement("li");
             listItem.className = "list-group-item";
@@ -57,7 +67,7 @@ class UserList extends HTMLElement {
     createUserCard(user) {
         const userCardSm = document.createElement("user-profile-small");
         userCardSm.page = this.page;
-        userCardSm.setUser(user);
+        userCardSm.setState({user});
         userCardSm.setAttribute("data-user-id", user.id);
 
         const isPending = user.game_invite?.expires_at || user.friendship?.status === "pending";
@@ -66,11 +76,11 @@ class UserList extends HTMLElement {
         userCardSm.addEventListener("click", () => {
             this.actionButton?.classList.add("d-none");
             this.updateSelectedStyle(userCardSm);
-            this.selectedUserCard?.setUser(user);
-            if (this.actionButton && (this.state.actionText === "Accept" || !isPending)) {
+            this.selectedUserCard?.setState({ user });
+            if (this.actionButton && (this.actionText === "Accept" || !isPending)) {
                 this.actionButton.classList.remove("d-none");
-                this.actionButton.textContent = this.state.actionText;
-                this.actionButton.onclick = () => this.state.actionCallback(user, userCardSm);
+                this.actionButton.textContent = this.actionText;
+                this.actionButton.onclick = () => this.actionCallback(user, userCardSm);
             }
         });
 
@@ -81,10 +91,9 @@ class UserList extends HTMLElement {
         this.shadowRoot.querySelectorAll("user-profile-small").forEach(card => {
             card.shadowRoot.querySelector(".profile-container").classList.remove("selected");
         });
-        if (selectedCard) {
-            selectedCard.shadowRoot.querySelector(".profile-container").classList.add("selected");
-        }
+        selectedCard?.shadowRoot.querySelector(".profile-container").classList.add("selected");
     }
+
     setupTemplate() {
         this.shadowRoot.innerHTML = `
         <style>

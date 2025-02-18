@@ -24,11 +24,7 @@ export default class GamePage extends Page {
 
             if (game.status === "not_started") {
                 gameEl.startGame(gameId);
-                app.stateManager.currentGame = true;
-                gameEl.addEventListener("gameOver", async () => {
-                    app.stateManager.currentGame = null;
-                        this.showScoreBoard(gameId);
-                });
+                gameEl.addEventListener("gameOver", async () => this.showScoreBoard(gameId));
             } else if (game.status === "completed" || game.status === "interrupted") {
                 this.showScoreBoard(gameId);
             } else {
@@ -45,8 +41,7 @@ export default class GamePage extends Page {
         const gameEl = mainElement.querySelector("pong-game");
         const scoreBoardEl = mainElement.querySelector("score-board");
         scoreBoardEl.page = this;
-        const game = await this.app.api.getGame(gameId);
-        scoreBoardEl.displayMatch(game);
+        scoreBoardEl.displayMatch(await this.app.api.getGame(gameId));
         gameEl.remove();
         scoreBoardEl.classList.remove("d-none");
     }

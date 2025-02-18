@@ -1,7 +1,8 @@
 import { EMPTY_AVATAR_URL } from "../settings.js";
 import { getAvatarSrc } from "../utils.js";
+import BaseElement from "./BaseElement.js";
 
-class TournamentBracket extends HTMLElement {
+class TournamentBracket extends BaseElement {
     constructor() {
         super().attachShadow({ mode: "open" });
         this.setupTemplate();
@@ -17,36 +18,32 @@ class TournamentBracket extends HTMLElement {
                 finalPlayer2: null
             }
         };
-    }
-
-    set state(newState) {
-        this._state = { ...this._state, ...newState };
-        this.render();
-    }
-
-    get state() {
-        return this._state;
+        this._pageSetCallback = () => {
+            this.unsubscribe = this.page.app.stateManager.subscribe(
+                'currentTournament',
+                (currentTournament) => this.setTournament(currentTournament)
+            );
+        };
     }
 
     checkIsParticipant(tournament) {
-        const { auth } = this.page.app;
-        if (!tournament || !auth.user) return false;
+        const { user } = this.page.app.auth;
+        if (!tournament || !user) return false;
 
-        const games = [tournament.semifinal_1_game, tournament.semifinal_2_game, tournament.final_game];
-        return games.some(game =>
-            game && 
-            ((game.player1 && game.player1.id === auth.user.id) || 
-            (game.player2 && game.player2.id === auth.user.id)) && 
-            game.status === "not_started"
-        );
+        return ['semifinal_1_game', 'semifinal_2_game', 'final_game']
+            .some(gameKey => {
+                const game = tournament[gameKey];
+                return game && 
+                       game.status === "not_started" && 
+                       [game.player1, game.player2].some(player => 
+                           player && player.id === user.id
+                       );
+            });
     }
 
     async setTournament(tournament) {
-        if (!tournament) return;
-
-        const { semifinal_1_game, semifinal_2_game, final_game } = tournament;
-        
         const startButtonEnabled = this.checkIsParticipant(tournament);
+        const { semifinal_1_game, semifinal_2_game, final_game } = tournament;
 
         const participants = {
             semi1Player1: semifinal_1_game.player1,
@@ -57,11 +54,15 @@ class TournamentBracket extends HTMLElement {
             finalPlayer2: final_game.player2
         };
 
-        this.state = {
-            tournament,
-            startButtonEnabled,
-            participants
-        };
+        this.setState({ tournament, startButtonEnabled, participants });
+
+        if (final_game.status === "completed") {
+            if (typeof this.unsubscribe === 'function') {
+                this.unsubscribe();
+                this.unsubscribe = null;
+            }
+            this.page.app.stateManager.updateState('currentTournament', null);
+        }
     }
 
     async render() {
@@ -73,24 +74,27 @@ class TournamentBracket extends HTMLElement {
     }
 
     async renderParticipant(elementId, player) {
-        const { auth } = this.page.app;
         const participantEl = this.shadowRoot.getElementById(elementId);
         if (!participantEl || !player) return;
 
         const avatarImg = participantEl.querySelector(".avatar img");
         const usernameEl = participantEl.querySelector(".username");
+        
         participantEl.style.opacity = 0;
 
-        avatarImg.src = await getAvatarSrc(player, this.page.app.api.fetchAvatarObjectUrl);
-        avatarImg.alt = player.username;
+        const avatarSrcPromise = getAvatarSrc(player, this.page.app.api.fetchAvatarObjectUrl);
+        
         usernameEl.textContent = player.username;
-
         participantEl.setAttribute("data-player-id", player.id);
-
-        participantEl.style.opacity = 1;
-        if (player.id === auth.user.id) {
+        
+        if (player.id === this.page.app.auth.user?.id) {
             participantEl.style.backgroundColor = "#0d6efd";
         }
+
+        avatarImg.src = await avatarSrcPromise;
+        avatarImg.alt = player.username;
+        
+        participantEl.style.opacity = 1;
     }
 
     async renderParticipants() {
@@ -132,17 +136,16 @@ class TournamentBracket extends HTMLElement {
     }
 
     renderStartButton() {
-        const { startButtonEnabled } = this.state;
         const startButton = this.shadowRoot.querySelector(".start-button-container button");
         if (!startButton) return;
 
+        const { startButtonEnabled } = this.state;
+        startButton.style.display = startButtonEnabled ? "block" : "none";
+        
         if (startButtonEnabled) {
             startButton.textContent = "START";
             startButton.disabled = false;
             startButton.style.cursor = "pointer";
-            startButton.style.display = "block";
-        } else {
-            startButton.style.display = "none";
         }
     }
 
@@ -174,12 +177,13 @@ class TournamentBracket extends HTMLElement {
     }
 
     disconnectedCallback() {
+        super.disconnectedCallback();
         const startButton = this.shadowRoot.querySelector(".start-button-container button");
         if (startButton) {
             startButton.removeEventListener("click", this.handleStartButtonClick);
         }
     }
-
+    
     setupTemplate() {
         this.shadowRoot.innerHTML = `
         <style>

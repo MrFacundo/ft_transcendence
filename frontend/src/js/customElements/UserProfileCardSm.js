@@ -1,25 +1,12 @@
 import { EMPTY_AVATAR_URL } from "../settings.js";
 import { getAvatarSrc } from "../utils.js";
+import BaseElement from "./BaseElement.js";
 
-class UserProfileCardSm extends HTMLElement {
+class UserProfileCardSm extends BaseElement {
     constructor() {
         super().attachShadow({ mode: "open" });
         this.setupTemplate();
         this.state = { user: null };
-    }
-
-    set state(newState) {
-        this._state = { ...this._state, ...newState };
-        this.render();
-    }
-
-    get state() {
-        return this._state;
-    }
-
-    async setUser(user) {
-        if (!user) return;
-        this.state = { user };
     }
 
     async render() {
@@ -30,17 +17,17 @@ class UserProfileCardSm extends HTMLElement {
 
         avatarEl.src = await getAvatarSrc(this.state.user, this.page.app.api.fetchAvatarObjectUrl);
         usernameEl.textContent = this.state.user.username;
-        this.updateOnlineStatus();
+
+        const { stateManager } = this.page.app;
+        this.updateOnlineStatus(stateManager.state.onlineStatuses.get(this.state.user.id)?.is_online);
     }
 
     appendPendingButton(expiresAt = null) {
-        console.log("Appending pending button");
         if (!expiresAt) expiresAt = "Pending";
         else expiresAt = `expires at ${new Date(expiresAt).toLocaleTimeString()}`;
 
         const profileContainer = this.shadowRoot.querySelector(".profile-container");
         if (!profileContainer.querySelector(".btn-warning")) {
-            console.log("profileContainer", profileContainer);
             const pendingButton = document.createElement("button");
             pendingButton.className = "btn-warning";
             pendingButton.innerText = expiresAt;
@@ -48,10 +35,11 @@ class UserProfileCardSm extends HTMLElement {
         }
     }
 
-    updateOnlineStatus() {
-        const { stateManager } = this.page.app;
-        const onlineStatus = stateManager.onlineStatuses.get(this.state.user.id)?.is_online;
-        this.shadowRoot.querySelector(".status-indicator").style.backgroundColor = onlineStatus ? "#e0a800" : "#a6a6a6";
+    updateOnlineStatus(isOnline) {
+        const statusIndicator = this.shadowRoot.querySelector('.status-indicator');
+        if (statusIndicator) {
+            statusIndicator.style.backgroundColor = isOnline ? "#e0a800" : "#a6a6a6";
+        }
     }
 
     setupTemplate() {

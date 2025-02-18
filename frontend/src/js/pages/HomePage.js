@@ -20,9 +20,7 @@ class HomePage extends Page {
 		const actionButton = document.querySelector("#action-friend");
 		const selectedUserCard = document.querySelector("user-profile");
 
-		[sendList, receiveList, selectedUserCard].forEach(
-			(el) => (el.page = this)
-		);
+		[sendList, receiveList, selectedUserCard].forEach(el => el.page = this);
 		
 		const userLists = await api.getUsers(auth.user.id);
 
@@ -46,7 +44,7 @@ class HomePage extends Page {
 				userCardSm.appendPendingButton();
 			}
 		};
-		await sendList.populateList(sendListData);
+		sendList.setState ({ users: sendListData });
 		this.sendListElement = sendList;
 
 		receiveList.config = {
@@ -59,7 +57,7 @@ class HomePage extends Page {
 				showMessage(`${user.username} is now your friend.`);
 			}
 		};
-		await receiveList.populateList(receiveListData);
+		receiveList.setState ({ users: receiveListData });
 	}
 }
 

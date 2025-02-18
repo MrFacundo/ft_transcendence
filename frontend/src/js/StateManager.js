@@ -1,75 +1,85 @@
 export class StateManager {
-	constructor(app) {
-		this.app = app;
-		this.onlineStatuses = null;
-		this.tournaments = null;
-		this.currentTournament = null;
-		this.currentGame = null;
-	}
+    constructor(app) {
+        this.app = app;
+        this.subscribers = new Map();
+        this.state = {
+            onlineStatuses: null,
+            currentTournament: null,
+            currentGame: null
+        };
+        this.init();
+    }
+    
+    subscribe(key, callback) {
+        if (!this.subscribers.has(key)) {
+            this.subscribers.set(key, new Set());
+        }
+        this.subscribers.get(key).add(callback);
+        return () => {
+            if (this.subscribers.has(key)) {
+                const unsubscribed = this.subscribers.get(key).delete(callback);
+                console.log(`Unsubscribing from ${key}: ${unsubscribed ? 'Success' : 'Failed'}`);
+            }
+        };
+    }
+    
+    updateState(key, newValue, additionalData) {
+        console.log("Updating state:", key, newValue);
+        this.state[key] = newValue;
+        if (this.subscribers.has(key)) {
+            this.subscribers.get(key).forEach(callback =>
+                callback(newValue, additionalData)
+            );
+        }
+    }
 
-	async init() {
-		if (!this.app.auth || !this.app.auth.user) {
-			console.warn("Cannot set state: User is not authenticated.");
-			return;
-		}
+    async init() {
+        if (!this.app.auth.authenticated) {
+            return;
+        }
 
-		const promises = [
-			this.onlineStatuses ? null : this.setInitialOnlineStatuses(),
-			//this.tournaments ? null : this.setInitialTournaments(),
-			this.currentTournament ? null : this.setCurrentTournament()
-		].filter(Boolean);
+        const promises = [
+            this.state.onlineStatuses === null ? this.setInitialOnlineStatuses() : null,
+            this.state.currentTournament === null ? this.setInitialCurrentTournament() : null
+        ].filter(Boolean);
 
-		await Promise.all(promises);
-	}
+        await Promise.all(promises);
+    }
 
-	/* Online Status */
-	async setInitialOnlineStatuses() {
-		try {
-			const response = await this.app.api.getOnlineStatuses();
-			this.onlineStatuses = new Map(response.map(user => [user.user_id, user]));
-		} catch (error) {
-			console.error("Error fetching online status data:", error);
-		}
-	}
+    async setInitialOnlineStatuses() {
+        try {
+            const response = await this.app.api.getOnlineStatuses();
+            const statusesMap = new Map(response.map(user => [user.user_id, user]));
+            this.updateState('onlineStatuses', statusesMap);
+        } catch (error) {
+            console.error("Error fetching online status data:", error);
+        }
+    }
 
-	updateIndividualOnlineStatus(data) {
-		if (!this.onlineStatuses) return;
-		this.onlineStatuses.set(data.user_id, data);
-	}
+    updateIndividualOnlineStatus(data) {
+        if (!this.state.onlineStatuses) return;
 
-	/* Tournaments */
+        const newStatuses = new Map(this.state.onlineStatuses);
+        newStatuses.set(data.user_id, data);
 
-	async setInitialTournaments() {
-		try {
-			const response = await this.app.api.getTournaments();
-			this.tournaments = new Map(response.map(tournament => [tournament.id, tournament]));
-			console.log("Tournaments:", this.tournaments);
-		} catch (error) {
-			console.error("Error fetching tournament data:", error);
-		}
-	}
+        this.updateState('onlineStatuses', newStatuses, data.user_id);
+    }
 
-	async setCurrentTournament(tournament = null) {
-		if (tournament) {
-			this.currentTournament = tournament;
-		} else {
-			try {
-				this.currentTournament = await this.app.api.getCurrentTournament();
-			} catch (error) {
-				console.error("Error fetching current tournament data:", error);
-			}
-		}
-		//console.log("Current tournament:", this.currentTournament);
-	}
+    async setInitialCurrentTournament() {
+        try {
+            const currentTournament = await this.app.api.getCurrentTournament();
+            currentTournament && this.updateState('currentTournament', currentTournament);
+        } catch (error) {
+            console.error("Error fetching current tournament data:", error);
+        }
+    }
 
-	updateCurrentTournament(tournament) {
-			this.setCurrentTournament(tournament);
-	}
-
-	close() {
-		this.onlineStatuses = null;
-		this.tournaments = null;
-		this.currentTournament = null;
-		this.currentGame = null;
-	}
+    close() {
+        this.subscribers.clear();
+        Object.keys(this.state).forEach(key => {
+            if (this.state[key] !== null) {
+                this.updateState(key, null);
+            }
+        });
+    }
 }

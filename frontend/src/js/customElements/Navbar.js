@@ -1,16 +1,12 @@
 import { EMPTY_AVATAR_URL } from "../settings.js";
 import { getAvatarSrc } from "../utils.js";
+import BaseElement from "./BaseElement.js";
 
-class Navbar extends HTMLElement {
+class Navbar extends BaseElement {
     constructor() {
         super().attachShadow({ mode: "open" });
         this.state = { user: null, authenticated: false };
         this.setupTemplate();
-    }
-
-    setState(newState) {
-        this.state = { ...this.state, ...newState };
-        this.render();
     }
 
     setDisplay(elements, display) {
@@ -37,9 +33,12 @@ class Navbar extends HTMLElement {
             this.setDisplay([profileEl, settingsEl, logoutEl], "none");
         }
 
-        this.shadowRoot.querySelectorAll("[data-href]").forEach(element => {
-            element.addEventListener("click", this.page.handleClick);
-        });
+        if (!this.listenersAdded) {
+            this.shadowRoot.querySelectorAll("[data-href]").forEach(element => {
+                element.addEventListener("click", (event) => this.page.handleClick(event));
+            });
+            this.listenersAdded = true;
+        }
     }
 
     async updateAuthValues() {
@@ -57,7 +56,9 @@ class Navbar extends HTMLElement {
     }
 
     disconnectedCallback() {
+        super.disconnectedCallback();
         this.shadowRoot.querySelectorAll("[data-href]").forEach(element => {
+            console.log("Removing event listener from", element);
             element.removeEventListener("click", this.page.handleClick);
         });
     }

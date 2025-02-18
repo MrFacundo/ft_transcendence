@@ -1,5 +1,5 @@
 import Page from "./Page.js";
-import { formatErrorMessages } from "../utils.js";
+import { formatErrorMessages, showMessage } from "../utils.js";
 import "../customElements/CustomForm.js";
 
 class TournamentCreatePage extends Page {
@@ -22,9 +22,6 @@ class TournamentCreatePage extends Page {
         }
 
         const form = this.mainElement.querySelector("custom-form");
-        const successMsg = this.mainElement.querySelector("#create-success");
-        const createdName = this.mainElement.querySelector("#tournament-created-name");
-        const createdParticipants = this.mainElement.querySelector("#tournament-created-participants");
 
         form.submitForm = async (formData) => {
             try {
@@ -32,13 +29,10 @@ class TournamentCreatePage extends Page {
                     throw new Error("Tournament name must be between 3 and 20 characters.");
                 }
                 const response = await api.createTournament(formData.tournament_name, formData.participants_amount);
-                const successMessage = "Tournament created successfully.";
-                stateManager.setCurrentTournament(response);
+                stateManager.updateState('currentTournament', response);
                 wsManager.setupTournamentWebSocket();
-                successMsg.textContent = successMessage;
-                createdName.textContent = response.name;
-                createdParticipants.textContent = "Participants: " + response.participants_amount;
-                form.style.display = "none";
+                showMessage("Tournament created successfully.");
+                this.app.navigate("/tournament");
             } catch (error) {
                 console.error("error", error);
                 const errorMessage = error.response?.data ? formatErrorMessages(error.response.data) : error.message || "An unknown error occurred";
