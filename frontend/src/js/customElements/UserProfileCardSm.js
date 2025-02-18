@@ -1,25 +1,12 @@
 import { EMPTY_AVATAR_URL } from "../settings.js";
 import { getAvatarSrc } from "../utils.js";
+import BaseElement from "./BaseElement.js";
 
-class UserProfileCardSm extends HTMLElement {
+class UserProfileCardSm extends BaseElement {
     constructor() {
         super().attachShadow({ mode: "open" });
         this.setupTemplate();
         this.state = { user: null };
-    }
-
-    set state(newState) {
-        this._state = { ...this._state, ...newState };
-        this.render();
-    }
-
-    get state() {
-        return this._state;
-    }
-
-    async setUser(user) {
-        if (!user) return;
-        this.state = { user };
     }
 
     async render() {

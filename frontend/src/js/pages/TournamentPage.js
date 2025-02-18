@@ -39,7 +39,7 @@ class TournamentPage extends Page {
                 [partcipantsListEl, selectedUserCard].forEach(el => (el.page = this));
 
                 partcipantsListEl.config = { selectedUserCard };
-                partcipantsListEl.state = { users: tournament.participants };
+                partcipantsListEl.setState ({ users: tournament.participants });
             } else {
                 // Show tournament bracket
                 tournamentBracketContainerEl.classList.remove("d-none");

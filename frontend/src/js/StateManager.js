@@ -16,10 +16,13 @@ export class StateManager {
         }
         this.subscribers.get(key).add(callback);
         return () => {
-            const unsubscribed = this.subscribers.get(key).delete(callback);
-            console.log(`Unsubscribing from ${key}: ${unsubscribed ? 'Success' : 'Failed'}`);
+            if (this.subscribers.has(key)) {
+                const unsubscribed = this.subscribers.get(key).delete(callback);
+                console.log(`Unsubscribing from ${key}: ${unsubscribed ? 'Success' : 'Failed'}`);
+            }
         };
     }
+    
     updateState(key, newValue, additionalData) {
         console.log("Updating state:", key, newValue);
         this.state[key] = newValue;
@@ -32,7 +35,6 @@ export class StateManager {
 
     async init() {
         if (!this.app.auth.authenticated) {
-            console.log("Cannot set state: User is not authenticated.");
             return;
         }
 

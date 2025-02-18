@@ -18,6 +18,17 @@ class BaseElement extends HTMLElement {
             this._pageSetCallback();
         }
     }
+    
+    setState(newState) {
+        this.state = { ...this.state, ...newState };
+        this.render();
+    }
+
+    disconnectedCallback() {
+        if (this.unsubscribe) {
+            this.unsubscribe();
+        }
+    }
 }
 
 export default BaseElement;

@@ -44,7 +44,7 @@ class OneVsOne extends Page {
                 return response;
             },
 		};
-		sendList.state = { users: sendListData };
+		sendList.setState ({ users: sendListData });
 
         receiveList.config = {
 			selectedUserCard,
@@ -61,7 +61,7 @@ class OneVsOne extends Page {
                 return response;
             },
 		};
-		receiveList.state = { users: receiveListData };
+		receiveList.setState ({ users: receiveListData });
     }
 }
 

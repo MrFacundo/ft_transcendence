@@ -8,7 +8,7 @@ import { WebSocketManager } from './WebSocketManager.js';
 import { StateManager } from './StateManager.js';
 
 /**
- * App class initializes the application, manages page navigation, and handles authentication.
+ * Initializes the application, manages page navigation, and handles authentication.
  */
 class App {
     constructor() {
@@ -45,6 +45,8 @@ class App {
      * @param {boolean} replaceHistory - Whether to replace the current history entry instead of pushing a new one.
      */
     async navigate(path, replaceHistory = false) {
+        if (this.currentPage?.url === path) return;
+
         if (path === "/") {
             path = "/home";
         } else if (path === "/logout") {

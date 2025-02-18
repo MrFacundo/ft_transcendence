@@ -11,7 +11,7 @@ export class WebSocketManager {
     }
 
     async init() {
-        if (!this.app.auth || !this.app.auth.user) {
+        if (!this.app.auth?.user) {
             console.warn("Cannot establish WebSocket connections: User is not authenticated.");
             return;
         }
@@ -121,7 +121,7 @@ export class WebSocketManager {
 
     handleJoinMessage(data, auth, stateManager) {
         if (data.tournament.participants.length === data.tournament.participants_amount) {
-            this.app.navigate("/tournament");
+            return this.app.navigate("/tournament");
         }
         if (data.participant_id !== auth.user.id) {
             stateManager.updateState('currentTournament', data.tournament);

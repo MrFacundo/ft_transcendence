@@ -55,6 +55,7 @@ class Page {
                 this.handleClick(event, app)
             );
         });
+        if (this.unsubscribe) this.unsubscribe();
         this.mainElement.innerHTML = "";
     }
 
@@ -79,7 +80,7 @@ class Page {
         navbarElement.page = this;
         navbarElement.updateAuthValues();
     }
-
+    
     /**
      * Renders the page
      * @abstract
