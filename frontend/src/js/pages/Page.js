@@ -27,8 +27,7 @@ class Page {
     async open() {
         const { app } = this;
         if (this.isProtected) {
-            await app.auth.authenticate();
-            if (!app.auth.authenticated) return app.navigate("/login");
+            if (!app.auth.authenticated) return app.auth.logout();
         }
         document.querySelectorAll("section").forEach((section) => { section.remove() });
         const tempElement = document.createElement(this.pageElement.tagName);
@@ -56,6 +55,7 @@ class Page {
                 this.handleClick(event, app)
             );
         });
+        if (this.unsubscribe) this.unsubscribe();
         this.mainElement.innerHTML = "";
     }
 
@@ -80,7 +80,7 @@ class Page {
         navbarElement.page = this;
         navbarElement.updateAuthValues();
     }
-
+    
     /**
      * Renders the page
      * @abstract

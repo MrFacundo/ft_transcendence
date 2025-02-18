@@ -1,0 +1,221 @@
+//////////////////////////////////////////////////////////////
+// 1) USERS & AUTH
+//////////////////////////////////////////////////////////////
+Table user {
+  id bigint [pk, increment]
+
+//  -- Basic account data
+  username             varchar(20)   [not null, unique]
+  email                varchar(255)  [not null, unique]
+  email_is_verified    boolean       [not null, default: false]
+  new_email            varchar(255)
+  new_email_is_verified boolean      [not null, default: false]
+  
+//  -- Password / auth
+  password_hash        varchar(250)  [not null]
+  password_salt        varchar(100)
+  two_factor_method    varchar(13)   [not null, default: 'none']
+  validation_secret    varchar(32)
+
+  //-- Profile
+  first_name           varchar(150)  [not null, default: '']
+  last_name            varchar(150)  [not null, default: '']
+  avatar_upload        varchar(100)  // file path or URL; use a bytea column if you store image data
+
+  // Permissions / status
+  is_superuser         boolean       [not null, default: false]
+  is_staff             boolean       [not null, default: false]
+  is_active            boolean       [not null, default: true]
+  date_joined          timestamp     [not null]
+  last_login           timestamp
+}
+
+Table user_friendship {
+  id bigint [pk, increment]
+  user_id   bigint [not null, ref: > user.id]
+  friend_id bigint [not null, ref: > user.id]
+  status    varchar(10) [not null, default: 'pending'] 
+    // 'pending','accepted','declined','blocked'
+  blocked_by bigint [ref: > user.id]  // set if status='blocked'
+
+//  Note: 'You can enforce a unique constraint on (user_id, friend_id) in an unordered way, 
+//        e.g. always store user_id < friend_id or use a separate check.'
+}
+
+Table user_gamestats {
+  id bigint [pk, increment]
+  user_id      bigint [not null, unique, ref: > user.id]
+  total_matches int   [not null, default: 0, note: "CHECK (total_matches >= 0)"]
+  wins          int   [not null, default: 0, note: "CHECK (wins >= 0)"]
+  losses        int   [not null, default: 0, note: "CHECK (losses >= 0)"]
+}
+
+//////////////////////////////////////////////////////////////
+// 2) DJANGO-LIKE PERMISSIONS TABLES
+//////////////////////////////////////////////////////////////
+Table auth_group {
+    id int [pk, increment]
+    name varchar(150) [not null, unique]
+}
+
+Table auth_permission {
+    id int [pk, increment]
+    name varchar(255) [not null]
+    content_type_id int [not null, ref: > django_content_type.id]
+    codename varchar(100) [not null]
+}
+
+Table auth_group_permissions {
+    id bigint [pk, increment]
+    group_id int [not null, ref: > auth_group.id]
+    permission_id int [not null, ref: > auth_permission.id]
+}
+
+Table django_content_type {
+    id int [pk, increment]
+    app_label varchar(100) [not null]
+    model varchar(100) [not null]
+}
+
+Table django_admin_log {
+    id int [pk, increment]
+    action_time timestamp [not null]
+    object_id text
+    object_repr varchar(200) [not null]
+    action_flag smallint [not null, note: "CHECK (action_flag >= 0)"]
+    change_message text [not null]
+    content_type_id int [ref: > django_content_type.id]
+    user_id bigint [not null, ref: > user.id]
+}
+
+Table token_blacklist_outstandingtoken {
+    id bigint [pk, increment]
+    token text [not null]
+    created_at timestamp
+    expires_at timestamp [not null]
+    user_id bigint [ref: > user.id]
+    jti varchar(255) [not null]
+}
+
+Table token_blacklist_blacklistedtoken {
+    id bigint [pk, increment]
+    blacklisted_at timestamp [not null]
+    token_id bigint [not null, ref: > token_blacklist_outstandingtoken.id]
+}
+
+Table user_groups {
+    id bigint [pk, increment]
+    user_id  bigint [not null, ref: > user.id]
+    group_id int    [not null, ref: > auth_group.id]
+}
+
+Table user_permissions {
+    id bigint [pk, increment]
+    user_id      bigint [not null, ref: > user.id]
+    permission_id int   [not null, ref: > auth_permission.id]
+}
+
+//////////////////////////////////////////////////////////////
+// 3) TOURNAMENT & BRACKET STRUCTURE
+//////////////////////////////////////////////////////////////
+Table tournament {
+  id bigint [pk, increment]
+  name               varchar(100) [not null]
+  start_date         timestamp    [not null]
+  end_date           timestamp    [not null]
+  bracket_type       varchar(20)  [not null, default: 'single_elimination']
+  number_of_rounds   int
+
+  // Optionally bring back min_level, max_level, or map references here if needed:
+  // min_level int
+  // max_level int
+  // tournament_map_id bigint [ref: > tournament_map.id]
+}
+
+Table tournament_participant {
+  id bigint [pk, increment]
+  tournament_id bigint [not null, ref: > tournament.id]
+  user_id       bigint [not null, ref: > user.id]
+  seed          int   // For bracket seeding if desired
+  registration_date date
+}
+
+//////////////////////////////////////////////////////////////
+// 4) SINGLE-ELIMINATION BRACKET SLOTS
+//////////////////////////////////////////////////////////////
+// Each slot is one "place" in the bracket. 
+// For single elimination with N participants, you'll typically have N-1 slots.
+Table bracket_slot {
+  id bigint [pk, increment]
+
+  tournament_id bigint [not null, ref: > tournament.id]
+  // The match assigned to this slot once it is created/scheduled
+  match_id bigint [ref: > match.id]
+  round         int    [not null]  // e.g. 1 for Round 1, 2 for Round 2, etc.
+  slot_in_round int    [not null]  // e.g. match #1, #2 in that round
+
+  // Parent references: the winners from these slots feed into this one
+  parent_slot1_id bigint [ref: > bracket_slot.id]
+  parent_slot2_id bigint [ref: > bracket_slot.id]
+
+  // Child reference: where the winner of this slot goes
+  next_slot_id    bigint [ref: > bracket_slot.id] 
+  // If null, it's the final match
+}
+
+//////////////////////////////////////////////////////////////
+// 5) MATCH & MATCH_PARTICIPANT
+//////////////////////////////////////////////////////////////
+// The actual game played in a bracket slot (or a casual match with no slot).
+Table match {
+  id bigint [pk, increment]
+
+  // Basic info
+  date_played   timestamp
+  status        varchar(20) [not null, default: 'scheduled'] // e.g. 'scheduled','in_progress','completed'
+  channel_group_name  varchar(100)                           // from app_ponggame
+
+  // If you want an explicit "winner_id," you can add:
+  // winner_id bigint [ref: > tournament_participant.id]
+  //
+  // But typically you'll store the winner in match_participant.is_winner 
+  // or in the bracket slot once the match is complete.
+}
+
+Table match_participant {
+  id bigint [pk, increment]
+  match_id       bigint [not null, ref: > match.id]
+  participant_id bigint [not null, ref: > tournament_participant.id]
+
+  score    int      [default: 0]     // how many points/sets they scored
+  is_winner boolean [default: false] // or set "true" for the winner
+}
+
+//////////////////////////////////////////////////////////////
+// 6) PLAYER_STANDINGS (Optional - track each player's stats in a tournament)
+//////////////////////////////////////////////////////////////
+Table player_standings {
+  id bigint [pk, increment]
+  tournament_id bigint [not null, ref: > tournament.id]
+  tournament_participant_id bigint [not null, ref: > tournament_participant.id]
+  
+  matches_played int
+  matches_won    int
+  sets_won       int
+  total_points   int
+  current_score  int
+}
+
+//////////////////////////////////////////////////////////////
+// 7) GAME_INVITATION
+//////////////////////////////////////////////////////////////
+// For inviting a user to join a particular match (casual or bracket-based).
+Table game_invitation {
+  id bigint [pk, increment]
+  status     varchar(10) [not null, default: 'pending']
+  created_at timestamp   [not null]
+  
+  match_id    bigint [ref: > match.id] // the game they're being invited to
+  receiver_id bigint [not null, ref: > user.id]
+  sender_id   bigint [not null, ref: > user.id]
+}

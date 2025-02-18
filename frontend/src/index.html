@@ -35,12 +35,11 @@
                     <custom-form id="login-form">
                         <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
                         <div class="form-floating mb-3">
-                            <input type="email" class="form-control" data-id="Email" placeholder="name@example.com"
-                                autocomplete="email" />
-                            <label for="Email">Email address</label>
+                            <input type="email" class="form-control" data-id="Email"/>
+                            <label for="Email">Username or email</label>
                         </div>
                         <div class="form-floating mb-3">
-                            <input type="password" class="form-control" data-id="Password" placeholder="Password" />
+                            <input type="password" class="form-control" data-id="Password" />
                             <label for="Password">Password</label>
                         </div>
                         <button class="btn btn-primary w-100 py-2" type="submit">
@@ -87,7 +86,7 @@
                         </button>
                         <a class="d-inline-block text-center w-100 mt-3" data-href="/login">already with us?</a>
                     </custom-form>
-                    <p id="login-success" class="text-success"></p>
+                    <p id="register-success" class="text-success"></p>
                 </main>
             </div>
         </div>
@@ -327,17 +326,18 @@
         </div>
         <h2 class="my-5 text-center display-6">Add friends</h2>
         <div class="row">
-            <div class="col-md-4">
-                <p class="font-weight-bold">Invitations Received</p>
-                <ul class="list-group" id="receive-list"></ul>
-            </div>
-            <div class="col-md-4">
-                <p class="font-weight-bold">Send Invitations</p>
-                <ul class="list-group" id="send-list"></ul>
-            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <p>Invitations Received</p>
+                    <user-list id="receive-list"></user-list>
+                </div>
+                <div class="col-md-4">
+                    <p>Send Invitations</p>
+                    <user-list id="send-list"></user-list>
+                </div>
             <div class="col-md-4 d-flex flex-column align-items-center text-center">
                 <user-profile></user-profile>
-                <button class="btn btn-primary mt-3" id="action-friend">Invite</button>
+                <button class="btn btn-primary mt-3 d-none" id="action-friend"></button>
             </div>
         </div>
     </section>
@@ -356,11 +356,11 @@
         <div class="row">
             <div class="col-md-4">
                 <p>Invitations Received</p>
-                <ul class="list-group" id="receive-list"></ul>
+                <user-list id="receive-list"></user-list>
             </div>
             <div class="col-md-4">
                 <p>Send Invitations</p>
-                <ul class="list-group" id="send-list"></ul>
+                <user-list id="send-list"></user-list>
             </div>
             <div class="col-md-4 d-flex flex-column align-items-center text-center">
                 <user-profile></user-profile>
@@ -375,25 +375,71 @@
 
     <section id="Tournament" class="container mt-5">
         <h1 class="mb-4">Tournament</h1>
-        <div class="tournament-dashboard row">
-            <div class="col-md-4">
-                <p>Open tournaments</p>
-                <ul class="list-group" id="tournament-list">
-                </ul>
-            </div>
-            <div class="col-md-8 d-flex flex-column align-items-center text-center">
-                <p>Create new tournament</p>
-                <form id="create-tournament-form" class="w-50">
-                    <div class="form-group mb-3">
-                        <label for="tournament-name">Tournament Name</label>
-                        <input type="text" class="form-control" id="tournament-name"
-                            placeholder="Enter tournament name">
+        <div id="cards-container" class="row justify-content-around d-none">
+            <div class="col-md-4" data-href="/tournament-create">
+                <div class="card bg-light my-4 shadow-sm" style="min-height: 250px; cursor: pointer;">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Create</h5>
+                        <img src="/static/images/pencil-square.svg" alt="Pencil Icon" width="130" height="130">
+                        <p class="card-text mt-4">Create a new tournament.</p>
                     </div>
-                    <button type="submit" class="btn btn-primary">Create</button>
-                </form>
+                </div>
+            </div>
+            <div class="col-md-4" data-href="/tournament-join">
+                <div class="card bg-light my-4 shadow-sm" style="min-height: 250px; cursor: pointer;">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Join</h5>
+                        <img src="/static/images/person-plus-fill.svg" alt="Person Icon" width="130" height="130">
+                        <p class="card-text mt-4">Join an existing tournament.</p>
+                    </div>
+                </div>
             </div>
         </div>
-        <tournament-bracket class="d-none"></tournament-bracket>
+        <div id="tournament-details" class="row justify-content-center d-none">
+            <h2  id="tournament-name" class="mb-4 text-center text-warning display-6"></h2>
+            <div id="participants-info" class="row d-none">
+                <div class="col-md-4">
+                    <p>Participants</p>
+                    <user-list id="tournament-participants"></user-list>
+                </div>
+                <div class="col-md-4 d-flex flex-column align-items-center text-center">
+                    <user-profile id="selected-participant"></user-profile>
+                </div>
+            </div>
+            <div id="tournament-bracket-container" class="d-none">
+                <tournament-bracket></tournament-bracket>
+            </div>
+        </div>
+    </section>
+
+    <section id="TournamentCreate" class="container mt-5">
+        <h1 class="mb-4">Create Tournament</h1>
+        <div class="row justify-content-around">
+            <custom-form class="col-md-8">
+                <h1 class="h3 mb-3 fw-normal">Enter your tournament settings</h1>
+                <div class="form-check mb-3">
+                    <label for="tournament_name">Tournament Name</label>
+                    <input type="text" class="form-control" data-id="tournament_name" />
+                </div>
+                <div class="form-check mb-3">
+                    <label for="participants_amount">Participants</label>
+                    <select class="form-control" data-id="participants_amount">
+                        <option value="4">4</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary w-100 py-2" type="submit">
+                    Create
+                </button>
+            </custom-form>
+        </div>
+    </section>
+
+    <section id="TournamentJoin" class="container mt-5">
+        <h1 class="mb-4">Join a Tournament</h1>
+        <div class="row justify-content-around">
+            <ol class="list-group col-md-6 mx-auto" id="tournament-list">
+            </ol>
+        </div>
     </section>
 
     <section id="Profile" class="container mt-5">
@@ -410,7 +456,7 @@
         <h2 id="friend-list-title" class="my-5 text-center display-6"></h2>
         <div class="row justify-content-center">
             <div class="col-md-4">
-                <ul class="list-group" id="friend-list"></ul>
+                <user-list id="friend-list"></user-list>
             </div>
             <div class="col-md-4 d-flex flex-column align-items-center text-center">
                 <user-profile id="selected-friend"></user-profile>

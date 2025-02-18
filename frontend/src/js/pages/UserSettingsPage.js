@@ -1,6 +1,6 @@
 import Page from "./Page";
 import { Modal } from 'bootstrap';
-import { capitalizeFirstLetter } from "../utils";
+import { capitalizeFirstLetter, showMessage } from "../utils";
 import "../customElements/CustomForm";
 
 class UserSettingsPage extends Page {
@@ -85,14 +85,14 @@ class UserSettingsPage extends Page {
     deleteAccount() {
         this.app.api.deleteUser()
             .then(() => {
-                this.showMessage("Account successfully deleted.", "success");
+                showMessage("Account successfully deleted.");
                 Modal.getInstance(document.getElementById('deleteAccountModal')).hide();
                 setTimeout(() => {
                     return this.app.auth.logout();
                 }, 3000);
             })
             .catch(error => {
-                this.showMessage("An error occurred while deleting the account.", "error");
+                showMessage("An error occurred while deleting the account.", "error");
             });
     }
 
@@ -100,23 +100,23 @@ class UserSettingsPage extends Page {
     handleChange(field, newValue, successMessage, confirmPasswordValue = null) {
         newValue = newValue.trim();
         if (field === "new_password" && newValue !== confirmPasswordValue) {
-            this.showMessage("Passwords do not match.", "error");
+            showMessage("Passwords do not match.", "error");
             return;
         }
         if (field === "avatar") {
             const fileInput = document.querySelector("#new-avatar");
             if (fileInput.files.length === 0) {
-                this.showMessage("Please select an image to upload.", "error");
+                showMessage("Please select an image to upload.", "error");
                 return;
             }
             const file = fileInput.files[0];
             this.app.api.uploadAvatar(file)
                 .then(() => {
-                    this.showMessage(successMessage, "success");
+                    showMessage(successMessage);
                     setTimeout(() => this.app.navigate(this.url), 3000);
                 })
                 .catch(error => {
-                    this.showMessage("An error occurred while updating the avatar.", "error");
+                    showMessage("An error occurred while updating the avatar.", "error");
                 });
             return;
         }
@@ -125,34 +125,17 @@ class UserSettingsPage extends Page {
         }
         this.app.api.updateUser({ [field]: newValue })
             .then(() => {
-                this.showMessage(successMessage, "success");
+                showMessage(successMessage);
                 setTimeout(() => this.app.navigate(this.url), 3000);
             })
             .catch(error => {
                 const errors = error.response.data;
                 const firstErrorKey = Object.keys(errors)[0];
                 if (firstErrorKey && errors[firstErrorKey][0]) {
-                    return this.showMessage(capitalizeFirstLetter(errors[firstErrorKey][0]), "error");
+                    return showMessage(capitalizeFirstLetter(errors[firstErrorKey][0]), "error");
                 }
-                this.showMessage("An error occurred while updating the settings.", "error");
+                showMessage("An error occurred while updating the settings.", "error");
             });
-    }
-
-    /* Show form / response message */
-    showMessage(message, type) {
-        const existingMessageContainer = document.querySelector(".alert");
-        if (existingMessageContainer) existingMessageContainer.remove();
-
-        const messageContainer = document.createElement("div");
-        messageContainer.className = `mt-3 alert alert-${type === "success" ? "success" : "danger"} alert-dismissible fade show`;
-        messageContainer.textContent = message;
-
-        document.querySelector("#tab-content").appendChild(messageContainer);
-
-        setTimeout(() => {
-            messageContainer.classList.remove("show");
-            setTimeout(() => messageContainer.remove(), 150);
-        }, 3000);
     }
 }
 

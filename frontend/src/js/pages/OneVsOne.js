@@ -1,6 +1,7 @@
 import Page from "./Page.js";
 import "../customElements/UserProfileCard.js";
 import "../customElements/UserProfileCardSm.js";
+import "../customElements/UserList.js";
 
 class OneVsOne extends Page {
     constructor(app) {
@@ -14,74 +15,53 @@ class OneVsOne extends Page {
     }
 
     async render() {
-        const { api } = this.app;
+        const { api, auth, stateManager } = this.app;
         const sendList = document.querySelector("#send-list");
         const receiveList = document.querySelector("#receive-list");
-        const inviteBtn = document.querySelector("#action-friend");
-        const selectedFriend = this.mainElement.querySelector("user-profile");
-        selectedFriend.page = this;
+        const actionButton = document.querySelector("#action-friend");
+        const selectedUserCard = document.querySelector("user-profile");
 
-        const sentInvites = await api.getSentGameInvites();
-        const friends = await api.getFriends(this.app.auth.user.id);
-        const receivedInvites = await api.getReceivedGameInvites();
+        [sendList, receiveList, selectedUserCard].forEach(el => (el.page = this));
 
-        this.createFriendList(friends, sentInvites, inviteBtn, selectedFriend, sendList);
-        this.createReceivedInvitesList(receivedInvites, inviteBtn, selectedFriend, receiveList);
+        const friendList = await api.getFriends(auth.user.id);
 
-        inviteBtn.classList.add("d-none");
-    }
+        const sendListData = friendList.filter(user =>
+            !user.game_invite || user.game_invite.sender === auth.user.id
+        );
 
-    createFriendList(friends, sentInvites, inviteBtn, selectedFriend, sendList) {
-        friends.forEach(friend => {
-            const friendItem = this.setupFriendItem(friend, "Invite", async () => {
-                try {
-                    await this.app.api.gameRequest(friend.id);
-                    friendItem.appendPendingButton();
-                    inviteBtn.classList.add("d-none");
-                } catch (error) {
-                    console.error(error);
+        const receiveListData = friendList.filter(user =>
+            user.game_invite && user.game_invite.sender === user.id
+        );
+
+        sendList.config = {
+			selectedUserCard,
+			actionButton,
+			actionText: "Invite",
+            actionCallback: async (user, userCardSm) => {
+                const response = await api.gameRequest(user.id);
+                userCardSm.appendPendingButton(Date.now() + 10 * 60 * 1000);
+                console.log(`Game invite sent to: ${user.username}`);
+                return response;
+            },
+		};
+		sendList.setState ({ users: sendListData });
+
+        receiveList.config = {
+			selectedUserCard,
+			actionButton,
+			actionText: "Accept",
+            actionCallback: async (user) => {
+                if (!stateManager.onlineStatuses.get(user.id)?.is_online) {
+                    alert(`${user.username} is offline, try again later.`);
+                    return;
                 }
-            }, sentInvites, inviteBtn, selectedFriend);
-            sendList.appendChild(friendItem);
-        });
-    }
-
-    createReceivedInvitesList(receivedInvites, inviteBtn, selectedFriend, receiveList) {
-        receivedInvites.forEach(invite => {
-            if (invite.status !== "pending") return;
-            const friendItem = this.setupFriendItem(invite.sender, "Accept", async () => {
-                try {
-                    const response = await this.app.api.gameAccept(invite.id);
-                    receiveList.removeChild(friendItem);
-                    inviteBtn.classList.add("d-none");
-                    console.log(response);
-                    console.log(`Redirecting to game: ${response.game_url}`);
-                    this.app.currentGame = true; // TODO: implement game state management
-                    this.app.navigate(response.game_url);
-                } catch (error) {
-                    console.error(error);
-                }
-            }, [], inviteBtn, selectedFriend);
-            receiveList.appendChild(friendItem);
-        });
-    }
-
-    setupFriendItem(friend, actionText, actionCallback, sentInvites, inviteBtn, selectedFriend) {
-        const friendItem = document.createElement("user-profile-small");
-        friendItem.page = this;
-        friendItem.setUser(friend);
-        friendItem.addEventListener("click", () => {
-            inviteBtn.classList.remove("d-none");
-            inviteBtn.textContent = actionText;
-            inviteBtn.onclick = actionCallback;
-            selectedFriend.setUser(friend);
-        });
-
-        if (sentInvites.some(invite => invite.receiver.id === friend.id && invite.status === "pending")) {
-            friendItem.appendPendingButton();
-        }
-
-        return friendItem;
+                const response = await api.gameAccept(user.game_invite.id);
+                console.log(`Game invite accepted from: ${user.username}`);
+                this.app.navigate(response.game_url);
+                return response;
+            },
+		};
+		receiveList.setState ({ users: receiveListData });
     }
 }
 
