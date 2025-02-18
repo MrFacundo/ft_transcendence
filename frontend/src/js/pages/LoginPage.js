@@ -41,8 +41,9 @@ class LoginPage extends Page {
         };
 
         const oAuthButton = this.mainElement.querySelector("#oauth");
-        oAuthButton.addEventListener("click", () => {
-            auth.oAuthLogin().catch((error) => {
+        oAuthButton.addEventListener("click",  async () => {
+            console.log("OAuth login");
+            await auth.oAuthLogin().catch((error) => {
                 form.showFormError(error.message);
             });
         });

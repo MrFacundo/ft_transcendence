@@ -2,70 +2,63 @@ import Page from "./Page.js";
 import { showMessage } from "../utils.js";
 
 class HomePage extends Page {
-    constructor(app) {
-        super({
-            name: "home",
-            url: "/home",
-            pageElement: "#Home",
-            isProtected: true,
-            app: app,
-        });
-    }
+	constructor(app) {
+		super({
+			name: "home",
+			url: "/home",
+			pageElement: "#Home",
+			isProtected: true,
+			app: app,
+		});
+		this.sendListElement = null;
+	}
 
-    async render() {
-        const { api } = this.app;
+	async render() {
+		const { api, auth } = this.app;
+		const sendList = document.querySelector("#send-list");
+		const receiveList = document.querySelector("#receive-list");
+		const actionButton = document.querySelector("#action-friend");
+		const selectedUserCard = document.querySelector("user-profile");
+
+		[sendList, receiveList, selectedUserCard].forEach(el => el.page = this);
+		
+		const userLists = await api.getUsers(auth.user.id);
+
+        const sendListData = userLists.filter(user => 
+            user.id !== auth.user.id && 
+            (!user.friendship || 
+            (user.friendship.status === "pending" && user.friendship.sender === auth.user.id))
+        );
         
-        const sendList = document.querySelector("#send-list");
-        const receiveList = document.querySelector("#receive-list");
-        const inviteBtn = document.querySelector("#action-friend");
-        const selectedFriend = this.mainElement.querySelector("user-profile");
-        selectedFriend.page = this;
-    
-        const setupFriendItem = (friend, actionText, actionCallback) => {
-            const friendItem = document.createElement("user-profile-small");
-            friendItem.page = this;
-            friendItem.setUser(friend);
-            friendItem.addEventListener("click", () => {
-                inviteBtn.classList.remove("d-none");
-                inviteBtn.textContent = actionText;
-                inviteBtn.onclick = actionCallback;
-                selectedFriend.setUser(friend);
-            });
-            return friendItem;
-        };
+        const receiveListData = userLists.filter(user => 
+            user.friendship?.sender === user.id &&
+            user.friendship.status === "pending"
+        );
 
-        const friendsInvitable = await api.getFriendsInvitable()
-        friendsInvitable.forEach(friend => {
-            const friendItem = setupFriendItem(friend, "Invite", async () => {
-                try {
-                    await api.friendRequest(friend.id);
-                    friendItem.appendPendingButton();
-                    inviteBtn.classList.add("d-none");
-                } catch (error) {
-                    showMessage(error.response.data.message);
-                }
-            });
-            sendList.appendChild(friendItem);
-        });
-    
-        const friendsRequests = await api.getFriendsRequests();
-        friendsRequests.forEach(invite => {
-            const friendItem = setupFriendItem(invite, "Accept", async () => {
-                try {
-                    const response = await api.friendAccept(invite.id);
-                    receiveList.removeChild(friendItem);
-                    inviteBtn.classList.add("d-none");
-                    showMessage(response.message);
-                } catch (error) {
-                    console.log(error);
-                    showMessage(error.response.data.message);
-                }
-            });
-            receiveList.appendChild(friendItem);
-        });
-    
-        inviteBtn.classList.add("d-none");
-    }
+		sendList.config = {
+			selectedUserCard,
+			actionButton,
+			actionText: "Invite",
+			actionCallback: async (user, userCardSm) => {
+				await api.friendRequest(user.id);
+				userCardSm.appendPendingButton();
+			}
+		};
+		sendList.setState ({ users: sendListData });
+		this.sendListElement = sendList;
+
+		receiveList.config = {
+			selectedUserCard,
+			actionButton,
+			actionText: "Accept",
+			actionCallback: async (user) => {
+				api.friendAccept(user.id)
+				receiveList.removeUser(user.id);
+				showMessage(`${user.username} is now your friend.`);
+			}
+		};
+		receiveList.setState ({ users: receiveListData });
+	}
 }
 
 export default HomePage;

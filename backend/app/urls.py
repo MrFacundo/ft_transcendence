@@ -1,68 +1,49 @@
-from django.urls import path
+"""
+URL configuration for backend project.
 
-from app.views.auth_views import (
-    LoginView,
-    UserDetailView,
-    VerifyEmailView,
-)
+The `urlpatterns` list routes URLs to views. For more information please see:
+    https://docs.djangoproject.com/en/4.2/topics/http/urls/
+"""
 
-from app.views.oauth_views import (
-    OAuth42View,
-    OAuth42CallbackView,
-)
+from django.contrib import admin
+from django.urls import include, path
+from django.conf import settings
+from django.conf.urls.static import static
+from app.views import ProtectedMediaView
+from rest_framework import permissions
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
 
-from rest_framework_simplejwt.views import TokenRefreshView
 
-from app.views.two_factor_auth_views import (
-	VerifyOTPView,
-	AuthenticatorSetupView,
-	VerifyAuthenticatorSetupView
-)
-
-from app.views.user_views import (
-	UserListView,
-	 FriendRequestView,
-	 FriendAcceptView,
-	 FriendInvitableUsersListView,
-	 FriendRequestUsersListView,
-	 FriendsListView
-)
-
-from app.views.game_views import (
-	CreateGameInvitationView,
-	AcceptGameInvitationView,
-	SentGameInvitationsListView,
-	ReceivedGameInvitationsListView,
-	PongGameDetailView,
-	MatchHistoryListView
+schema_view = get_schema_view(
+    openapi.Info(
+        title="Transcendence API",
+        default_version='v1',
+        description="API documentation",
+        license=openapi.License(name="BSD License"),
+    ),
+    public=True,
+    permission_classes=(permissions.AllowAny,),
 )
 
 urlpatterns = [
-	# Auth
-    path('token/', LoginView.as_view(), name='token_obtain_pair'),
-    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('verify-email/<str:token>/', VerifyEmailView.as_view(), name='verify-email'),
-    path('oauth/42', OAuth42View.as_view(), name='oauth_42'),
-    path('oauth/42/callback', OAuth42CallbackView.as_view(), name='oauth_42_callback'),
-    path('2fa/verify-otp/', VerifyOTPView.as_view(), name='verify-otp'),
-	path('2fa/setup/', AuthenticatorSetupView.as_view(), name='authenticator_setup'),
-    path('2fa/verify-setup/', VerifyAuthenticatorSetupView.as_view(), name='verify_authenticator_setup'),
-	# Users and friends
-    path('user', UserDetailView.as_view(), name='user-detail'),
-	path('users/', UserListView.as_view(), name='user-list'),
-	path('user/<int:pk>', UserDetailView.as_view(), name='user-detail-pk'),
-	path('friend-request/<int:friend_id>', FriendRequestView.as_view(), name='friend-request'),
-	path('friend-accept/<int:friend_id>', FriendAcceptView.as_view(), name='friend-accept'),
-	path('friends-invitable/', FriendInvitableUsersListView.as_view(), name='friend-invitable-users'),
-	path('friends-requests/', FriendRequestUsersListView.as_view(), name='friend-request-users'),
-	path('friends/<int:user_id>/', FriendsListView.as_view(), name='friends-list'),
-	# Game invitations
-	path('game-invitation/<int:user_id>/', CreateGameInvitationView.as_view(), name='game-invitation'),
-	path('game-invitation/<int:invitation_id>/accept/', AcceptGameInvitationView.as_view(), name='accept-game-invitation'),
-	path('game-invitations/sent/', SentGameInvitationsListView.as_view(), name='sent-game-invitations'),
-	path('game-invitations/received/', ReceivedGameInvitationsListView.as_view(), name='received-game-invitations'),
-	# Game
-	path('games/<int:id>/', PongGameDetailView.as_view(), name='pong-game-detail'),
-	# Match history
-	path('match-history/<int:id>/', MatchHistoryListView.as_view(), name='match-history'),
+    path('swagger<format>/', schema_view.without_ui(cache_timeout=0), name='schema-json'),
+    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
+    # Admin
+    path('admin/', admin.site.urls),
+
+    path('api/', include('app.users.urls')),
+    path('api/', include('app.auth.urls')),
+    path('api/', include('app.games.urls')),
+    path('api/', include('app.tournaments.urls')),
+
+    # Profiling (Django Silk)
+    path('silk/', include('silk.urls', namespace='silk')),
 ]
+
+# Handle media files
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+elif settings.PRODUCTION:
+    urlpatterns += [path('media/<path:path>', ProtectedMediaView.as_view())]

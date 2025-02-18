@@ -1,51 +1,14 @@
 class CustomForm extends HTMLElement {
     constructor() {
         super().attachShadow({ mode: "open" });
-
         this.errorDiv = document.createElement("div");
         this.errorDiv.classList.add("error");
         this.appendChild(this.errorDiv);
-
+        this.setupTemplate();
         this.state = {
             loading: false,
             formData: {},
         };
-
-        this.shadowRoot.innerHTML = `
-            <style>
-                .loading {
-                    pointer-events: none;
-                    opacity: 0.6;
-                }
-                .error {
-                    color: red;
-                    text-align: center;
-                    position: absolute;
-                    bottom: -2.5rem;
-                    width: 100%;
-                }
-                .success {
-                    color: green;
-                    text-align: center;
-                    position: absolute;
-                    bottom: -4.5rem;
-                    width: 100%;
-                }
-                .spinner-border {
-                    width: 1rem;
-                    height: 1rem;
-                    border-width: 0.2em;
-                }
-                form {
-                    position: relative;
-                }
-            </style>
-            <form class="needs-validation" novalidate>
-                <slot></slot>
-                <div id="form-error" class="error"></div>
-                <div id="form-success" class="success"></div>
-            </form>
-            `;
     }
 
     connectedCallback() {
@@ -92,12 +55,9 @@ class CustomForm extends HTMLElement {
             this.loading = true;
             try {
                 const response = await this.submitForm(this.formData);
-                // handle successful form submission
                 console.log("Form submitted successfully", response);
             } catch (error) {
-                // handle error in form submission
                 console.error("Form submission error", error);
-                // this.errorDiv.textContent = "Error submitting form: " + error.message;
             } finally {
                 this.loading = false;
             }
@@ -127,10 +87,6 @@ class CustomForm extends HTMLElement {
         return this.state.loading;
     }
 
-    /**
-     * @param {boolean} isLoading
-     * @type {boolean}
-     */
     set loading(isLoading) {
         this.state.loading = isLoading;
         const inputs = this.querySelectorAll("input, select, textarea");
@@ -151,12 +107,44 @@ class CustomForm extends HTMLElement {
     }
 
     async submitForm(formData) {
-        // Simulate a form submission request
-        return new Promise((resolve, reject) => {
-            setTimeout(() => {
-                resolve({ success: true });
-            }, 2000);
-        });
+    }
+
+    setupTemplate() {
+        this.shadowRoot.innerHTML = `
+        <style>
+            .loading {
+                pointer-events: none;
+                opacity: 0.6;
+            }
+            .error {
+                color: red;
+                text-align: center;
+                position: absolute;
+                bottom: -2.5rem;
+                width: 100%;
+            }
+            .success {
+                color: green;
+                text-align: center;
+                position: absolute;
+                bottom: -4.5rem;
+                width: 100%;
+            }
+            .spinner-border {
+                width: 1rem;
+                height: 1rem;
+                border-width: 0.2em;
+            }
+            form {
+                position: relative;
+            }
+        </style>
+        <form class="needs-validation" novalidate>
+            <slot></slot>
+            <div id="form-error" class="error"></div>
+            <div id="form-success" class="success"></div>
+        </form>
+        `;
     }
 }
 
