@@ -1,5 +1,5 @@
 import axios from "axios";
-import { API_URL, MEDIA_URL } from "./settings.js";
+import { API_WAF_URL, API_URL, MEDIA_URL } from "./constants.js";
 
 /**
  * Handles all API requests.
@@ -8,7 +8,7 @@ export class Api {
     constructor(auth) {
         this.auth = auth;
         this.client = axios.create({
-            baseURL: API_URL,
+            baseURL: API_WAF_URL,
         });
     }
 
