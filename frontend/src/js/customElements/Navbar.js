@@ -1,4 +1,4 @@
-import { EMPTY_AVATAR_URL } from "../settings.js";
+import { settings } from "../settings.js";
 import { getAvatarSrc } from "../utils.js";
 import BaseElement from "./BaseElement.js";
 
@@ -22,7 +22,7 @@ class Navbar extends BaseElement {
 
         if (this.state.authenticated) {
             const { user } = this.state;
-            profileEl.querySelector("img").src = user.avatarUrl || EMPTY_AVATAR_URL;
+            profileEl.querySelector("img").src = user.avatarUrl || settings.EMPTY_AVATAR_URL;
             profileEl.querySelector(".username").textContent = user.username;
             profileEl.setAttribute("data-href", `/profile/${user.id}`);
             this.setDisplay([loginEl, registerEl], "none");
@@ -37,6 +37,7 @@ class Navbar extends BaseElement {
             this.shadowRoot.querySelectorAll("[data-href]").forEach(element => {
                 element.addEventListener("click", (event) => this.page.handleClick(event));
             });
+            this.shadowRoot.querySelector(".logout").addEventListener("click", () => this.page.app.auth.logout());
             this.listenersAdded = true;
         }
     }
@@ -61,6 +62,7 @@ class Navbar extends BaseElement {
             console.log("Removing event listener from", element);
             element.removeEventListener("click", this.page.handleClick);
         });
+        this.shadowRoot.querySelector(".logout").removeEventListener("click", this.page.auth.logout);
     }
 
     setupTemplate() {
@@ -117,14 +119,14 @@ class Navbar extends BaseElement {
             <nav class="navbar">
                 <a class="navbar-brand" data-href="/home">PONG</a>
                 <div class="profile navbar-center" data-href="/profile">
-                    <img src="${EMPTY_AVATAR_URL}" width="40" height="40" alt="Avatar" class="avatar" />
+                    <img src="${settings.EMPTY_AVATAR_URL}" width="40" height="40" alt="Avatar" class="avatar" />
                     <span class="username"></span>
                 </div>
                 <ul class="navbar-nav">
                     <li class="login nav-item"><a class="nav-link" data-href="/login">Login</a></li>
                     <li class="register nav-item"><a class="nav-link" data-href="/register">Register</a></li>
                     <li class="settings nav-item"><a class="nav-link" data-href="/settings">Settings</a></li>
-                    <li class="logout nav-item"><a class="nav-link" data-href="/logout">Logout</a></li>
+                    <li class="logout nav-item"><a class="nav-link">Logout</a></li>
                 </ul>
             </nav>
         `;

@@ -1,4 +1,4 @@
-import { EMPTY_AVATAR_URL, DEBUG, MEDIA_URL } from "./settings.js";
+import { settings } from "./settings.js";
 
 export function capitalizeFirstLetter(message) {
 	return message.charAt(0).toUpperCase() + message.slice(1);
@@ -25,6 +25,8 @@ export function showMessage(message, type = 'success') {
 }
 
 export function parsePath(path, pages) {
+    if (path === "/") path = "/home";
+
     const requestedPath = path.replace(/\/+$/, "");
 
     return Object.values(pages).reduce((match, page) => {
@@ -57,11 +59,11 @@ export async function getAvatarSrc(user, apiFetchCallback) {
     if (!user) return null;
     let avatar_upload = null;
 
-    if (DEBUG) {
+    if (settings.DEBUG) {
         if (user.avatar_upload) {
-            avatar_upload = user.avatar_upload.includes(MEDIA_URL) 
+            avatar_upload = user.avatar_upload.includes(settings.MEDIA_URL) 
                 ? user.avatar_upload 
-                : `${MEDIA_URL}/${user.avatar_upload}`;
+                : `${settings.MEDIA_URL}/${user.avatar_upload}`;
         }
     } else {
         if (user.avatar_upload) {
@@ -69,7 +71,7 @@ export async function getAvatarSrc(user, apiFetchCallback) {
         }
     }
 
-    return avatar_upload || user.avatar_oauth || EMPTY_AVATAR_URL;
+    return avatar_upload || user.avatar_oauth || settings.EMPTY_AVATAR_URL;
 }
 
 export function formatErrorMessages(errorData) {

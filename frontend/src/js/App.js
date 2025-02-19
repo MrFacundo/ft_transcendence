@@ -1,14 +1,15 @@
 import { parsePath } from "./utils.js";
 import * as Pages from "./pages/index.js";
 import "../scss/styles.scss";
+import { settings } from "./settings.js";
 import { Api } from "./Api.js";
 import { Auth } from "./Auth.js";
-import { logSettings } from "./settings.js";
 import { WebSocketManager } from './WebSocketManager.js';
 import { StateManager } from './StateManager.js';
 
 /**
- * Initializes the application, manages page navigation, and handles authentication.
+ * Initializes pages, authentication, API, state management, and WebSocket management.
+ * Handles navigation and manages the application's state.
  */
 class App {
     constructor() {
@@ -40,42 +41,42 @@ class App {
             document.getElementById("noScript").remove();
     }
     /**
-     * Navigates to the specified path and updates the current page.
+     * Navigates to the specified path
      * @param {string} path - The path to navigate to.
      * @param {boolean} replaceHistory - Whether to replace the current history entry instead of pushing a new one.
      */
     async navigate(path, replaceHistory = false) {
+        const { pages, auth, stateManager, wsManager} = this;
         if (this.currentPage?.url === path) return;
 
-        if (path === "/") {
-            path = "/home";
-        } else if (path === "/logout") {
-            return this.auth.logout();
-        }
-
-        const parsedPath = parsePath(path, this.pages);
+        const parsedPath = parsePath(path, pages);
         if (!parsedPath || !parsedPath.page) {
             console.error("No matching page found for path:", path);
-            if (path !== "/404") this.navigate("/404", true);
+            this.navigate("/404", true);
             return;
         }
 
         const { page, params } = parsedPath;
         const queryParams = window.location.search;
-        console.log("Navigating to:", path, "page: ", page, "params: ", params, "queryParams: ", queryParams);
 
-        page.params = params;
+        console.log("Navigating to:", path, "page: ", page, "params: ", params, "queryParams: ", queryParams);
+        
+        if (page.isProtected) {
+            await auth.authenticate();
+            if (!auth.authenticated) return auth.logout();
+        }
+        
         if (this.currentPage) this.currentPage.close();
+        page.params = params;
         this.mainElement.setAttribute("data-page", page.name);
         this.currentPage = page;
 
         if (!replaceHistory) {
             history.pushState({}, page.name, path + (queryParams || ''));
         }
-        await this.auth.authenticate();
-        if (this.auth.authenticated) {
-            await this.stateManager.init();
-            await this.wsManager.init();
+        if (auth.authenticated) {
+            await stateManager.init();
+            await wsManager.init();
         }
         await page.open(this);
     }
@@ -84,7 +85,7 @@ class App {
      * Initializes the application, sets up event listeners, and handles initial navigation.
      */
     init() {
-        logSettings();
+        console.log("Settings:", settings);
         window.addEventListener("popstate", () => {
             this.navigate(window.location.pathname.toLowerCase(), true);
         });

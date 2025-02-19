@@ -1,14 +1,14 @@
 import axios from "axios";
-import { API_WAF_URL, API_URL, MEDIA_URL } from "./constants.js";
+import { settings } from "./settings.js";
 
 /**
- * Handles all API requests.
+ * Handles all requests to the backend app.
  */
 export class Api {
     constructor(auth) {
         this.auth = auth;
         this.client = axios.create({
-            baseURL: API_WAF_URL,
+            baseURL: settings.API_URL,
         });
     }
 
@@ -306,7 +306,7 @@ export class Api {
      */
     fetchAvatarObjectUrl = async (path) => {
         try {
-            const response = await this.request("get", `${MEDIA_URL}/${path}`, null, {
+            const response = await this.request("get", `${settings.MEDIA_URL}/${path}`, null, {
                 responseType: "blob",
             });
             return URL.createObjectURL(response);

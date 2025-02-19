@@ -1,3 +1,7 @@
+/**
+ * Handles state updates, subscriptions to state changes, and initialization of state data.
+ * Provides methods to update individual pieces of state and to close the state manager.
+ */
 export class StateManager {
     constructor(app) {
         this.app = app;

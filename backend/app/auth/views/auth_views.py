@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from rest_framework import status
 
-from .services import generate_jwt_response
+from ..services import generate_jwt_response
 
 from app.auth.serializers import LoginSerializer
 from app.auth.views.two_factor_auth_views import TwoFactorAuthView

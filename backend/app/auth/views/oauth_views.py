@@ -7,7 +7,7 @@ from django.shortcuts import redirect
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
-from .services import get_or_create_user_from_oauth
+from ..services import get_or_create_user_from_oauth
 
 logger = logging.getLogger(__name__)
 
