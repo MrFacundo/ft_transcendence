@@ -1,4 +1,4 @@
-import { EMPTY_AVATAR_URL } from "../settings.js";
+import { settings } from "../settings.js";
 import { getAvatarSrc } from "../utils.js";
 import BaseElement from "./BaseElement.js";
 
@@ -100,7 +100,7 @@ class UserProfileCardSm extends BaseElement {
             }
         </style>
         <div class="profile-container">
-            <img id="profile-avatar" src="${EMPTY_AVATAR_URL}" alt="User Avatar" class="profile-avatar" width="50" height="50" />
+            <img id="profile-avatar" src="${settings.EMPTY_AVATAR_URL}" alt="User Avatar" class="profile-avatar" width="50" height="50" />
             <div class="status-indicator"></div>
             <span id="profile-username" class="profile-username"></span>
         </div>

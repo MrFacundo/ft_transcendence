@@ -14,7 +14,10 @@ from asgiref.sync import async_to_sync
 from .serializers import UserSerializer
 from app.games.serializers import UserOnlineStatusSerializer, FriendSerializer, UserListSerializer, FriendshipInvitationSerializer
 from app.users.models import Friendship, UserOnlineStatus
-
+from app.auth.services import send_verification_email
+import logging
+logger = logging.getLogger(__name__)
+ 
 User = get_user_model()
 
 class IsOwnerOrReadOnly(BasePermission):

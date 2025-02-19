@@ -1,4 +1,4 @@
-import { EMPTY_AVATAR_URL } from "../settings.js";
+import { settings } from "../settings.js";
 import { getAvatarSrc } from "../utils.js";
 import BaseElement from "./BaseElement.js";
 
@@ -400,7 +400,7 @@ class TournamentBracket extends BaseElement {
                 <div class="round">
                     <div class="participant" id="semi1-player1">
                         <div class="avatar">
-                            <img src="${EMPTY_AVATAR_URL}" alt="Player 1">
+                            <img src="${settings.EMPTY_AVATAR_URL}" alt="Player 1">
                         </div>
                         <div class="participant-info">
                             <div class="username">TBD</div>
@@ -411,7 +411,7 @@ class TournamentBracket extends BaseElement {
                     </div>
                     <div class="participant" id="semi1-player2">
                         <div class="avatar">
-                            <img src="${EMPTY_AVATAR_URL}" alt="Player 2">
+                            <img src="${settings.EMPTY_AVATAR_URL}" alt="Player 2">
                         </div>
                         <div class="participant-info">
                             <div class="username">TBD</div>
@@ -426,7 +426,7 @@ class TournamentBracket extends BaseElement {
                 <div class="round final">
                     <div class="participant" id="final-player1">
                         <div class="avatar">
-                            <img src="${EMPTY_AVATAR_URL}" alt="Finalist 1">
+                            <img src="${settings.EMPTY_AVATAR_URL}" alt="Finalist 1">
                         </div>
                         <div class="participant-info">
                             <div class="username">TBD</div>
@@ -437,7 +437,7 @@ class TournamentBracket extends BaseElement {
                     </div>
                     <div class="participant" id="final-player2">
                         <div class="avatar">
-                            <img src="${EMPTY_AVATAR_URL}" alt="Finalist 2">
+                            <img src="${settings.EMPTY_AVATAR_URL}" alt="Finalist 2">
                         </div>
                         <div class="participant-info">
                             <div class="username">TBD</div>
@@ -452,7 +452,7 @@ class TournamentBracket extends BaseElement {
                 <div class="round">
                     <div class="participant" id="semi2-player1">
                         <div class="avatar">
-                            <img src="${EMPTY_AVATAR_URL}" alt="Player 3">
+                            <img src="${settings.EMPTY_AVATAR_URL}" alt="Player 3">
                         </div>
                         <div class="participant-info">
                             <div class="username">TBD</div>
@@ -463,7 +463,7 @@ class TournamentBracket extends BaseElement {
                     </div>
                     <div class="participant" id="semi2-player2">
                         <div class="avatar">
-                            <img src="${EMPTY_AVATAR_URL}" alt="Player 4">
+                            <img src="${settings.EMPTY_AVATAR_URL}" alt="Player 4">
                         </div>
                         <div class="participant-info">
                             <div class="username">TBD</div>

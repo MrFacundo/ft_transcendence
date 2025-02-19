@@ -1,8 +1,8 @@
 import Cookies from "js-cookie";
-import { API_URL } from "./settings.js"; // TODO: handle oauth in Api.js
+import { settings } from "./settings.js"; // TODO: handle oauth in Api.js
 
 /**
- * Auth class handles user authentication, including login, registration, token management, and OAuth.
+ * Handles user authentication, including login, registration, token and OAuth2 management.
  */
 export class Auth {
     constructor(app) {
@@ -168,7 +168,7 @@ export class Auth {
             return this.app.navigate("/home");
         }
         this.oauthPopup = window.open(
-            `${API_URL}/oauth/42`,
+            `${settings.API_URL}/oauth/42`,
             "OAuth Login",
             "width=600,height=600"
         );
