@@ -20,8 +20,8 @@ class RegisterPage extends Page {
             try {
                 const response = await this.app.auth.register(
                     formData.username,
-                    formData.email,
-                    formData.password,
+                    formData['register-email'],
+                    formData['register-password'],
                     formData.confirmpassword
                 );
                 const successMessage = "User registered successfully. Please verify your email.";

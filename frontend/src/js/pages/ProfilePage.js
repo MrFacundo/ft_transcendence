@@ -33,13 +33,13 @@ class ProfilePage extends Page {
         const friendListEl = document.querySelector("#friend-list");
         const selectedUserCard = document.querySelector("user-profile#selected-friend");
 
-        [UserProfileCard, friendListEl, selectedUserCard].forEach(el => (el.page = this));
+        [UserProfileCard, friendListEl, selectedUserCard].forEach(el => el.page = this);
 
         const userProfile = await api.getProfile(profileId);
         const matchHistory = await api.getMatchHistory(profileId);
         const friends = await api.getFriends(profileId);
 
-        UserProfileCard.setUser(userProfile);
+        UserProfileCard.setState({user: userProfile});
         pageTitle.textContent = profileId == auth.user.id ? "Your Profile" : capitalizeFirstLetter(userProfile.username) + "'s profile";
         userJoinedEl.textContent = "joined: " + formatDate(userProfile.date_joined);
 
@@ -54,12 +54,8 @@ class ProfilePage extends Page {
 
         if (friends.length > 0) {
             friendListTitle.textContent = profileId == auth.user.id ? "Your friends" : capitalizeFirstLetter(userProfile.username) + "'s friends";
-            friendListEl.initialize(selectedUserCard);
-            friendListEl.populateList({
-                users: friends,
-                actionText: null,
-                actionCallback: null,
-            });
+            friendListEl.config = { selectedUserCard};
+            friendListEl.setState ({ users: friends });
         } else {
             selectedUserCard.remove();
         }

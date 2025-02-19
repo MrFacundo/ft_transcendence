@@ -14,10 +14,8 @@ class Tournament(models.Model):
     end_date = models.DateTimeField(null=True, blank=True)
     participants_amount = models.IntegerField(choices=PARTICIPANTS_AMOUNT_CHOICES)
     participants = models.ManyToManyField(User, related_name='tournaments')
-    semifinal_1_game1 = models.ForeignKey('games.PongGame', related_name='semifinal_1_game1', on_delete=models.CASCADE, null=True)
-    semifinal_1_game2 = models.ForeignKey('games.PongGame', related_name='semifinal_1_game2', on_delete=models.CASCADE, null=True)
-    semifinal_2_game1 = models.ForeignKey('games.PongGame', related_name='semifinal_2_game1', on_delete=models.CASCADE, null=True)
-    semifinal_2_game2 = models.ForeignKey('games.PongGame', related_name='semifinal_2_game2', on_delete=models.CASCADE, null=True)
+    semifinal_1_game = models.ForeignKey('games.PongGame', related_name='semifinal_1_game', on_delete=models.CASCADE, null=True)
+    semifinal_2_game = models.ForeignKey('games.PongGame', related_name='semifinal_2_game', on_delete=models.CASCADE, null=True)
     final_game = models.ForeignKey('games.PongGame', related_name='final_game', on_delete=models.CASCADE, null=True)
 
     def __str__(self):

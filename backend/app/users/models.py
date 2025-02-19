@@ -50,7 +50,7 @@ class CustomUser(AbstractUser):
     REQUIRED_FIELDS = ['username']
 
     def __str__(self):
-        return self.email
+        return self.username
 
     def save(self, *args, **kwargs):
         if self.email_is_verified:
@@ -64,6 +64,9 @@ class CustomUser(AbstractUser):
             self.save()
         return pyotp.TOTP(self.validation_secret, interval=300)
 
+    def get_current_tournament(self):
+        return self.tournaments.filter(end_date__isnull=True).first()
+        
 class GameStats(models.Model):
     id = models.BigAutoField(primary_key=True)
     user = models.OneToOneField(

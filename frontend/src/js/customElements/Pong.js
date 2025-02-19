@@ -1,4 +1,4 @@
-import { WS_URL } from "../constants.js";
+import { settings } from "../settings.js";
 
 class Pong extends HTMLElement {
     constructor() {
@@ -31,7 +31,7 @@ class Pong extends HTMLElement {
     setWebsocket(id) {
         this.addEventListeners();
         this.ws = new WebSocket(
-            `${WS_URL}/${id}/?token=${this.page.app.auth.accessToken}`
+            `${settings.WS_URL}/${id}/?token=${this.page.app.auth.accessToken}`
         );
 
         this.ws.onmessage = (event) => this.handleMessage(JSON.parse(event.data));
@@ -47,7 +47,7 @@ class Pong extends HTMLElement {
                 }
                 break;
             case "gameState":
-                console.log("Received game state:", data);
+                //console.log("Received game state:", data);
                 this.setPositions({
                     leftPaddle: { top: `calc(${data.paddles[0].y * 100}%)` },
                     rightPaddle: { top: `calc(${data.paddles[1].y * 100}%)` },
@@ -96,6 +96,7 @@ class Pong extends HTMLElement {
     }
 
     async startGame(gameId) {
+        this.page.app.stateManager.updateState("currentGame", true);
         this.setWebsocket(gameId);
         while (this.ws?.readyState !== WebSocket.OPEN) {
             await new Promise((res) => setTimeout(res, 1000));
@@ -106,6 +107,7 @@ class Pong extends HTMLElement {
         this.removeEventListeners();
         this.ws = null;
         this.dispatchEvent(new CustomEvent("gameOver"));
+        this.page.app.stateManager.updateState("currentGame", false);
     }
 
     removeEventListeners() {

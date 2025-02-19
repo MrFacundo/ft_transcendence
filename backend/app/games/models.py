@@ -14,8 +14,8 @@ class PongGame(models.Model):
         ('interrupted', 'Interrupted')
     ]
 
-    player1 = models.ForeignKey(User, on_delete=models.CASCADE, related_name='player1_games', null=False)
-    player2 = models.ForeignKey(User, on_delete=models.CASCADE, related_name='player2_games', default=None, null=True)
+    player1 = models.ForeignKey(User, on_delete=models.CASCADE, related_name='player1_games', null=True)
+    player2 = models.ForeignKey(User, on_delete=models.CASCADE, related_name='player2_games', null=True)
     channel_group_name = models.CharField(max_length=100, default='')
     winner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='won_games', default=None, null=True)
     date_played = models.DateTimeField(auto_now_add=True)
@@ -30,7 +30,9 @@ class PongGame(models.Model):
     tournament = models.ForeignKey(Tournament, on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
-        return f"Game between {self.player1.username} and {self.player2.username}"
+        player1_username = self.player1.username if self.player1 else "N/A"
+        player2_username = self.player2.username if self.player2 else "N/A"
+        return f"Game between {player1_username} and {player2_username}"
     
 def default_expires_at():
     return timezone.now() + timedelta(minutes=10)

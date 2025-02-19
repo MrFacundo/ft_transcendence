@@ -1,14 +1,14 @@
 import axios from "axios";
-import { API_URL, MEDIA_URL } from "./constants.js";
+import { settings } from "./settings.js";
 
 /**
- * Handles all API requests.
+ * Handles all requests to the backend app.
  */
 export class Api {
     constructor(auth) {
         this.auth = auth;
         this.client = axios.create({
-            baseURL: API_URL,
+            baseURL: settings.API_URL,
         });
     }
 
@@ -277,6 +277,14 @@ export class Api {
         return this.request("get", "/tournaments/");
     }
 
+    /**
+     * Retrieves the tournament the current user is participating in.
+     * @returns {Promise<Object>} A tournament object.
+     * */
+    async getCurrentTournament() {
+        return this.request("get", "/tournament/current/");
+    }
+
     /* Media */
 
     /**
@@ -298,7 +306,7 @@ export class Api {
      */
     fetchAvatarObjectUrl = async (path) => {
         try {
-            const response = await this.request("get", `${MEDIA_URL}/${path}`, null, {
+            const response = await this.request("get", `${settings.MEDIA_URL}/${path}`, null, {
                 responseType: "blob",
             });
             return URL.createObjectURL(response);

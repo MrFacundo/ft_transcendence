@@ -10,43 +10,41 @@ class TournamentPage extends Page {
             isProtected: true,
             app: app,
         });
-    }
-
-    appendPendingButton(tournamentItem) {
-        if (!tournamentItem.querySelector(".pending")) {
-            const pendingButton = document.createElement("button");
-            pendingButton.className = "pending btn btn-warning text-white";
-            pendingButton.textContent = "Joined";
-            const spans = tournamentItem.querySelectorAll("span");
-            tournamentItem.insertBefore(pendingButton, spans[1]);
-        }
+        this.unsubscribe = this.app.stateManager.subscribe(
+            'currentTournament',
+            (currentTournament) => this.updateTournamentsList(currentTournament)
+        );
     }
 
     async render() {
-        const { api } = this.app;
+        const { api, wsManager, stateManager } = this.app;
         const openTournaments = await api.getTournaments();
         const tournamentListElement = document.querySelector("#tournament-list");
 
-        openTournaments.forEach((tournament) => {
+        openTournaments.forEach(({ id, name, participants, participants_amount }) => {
             const tournamentItem = document.createElement("li");
+            tournamentItem.id = `tournament-${id}`;
             tournamentItem.className = "list-group-item d-flex justify-content-between align-items-center shadow-lg p-4 my-3 rounded cursor-pointer";
-            tournamentItem.innerHTML = `<span>${tournament.name}</span><span class="badge bg-light text-dark">${tournament.participants.length} / ${tournament.participants_amount}</span>`;
+            tournamentItem.innerHTML = `<span>${name}</span><span class="badge bg-light text-dark">${participants.length} / ${participants_amount}</span>`;
             tournamentListElement.appendChild(tournamentItem);
-
-            if (tournament.participants.some(participant => participant.id === this.app.auth.user.id)) {
-                this.appendPendingButton(tournamentItem);
-            }
 
             tournamentItem.addEventListener("click", async () => {
                 try {
-                    await api.joinTournament(tournament.id);
-                    showMessage(`Joined tournament: ${tournament.name}`);
-                    this.appendPendingButton(tournamentItem);
+                    const response = await api.joinTournament(id);
+                    stateManager.updateState('currentTournament', response);
+                    this.updateTournamentsList(response);
+                    wsManager.setupTournamentWebSocket();
+                    showMessage(`Joined tournament: ${name}`);
                 } catch (error) {
-                    showMessage(error.response.data.message, "error");
+                    console.error("error", error);
+                    showMessage(error.response?.data?.message || error, "error");
                 }
             });
         });
+    }
+
+    // updates list of tournaments
+    updateTournamentsList(tournaments) {
     }
 }
 

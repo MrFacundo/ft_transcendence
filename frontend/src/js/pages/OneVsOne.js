@@ -15,16 +15,13 @@ class OneVsOne extends Page {
     }
 
     async render() {
-        const { api, auth, onlineStatusManager } = this.app;
+        const { api, auth, stateManager } = this.app;
         const sendList = document.querySelector("#send-list");
         const receiveList = document.querySelector("#receive-list");
-        const actionBtn = document.querySelector("#action-friend");
+        const actionButton = document.querySelector("#action-friend");
         const selectedUserCard = document.querySelector("user-profile");
 
-
         [sendList, receiveList, selectedUserCard].forEach(el => (el.page = this));
-        sendList.initialize(selectedUserCard, actionBtn);
-        receiveList.initialize(selectedUserCard, actionBtn);
 
         const friendList = await api.getFriends(auth.user.id);
 
@@ -36,34 +33,35 @@ class OneVsOne extends Page {
             user.game_invite && user.game_invite.sender === user.id
         );
 
-        await sendList.populateList({
-            users: sendListData,
-            actionText: "Invite",
+        sendList.config = {
+			selectedUserCard,
+			actionButton,
+			actionText: "Invite",
             actionCallback: async (user, userCardSm) => {
                 const response = await api.gameRequest(user.id);
                 userCardSm.appendPendingButton(Date.now() + 10 * 60 * 1000);
                 console.log(`Game invite sent to: ${user.username}`);
                 return response;
             },
-        });
+		};
+		sendList.setState ({ users: sendListData });
 
-        await receiveList.populateList({
-            users: receiveListData,
-            actionText: "Accept",
+        receiveList.config = {
+			selectedUserCard,
+			actionButton,
+			actionText: "Accept",
             actionCallback: async (user) => {
-                if (!onlineStatusManager.statuses.get(user.id)?.is_online) {
+                if (!stateManager.onlineStatuses.get(user.id)?.is_online) {
                     alert(`${user.username} is offline, try again later.`);
                     return;
                 }
                 const response = await api.gameAccept(user.game_invite.id);
                 console.log(`Game invite accepted from: ${user.username}`);
-                this.app.currentGame = true;
                 this.app.navigate(response.game_url);
                 return response;
             },
-        });
-
-        actionBtn.classList.add("d-none");
+		};
+		receiveList.setState ({ users: receiveListData });
     }
 }
 

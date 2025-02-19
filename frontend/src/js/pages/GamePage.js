@@ -17,20 +17,16 @@ export default class GamePage extends Page {
         const { mainElement, params } = this;
         const gameId = params["id"];
         const gameEl = mainElement.querySelector("pong-game");
-
         gameEl.page = this;
 
         try {
-            const gameInstance = await app.api.getGame(gameId);
+            const game = await app.api.getGame(gameId);
 
-            if (gameInstance.status === "not_started") {
+            if (game.status === "not_started") {
                 gameEl.startGame(gameId);
-                gameEl.addEventListener("gameOver", async () => {
-                    this.app.currentGame = false;
-                    this.showScoreBoard();
-                });
-            } else if (gameInstance.status === "completed" || gameInstance.status === "interrupted") {
-                this.showScoreBoard();
+                gameEl.addEventListener("gameOver", async () => this.showScoreBoard(gameId));
+            } else if (game.status === "completed" || game.status === "interrupted") {
+                this.showScoreBoard(gameId);
             } else {
                 gameEl.remove();
             }
@@ -40,14 +36,14 @@ export default class GamePage extends Page {
         }
     }
 
-    showScoreBoard() {
+    async showScoreBoard(gameId) {
         const { mainElement } = this;
         const gameEl = mainElement.querySelector("pong-game");
         const scoreBoardEl = mainElement.querySelector("score-board");
         if (!scoreBoardEl)
             return;
         scoreBoardEl.page = this;
-        scoreBoardEl.displayMatch();
+        scoreBoardEl.displayMatch(await this.app.api.getGame(gameId));
         gameEl.remove();
         scoreBoardEl.classList.remove("d-none");
     }

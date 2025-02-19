@@ -1,7 +1,9 @@
 /**
- * Class representing a Page
  * @class
  * @abstract
+ * Provides the basic structure and functionality for a page in the application.
+ * It handles opening and closing of the page, and rendering of the content, rendering 
+ * and click event listeners.
  */
 class Page {
     /**
@@ -22,25 +24,17 @@ class Page {
     }
 
     /**
-     * Opens the page, authenticates if necessary, and renders the content.
+     * Renders the page's content.
      */
     async open() {
         const { app } = this;
-        if (this.isProtected) {
-            await app.auth.authenticate();
-            if (!app.auth.authenticated) return app.navigate("/login");
-        }
+
         document.querySelectorAll("section").forEach((section) => { section.remove() });
         const tempElement = document.createElement(this.pageElement.tagName);
         tempElement.innerHTML = this.pageElement.innerHTML;
-        tempElement.querySelectorAll("[data-id]").forEach((element) => {
-            element.id = element.getAttribute("data-id");
-        });
         this.mainElement.innerHTML = tempElement.innerHTML;
         this.mainElement.querySelectorAll("[data-href]").forEach((element) => {
-            element.addEventListener("click", (event) =>
-                this.handleClick(event, app)
-            );
+            element.addEventListener("click", (event) => this.handleClick(event, app));
         });
         document.title = this.name;
         this.renderNavbar(this);
@@ -56,6 +50,7 @@ class Page {
                 this.handleClick(event, app)
             );
         });
+        if (this.unsubscribe) this.unsubscribe();
         this.mainElement.innerHTML = "";
     }
 
@@ -80,7 +75,7 @@ class Page {
         navbarElement.page = this;
         navbarElement.updateAuthValues();
     }
-
+    
     /**
      * Renders the page
      * @abstract

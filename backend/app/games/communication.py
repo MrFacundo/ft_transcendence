@@ -44,6 +44,16 @@ class GameCommunication:
             }
         )
 
+        tournament_id = await self.game.db.get_tournament_id()
+        if tournament_id:
+            await self.socket.channel_layer.group_send(
+                f"tournament_{tournament_id}",
+                {
+                    "type": "endGame",
+                    "game_id": self.socket.db_game.id,
+                }
+            )
+
     async def send_disconnect_message(self):
         await self.socket.channel_layer.group_send(
             self.socket.db_game.channel_group_name,
@@ -71,3 +81,4 @@ class GameCommunication:
             }
             for paddle in self.game.paddles
         ]
+

@@ -66,6 +66,19 @@ services:
       - cache_data:/data
     restart: unless-stopped
 
+  waf:
+    container_name: modecurity_waf
+    build:
+      context: ./modsecurity_waf
+      dockerfile: Dockerfile
+    platform: linux/amd64
+    ports:
+      - "8081:8081" # WAF exposed to the client
+    depends_on:
+      - backend
+    networks:
+      - backend-network
+
 networks:
   backend-network:
     driver: bridge

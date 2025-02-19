@@ -35,11 +35,11 @@
                     <custom-form id="login-form">
                         <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
                         <div class="form-floating mb-3">
-                            <input type="email" class="form-control" data-id="Email"/>
+                            <input type="email" class="form-control" id="login-email"/>
                             <label for="Email">Username or email</label>
                         </div>
                         <div class="form-floating mb-3">
-                            <input type="password" class="form-control" data-id="Password" />
+                            <input type="password" class="form-control" id="login-password" />
                             <label for="Password">Password</label>
                         </div>
                         <button class="btn btn-primary w-100 py-2" type="submit">
@@ -65,19 +65,19 @@
                     <custom-form>
                         <h1 class="h3 mb-3 fw-normal">Let's get you registered :)</h1>
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control" data-id="Username" placeholder="littlefrenchboy" />
+                            <input type="text" class="form-control" id="Username" placeholder="littlefrenchboy" />
                             <label for="Username">Username</label>
                         </div>
                         <div class="form-floating mb-3">
-                            <input type="email" class="form-control" data-id="Email" placeholder="name@example.com" />
+                            <input type="email" class="form-control" id="register-email" placeholder="name@example.com" />
                             <label for="Email">Email address</label>
                         </div>
                         <div class="form-floating mb-3">
-                            <input type="password" class="form-control" data-id="Password" placeholder="Password" />
+                            <input type="password" class="form-control" id="register-password" placeholder="Password" />
                             <label for="Password">Password</label>
                         </div>
                         <div class="form-floating mb-3">
-                            <input type="password" class="form-control" data-id="ConfirmPassword"
+                            <input type="password" class="form-control" id="ConfirmPassword"
                                 placeholder="Password" />
                             <label for="ConfirmPassword">Confirm Password</label>
                         </div>
@@ -120,9 +120,9 @@
         <div class="d-flex align-items-center py-4 bg-body-tertiary">
             <main class="form-signin w-100 m-auto">
                 <custom-form class="form-signin w-100 m-auto" id="otp-form">
-                    <p class="h6 text-center mb-3 fw-normal">Please enter the one-time password sent to your email</p>
+                    <p class="h6 text-center mb-3 fw-normal">Please enter your one-time password</p>
                     <div class="form-floating">
-                        <input type="otp" class="form-control p-2 fs-4 text-center" data-id="Otp" placeholder="123456"
+                        <input type="otp" class="form-control p-2 fs-4 text-center" id="Otp" placeholder="123456"
                             autocomplete="otp" />
                     </div>
                     <button class="btn btn-primary w-100 py-2 mt-2" type="submit">
@@ -337,7 +337,7 @@
                 </div>
             <div class="col-md-4 d-flex flex-column align-items-center text-center">
                 <user-profile></user-profile>
-                <button class="btn btn-primary mt-3" id="action-friend">Invite</button>
+                <button class="btn btn-primary mt-3 d-none" id="action-friend"></button>
             </div>
         </div>
     </section>
@@ -375,12 +375,12 @@
 
     <section id="Tournament" class="container mt-5">
         <h1 class="mb-4">Tournament</h1>
-        <div class="row justify-content-around">
+        <div id="cards-container" class="row justify-content-around d-none">
             <div class="col-md-4" data-href="/tournament-create">
                 <div class="card bg-light my-4 shadow-sm" style="min-height: 250px; cursor: pointer;">
                     <div class="card-body text-center">
                         <h5 class="card-title">Create</h5>
-                        <img src="/static/images/robot.svg" alt="Robot Icon" width="130" height="130">
+                        <img src="/static/images/pencil-square.svg" alt="Pencil Icon" width="130" height="130">
                         <p class="card-text mt-4">Create a new tournament.</p>
                     </div>
                 </div>
@@ -389,10 +389,25 @@
                 <div class="card bg-light my-4 shadow-sm" style="min-height: 250px; cursor: pointer;">
                     <div class="card-body text-center">
                         <h5 class="card-title">Join</h5>
-                        <img src="/static/images/trophy.svg" alt="Robot Icon" width="130" height="130">
+                        <img src="/static/images/person-plus-fill.svg" alt="Person Icon" width="130" height="130">
                         <p class="card-text mt-4">Join an existing tournament.</p>
                     </div>
                 </div>
+            </div>
+        </div>
+        <div id="tournament-details" class="row justify-content-center d-none">
+            <h2  id="tournament-name" class="mb-4 text-center text-warning display-6"></h2>
+            <div id="participants-info" class="row d-none">
+                <div class="col-md-4">
+                    <p>Participants</p>
+                    <user-list id="tournament-participants"></user-list>
+                </div>
+                <div class="col-md-4 d-flex flex-column align-items-center text-center">
+                    <user-profile id="selected-participant"></user-profile>
+                </div>
+            </div>
+            <div id="tournament-bracket-container" class="d-none">
+                <tournament-bracket></tournament-bracket>
             </div>
         </div>
     </section>
@@ -404,21 +419,18 @@
                 <h1 class="h3 mb-3 fw-normal">Enter your tournament settings</h1>
                 <div class="form-check mb-3">
                     <label for="tournament_name">Tournament Name</label>
-                    <input type="text" class="form-control" data-id="tournament_name" />
+                    <input type="text" class="form-control" id="tournament_name" />
                 </div>
                 <div class="form-check mb-3">
-                    <label for="participants_amount">Max Players</label>
-                    <input type="number" class="form-control" data-id="participants_amount" />
+                    <label for="participants_amount">Participants</label>
+                    <select class="form-control" id="participants_amount">
+                        <option value="4">4</option>
+                    </select>
                 </div>
                 <button class="btn btn-primary w-100 py-2" type="submit">
                     Create
                 </button>
             </custom-form>
-            <div class="col-md-4">
-                <p id="create-success" class="text-success"></p>
-                <h3 id="tournament-created-name"></h3>
-                <p id="tournament-created-participants"></p>
-            </div>
         </div>
     </section>
 
