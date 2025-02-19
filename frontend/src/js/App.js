@@ -34,6 +34,7 @@ class App {
             profile: new Pages.ProfilePage(this),
             AI: new Pages.AIPage(this),
             game: new Pages.GamePage(this),
+            offline: new Pages.OfflinePage(this),
         };
         this.currentPage = null;
         this.init();
