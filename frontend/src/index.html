@@ -13,6 +13,29 @@
             visibility: hidden;
         }
     </style>
+    <style>
+        .blur-background {
+            filter: blur(4px);
+            pointer-events: none;
+        }
+
+        .result-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        .result-modal button {
+            margin-top: 1rem;
+        }
+    </style>
 </head>
 
 <body class="loading">
@@ -35,7 +58,7 @@
                     <custom-form id="login-form">
                         <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
                         <div class="form-floating mb-3">
-                            <input type="email" class="form-control" data-id="Email"/>
+                            <input type="email" class="form-control" data-id="Email" />
                             <label for="Email">Username or email</label>
                         </div>
                         <div class="form-floating mb-3">
@@ -242,15 +265,18 @@
                     </div>
 
                     <!-- Two-Factor Authentication Modal -->
-                    <div class="modal fade" id="authenticatorModal" tabindex="-1" aria-labelledby="authenticatorModalLabel" aria-hidden="true">
+                    <div class="modal fade" id="authenticatorModal" tabindex="-1"
+                        aria-labelledby="authenticatorModalLabel" aria-hidden="true">
                         <div class="modal-dialog">
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <h5 class="modal-title" id="authenticatorModalLabel">Authenticator Setup</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
-                                    <p>Scan the QR code below with your authenticator app. Once scanned, enter the OTP below to finish the setup.</p>
+                                    <p>Scan the QR code below with your authenticator app. Once scanned, enter the OTP
+                                        below to finish the setup.</p>
                                     <div class="row">
                                         <div class="col-md-6">
                                             <img src="" id="QRCode" alt="QR Code" class="img-fluid">
@@ -259,7 +285,7 @@
                                             <custom-form>
                                                 <div class="mb-3">
                                                     <label for="otp-input" class="form-label">Enter OTP</label>
-                                                    <input type="text" class="form-control" id="otp-input" >
+                                                    <input type="text" class="form-control" id="otp-input">
                                                 </div>
                                                 <button type="submit" class="btn btn-primary">Verify OTP</button>
                                             </custom-form>
@@ -296,7 +322,7 @@
     <section id="Home" class="container mt-5">
         <h1 class="mb-4 text-center display-4">CHOOSE YOUR DESTINY</h1>
         <div class="row">
-            
+
             <div class="col-md-4" data-href="/ai">
                 <div class="card bg-light my-4 shadow-sm" style="min-height: 250px; cursor: pointer;">
                     <div class="card-body text-center">
@@ -337,15 +363,22 @@
                     <p>Send Invitations</p>
                     <user-list id="send-list"></user-list>
                 </div>
-            <div class="col-md-4 d-flex flex-column align-items-center text-center">
-                <user-profile></user-profile>
-                <button class="btn btn-primary mt-3" id="action-friend">Invite</button>
+                <div class="col-md-4 d-flex flex-column align-items-center text-center">
+                    <user-profile></user-profile>
+                    <button class="btn btn-primary mt-3" id="action-friend">Invite</button>
+                </div>
             </div>
-        </div>
     </section>
 
     <section id="AI" class="container mt-5">
         <h1 class="mb-4">AI Game</h1>
+        <div id="resultModal" class="result-modal d-none">
+            <h2 id="resultText" class="result-text" style="font-size: 32px; color: green;"></h2>
+            <button class="btn btn-primary"
+                onclick="document.querySelector('#resultModal').classList.add('d-none'); document.querySelector('#AI').classList.remove('blur-background');">
+                Play Again
+            </button>
+        </div>
         <div class="row">
             <div class="col-md-8">
                 <div class="card shadow">
@@ -370,9 +403,6 @@
                     <p class="text-muted">Challenge our AI bot to improve your skills!</p>
                 </div>
             </div>
-        </div>
-        <div id="gameCanvas" class="mt-4 d-none">
-            <canvas id="pongCanvas" width="800" height="400"></canvas>
         </div>
     </section>
 

@@ -7,7 +7,7 @@ class AIPage extends Page {
     super({
       name: "ai",
       url: "/ai",
-      pageElement: "#AI", 
+      pageElement: "#AI",
       isProtected: true,
       app: app,
     });
@@ -24,6 +24,8 @@ class AIPage extends Page {
     const startGameBtn = document.querySelector("#startGame");
     const botProfile = document.querySelector("user-profile[bot='true']");
     const mainContainer = document.querySelector("#main");
+    // Change from #resultMessage to #resultModal to match HTML
+    const resultModal = document.querySelector("#resultModal");
 
     if (!difficultySelect || !startGameBtn || !botProfile || !mainContainer) {
       console.error("Required AI page elements not found");
@@ -32,8 +34,16 @@ class AIPage extends Page {
 
     botProfile.page = this;
 
+    if (resultModal) {
+      resultModal.classList.add("d-none");
+    }
+
     startGameBtn.addEventListener("click", () => {
       const difficulty = difficultySelect.value;
+
+      if (resultModal) {
+        resultModal.classList.add("d-none");
+      }
 
       mainContainer.style.display = "none";
 
@@ -56,6 +66,17 @@ class AIPage extends Page {
       let pongAi = gameSection.querySelector("pong-ai");
       if (!pongAi) {
         pongAi = document.createElement("pong-ai");
+        pongAi.addEventListener("gameEnd", (event) => {
+          const result = event.detail;
+          if (resultModal) {
+            const resultText = resultModal.querySelector("#resultText");
+            if (resultText) {
+              resultText.textContent = result;
+              resultModal.classList.remove("d-none");
+              document.querySelector("#AI").classList.add("blur-background");
+            }
+          }
+        });
         gameSection.appendChild(pongAi);
       }
 
@@ -94,7 +115,7 @@ class AIPage extends Page {
       gameSection.style.display = "flex";
       gameSection.style.justifyContent = "center";
       gameSection.style.alignItems = "center";
-      gameSection.style.height = "100vh"; 
+      gameSection.style.height = "100vh";
       gameSection.classList.remove("d-none");
 
       let pongAi = gameSection.querySelector("pong-ai");

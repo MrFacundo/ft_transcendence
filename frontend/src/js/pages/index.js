@@ -25,5 +25,5 @@ export {
   TournamentPage,
   ProfilePage,
   AIPage,
-  GamePage
+  GamePage,
 };

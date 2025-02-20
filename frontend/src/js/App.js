@@ -12,7 +12,6 @@ import {
     TournamentPage,
     ProfilePage,
     AIPage,
-    GamePage,
 } from "./pages/index.js";
 import "../scss/styles.scss";
 import { Api } from "./Api.js";
@@ -42,7 +41,6 @@ class App {
             tournament: new TournamentPage(this),
             profile: new ProfilePage(this),
             AI: new AIPage(this),
-            game: new GamePage(this),
         };
         this.currentGame = false;
         this.currentPage = null;
