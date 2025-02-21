@@ -60,6 +60,30 @@ services:
     restart: unless-stopped
     env_file:
       - .env
+  ganache:
+    image: trufflesuite/ganache-cli
+    container_name: ganache_blockchain
+    restart: always
+    command: ["-p", "8545", "-m", "myth like bonus scare over problem client lizard pioneer submit female collect"]
+    ports:
+      - "8545:8545"
+    volumes:
+      - ganache_data:/ganache
+    networks:
+      - backend-network
+
+  truffle:
+    build:
+      context: ./truffle
+      dockerfile: Dockerfile
+    depends_on:
+      - ganache
+    volumes:
+      - ./truffle:/usr/src/app
+      - shared-data:/usr/src/app/shared
+    command: ["sh", "/usr/src/app/deploy.sh"]
+    networks:
+      - backend-network
   db:
     container_name: transcendence_db
     image: postgres:17
@@ -124,5 +148,10 @@ volumes:
   postgres_data:
     driver: local
   cache_data:
+    driver: local
+  ganache_data:
+    driver: local
+  
+  shared-data:
     driver: local
 

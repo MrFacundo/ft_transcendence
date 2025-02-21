@@ -10,13 +10,16 @@ WORKDIR /usr/src/app
 
 COPY requirements.txt /usr/src/app/
 RUN pip install --upgrade pip
-RUN pip install -r requirements.txt
-
+# RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 COPY . /usr/src/app/
 COPY crontab /etc/cron.d/crontab
 
 RUN chmod 0644 /etc/cron.d/crontab
 RUN crontab /etc/cron.d/crontab
+
+# Execute o script getPostgresV2.py após a instalação
+# RUN python3 /usr/src/app/scripts/getPostgresV2.py
 
 EXPOSE 8000
 

@@ -256,3 +256,18 @@ import os
 if not os.path.exists(MEDIA_ROOT):
     os.makedirs(MEDIA_ROOT)
     os.makedirs(os.path.join(MEDIA_ROOT, 'avatars'), exist_ok=True)
+
+# Configuração do Ganache
+from web3 import Web3
+GANACHE_HOST = config('GANACHE_HOST', default='ganache')
+GANACHE_PORT = config('GANACHE_PORT', default='8545')
+GANACHE_URL = f'http://{GANACHE_HOST}:{GANACHE_PORT}'
+
+# Conectar ao Ganache
+w3 = Web3(Web3.HTTPProvider(GANACHE_URL))
+
+# Teste de conexão com o Ganache
+if w3.is_connected():
+    print("✅ Conectado ao Ganache!")
+else:
+    print("❌ Falha ao conectar ao Ganache.")

@@ -37,3 +37,6 @@ db:
 
 cache:
 	$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) up -d cache
+
+users:
+	./create_users.sh

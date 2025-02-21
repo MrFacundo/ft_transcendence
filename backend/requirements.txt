@@ -1,7 +1,10 @@
 Django==4.2.14
 djangorestframework
 django-cors-headers
+sqlalchemy
 psycopg2-binary
+pandas
+web3
 python-decouple
 channels
 daphne

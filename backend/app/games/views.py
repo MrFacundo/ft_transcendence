@@ -16,7 +16,19 @@ from django.utils import timezone
 from django_ratelimit.decorators import ratelimit
 from django.utils.decorators import method_decorator
 
+# def get_total_game_count():
+from django.http import JsonResponse
+from .scripts.interact_with_contract import get_game_data
+
 User = get_user_model()
+
+def game_data_view(request, game_id):
+    try:
+        data = get_game_data(game_id)
+        return JsonResponse(data)
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
+
 
 class CreateGameInvitationView(APIView):
     """
@@ -127,3 +139,5 @@ class MatchHistoryListView(ListAPIView):
     def get_queryset(self):
         user_id = self.kwargs.get('id')
         return PongGame.objects.filter(player1_id=user_id, status="completed") | PongGame.objects.filter(player2_id=user_id, status="completed")
+
+
