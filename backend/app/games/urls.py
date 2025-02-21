@@ -18,4 +18,7 @@ urlpatterns = [
 
     # Match History
     path('match-history/<int:id>/', MatchHistoryListView.as_view(), name='match-history'),
+    
+    # Dados da blockchain
+    path('game/<int:game_id>/', game_data_view, name='game_data'),
 ]

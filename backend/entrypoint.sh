@@ -7,4 +7,8 @@ service cron start
 crontab /usr/src/app/crontab
 
 python ./manage.py runserver 0.0.0.0:8000 &
-python ./manage.py runworker pong
+python ./manage.py runworker pong 
+
+sleep 5
+
+python /usr/src/app/app/scripts/getPostgresV2.py
