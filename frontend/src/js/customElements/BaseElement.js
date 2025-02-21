@@ -1,3 +1,10 @@
+/**
+ * Extends HTMLElement.
+ * Adds basic functionality for managing a page property,
+ * setting state, and handling subscription to the app state.
+ * 
+ * Use this class as a base class for all custom elements.
+ */
 class BaseElement extends HTMLElement {
     constructor() {
         super();

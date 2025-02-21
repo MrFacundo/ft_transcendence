@@ -1,6 +1,10 @@
-import { WS_URL } from "./settings.js";
+import { settings } from "./settings.js";
 import { showMessage } from "./utils.js";
 
+/**
+ * Sets up WebSocket connections for game invitations, friend invitations, online statuses, and tournaments.
+ * Handles incoming WebSocket messages and updates the application state accordingly.
+ */
 export class WebSocketManager {
     constructor(app) {
         this.app = app;
@@ -42,7 +46,7 @@ export class WebSocketManager {
     }
 
     setupWebSocket(path, messageHandler) {
-        const ws = new WebSocket(`${WS_URL}/${path}/?token=${this.app.auth.accessToken}`);
+        const ws = new WebSocket(`${settings.WS_URL}/${path}/?token=${this.app.auth.accessToken}`);
         ws.onopen = () => console.log(`WebSocket connection established: ${path}`);
         ws.onmessage = messageHandler;
         ws.onerror = (error) => {

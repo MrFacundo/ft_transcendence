@@ -1,5 +1,6 @@
 import Page from "./Page.js";
 import { showMessage } from "../utils.js";
+import { settings } from "../settings.js";
 
 class HomePage extends Page {
 	constructor(app) {
@@ -14,6 +15,7 @@ class HomePage extends Page {
 	}
 
 	async render() {
+		console.log("settings.MEDIA_URL", settings.MEDIA_URL);
 		const { api, auth } = this.app;
 		const sendList = document.querySelector("#send-list");
 		const receiveList = document.querySelector("#receive-list");

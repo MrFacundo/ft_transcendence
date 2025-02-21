@@ -1,4 +1,4 @@
-import { WS_URL } from "../settings.js";
+import { settings } from "../settings.js";
 
 class Pong extends HTMLElement {
     constructor() {
@@ -31,7 +31,7 @@ class Pong extends HTMLElement {
     setWebsocket(id) {
         this.addEventListeners();
         this.ws = new WebSocket(
-            `${WS_URL}/${id}/?token=${this.page.app.auth.accessToken}`
+            `${settings.WS_URL}/${id}/?token=${this.page.app.auth.accessToken}`
         );
 
         this.ws.onmessage = (event) => this.handleMessage(JSON.parse(event.data));

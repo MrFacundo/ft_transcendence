@@ -1,4 +1,4 @@
-import { EMPTY_AVATAR_URL } from "../settings.js";
+import { settings } from "../settings.js";
 import { getAvatarSrc } from "../utils.js";
 
 class ScoreBoard extends HTMLElement {
@@ -85,7 +85,7 @@ class ScoreBoard extends HTMLElement {
         <div id="scoreboard">
             <div id="scoreboard-title">WELL PONGED</div>
             <div class="row">
-                <div class="col-avatar"><img id="avatar-1" src="${EMPTY_AVATAR_URL}" alt="Avatar" width="100" height="100"></div>
+                <div class="col-avatar"><img id="avatar-1" src="${settings.EMPTY_AVATAR_URL}" alt="Avatar" width="100" height="100"></div>
                 <div class="score">
                     <div id="username-1"></div>
                     <div id="score-1">0</div>
@@ -93,7 +93,7 @@ class ScoreBoard extends HTMLElement {
                     <div id="score-2">0</div>
                     <div id="username-2"></div>
                 </div>
-                <div class="col-avatar"><img id="avatar-2" src="${EMPTY_AVATAR_URL}" alt="Avatar" width="100" height="100"></div>
+                <div class="col-avatar"><img id="avatar-2" src="${settings.EMPTY_AVATAR_URL}" alt="Avatar" width="100" height="100"></div>
             </div>
         </div>`;
     }

@@ -35,11 +35,11 @@
                     <custom-form id="login-form">
                         <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
                         <div class="form-floating mb-3">
-                            <input type="email" class="form-control" data-id="Email"/>
+                            <input type="email" class="form-control" id="login-email"/>
                             <label for="Email">Username or email</label>
                         </div>
                         <div class="form-floating mb-3">
-                            <input type="password" class="form-control" data-id="Password" />
+                            <input type="password" class="form-control" id="login-password" />
                             <label for="Password">Password</label>
                         </div>
                         <button class="btn btn-primary w-100 py-2" type="submit">
@@ -65,19 +65,19 @@
                     <custom-form>
                         <h1 class="h3 mb-3 fw-normal">Let's get you registered :)</h1>
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control" data-id="Username" placeholder="littlefrenchboy" />
+                            <input type="text" class="form-control" id="Username" placeholder="littlefrenchboy" />
                             <label for="Username">Username</label>
                         </div>
                         <div class="form-floating mb-3">
-                            <input type="email" class="form-control" data-id="Email" placeholder="name@example.com" />
+                            <input type="email" class="form-control" id="register-email" placeholder="name@example.com" />
                             <label for="Email">Email address</label>
                         </div>
                         <div class="form-floating mb-3">
-                            <input type="password" class="form-control" data-id="Password" placeholder="Password" />
+                            <input type="password" class="form-control" id="register-password" placeholder="Password" />
                             <label for="Password">Password</label>
                         </div>
                         <div class="form-floating mb-3">
-                            <input type="password" class="form-control" data-id="ConfirmPassword"
+                            <input type="password" class="form-control" id="ConfirmPassword"
                                 placeholder="Password" />
                             <label for="ConfirmPassword">Confirm Password</label>
                         </div>
@@ -120,9 +120,9 @@
         <div class="d-flex align-items-center py-4 bg-body-tertiary">
             <main class="form-signin w-100 m-auto">
                 <custom-form class="form-signin w-100 m-auto" id="otp-form">
-                    <p class="h6 text-center mb-3 fw-normal">Please enter the one-time password sent to your email</p>
+                    <p class="h6 text-center mb-3 fw-normal">Please enter your one-time password</p>
                     <div class="form-floating">
-                        <input type="otp" class="form-control p-2 fs-4 text-center" data-id="Otp" placeholder="123456"
+                        <input type="otp" class="form-control p-2 fs-4 text-center" id="Otp" placeholder="123456"
                             autocomplete="otp" />
                     </div>
                     <button class="btn btn-primary w-100 py-2 mt-2" type="submit">
@@ -419,11 +419,11 @@
                 <h1 class="h3 mb-3 fw-normal">Enter your tournament settings</h1>
                 <div class="form-check mb-3">
                     <label for="tournament_name">Tournament Name</label>
-                    <input type="text" class="form-control" data-id="tournament_name" />
+                    <input type="text" class="form-control" id="tournament_name" />
                 </div>
                 <div class="form-check mb-3">
                     <label for="participants_amount">Participants</label>
-                    <select class="form-control" data-id="participants_amount">
+                    <select class="form-control" id="participants_amount">
                         <option value="4">4</option>
                     </select>
                 </div>
