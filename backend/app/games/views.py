@@ -15,13 +15,17 @@ from django.db.models import Q
 from django.utils import timezone
 from django_ratelimit.decorators import ratelimit
 from django.utils.decorators import method_decorator
-
-# def get_total_game_count():
 from django.http import JsonResponse
 from .scripts.interact_with_contract import get_game_data
 
-User = get_user_model()
-
+## obs
+def get_total_game_count(request):
+    try:
+        total_games = PongGame.objects.count()
+        return JsonResponse({"total_games": total_games})
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
+## view de blockchain
 def game_data_view(request, game_id):
     try:
         data = get_game_data(game_id)
@@ -29,6 +33,7 @@ def game_data_view(request, game_id):
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
 
+User = get_user_model()
 
 class CreateGameInvitationView(APIView):
     """

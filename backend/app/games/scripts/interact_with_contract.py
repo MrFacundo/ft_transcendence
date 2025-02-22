@@ -1,8 +1,9 @@
+import os
 import json
 from web3 import Web3
 
 # URL do Ganache (ou outro nó Ethereum)
-ganache_url = "http://ganache_blockchain:8545"
+ganache_url = "http://blockchain_ganache:8545"
 web3 = Web3(Web3.HTTPProvider(ganache_url))
 
 # Verifique se a conexão foi bem-sucedida
@@ -11,7 +12,9 @@ if not web3.is_connected():
     exit()
 
 # Ler o endereço do contrato a partir do arquivo JSON
-with open('/usr/src/app/deployedAddress.json') as f:
+#with open('/usr/src/app/deployedAddress.json') as f:
+with open('/usr/src/app/shared/deployedAddress.json') as f:
+
     data = json.load(f)
     contract_address = data['address']
 
