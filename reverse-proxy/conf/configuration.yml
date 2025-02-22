@@ -1,0 +1,50 @@
+global:
+  checkNewVersion: true
+  sendAnonymousUsage: false
+
+serversTransport:
+  insecureSkipVerify: true
+
+entryPoints:
+  # Redirect HTTP to HTTPS
+  web:
+    address: ":80"
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+
+  # HTTPS endpoint
+  websecure:
+    address: ":443"
+    http:
+      tls:
+        domains:
+          - main: "localhost"
+            sans:
+              - "*.localhost"
+
+providers:
+  providersThrottleDuration: 2s 
+
+  # Docker provider for services running inside Docker
+  docker:
+    watch: true
+    network: backend-network
+    exposedByDefault: false
+
+# Enable Traefik UI
+api:
+  dashboard: true
+  insecure: true
+
+# Log level: INFO|DEBUG|ERROR
+log:
+  level: DEBUG
+
+# Manual TLS (self-signed certificate setup)
+tls:
+  certificates:
+    - certFile: "/certs/localhost.crt"
+      keyFile: "/certs/localhost.key"

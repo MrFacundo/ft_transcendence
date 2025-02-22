@@ -29,8 +29,8 @@ SECRET_KEY = 'django-insecure-sm^l$qx=e&7q13f(o7&^@e$(^2ta7plc+b6&1yq-bdi4u=m%^%
 DEBUG = config('DEBUG', default=True, cast=bool)
 PRODUCTION = not DEBUG
 
-#ALLOWED_HOSTS = ["localhost", "127.0.0.1", "172.22.0.1"]
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost').split(',')
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "api.localhost"]
+# ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost').split(',')
 
 # jwt settings
 SIMPLE_JWT = {
@@ -110,11 +110,11 @@ MIDDLEWARE = [
 
 ]
 
-FRONTEND_URL = "http://localhost:8080"
-WAF_URL = "http://localhost:8081"
-
 CORS_ALLOWED_ORIGINS = [
-    FRONTEND_URL,
+    "http://localhost:8080",
+    "http://localhost:8081",
+    "https://api.localhost",
+    "https://localhost",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
