@@ -5,7 +5,7 @@ DOCKER_COMPOSE_FILE = docker-compose.yml
 # Targets
 .PHONY: up down build clean
 
-all: build up
+all: build up users
 
 up:
 	$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) up -d

@@ -20,21 +20,29 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./backend:/usr/src/app
+      - shared-data:/usr/src/app/shared  # Volume compartilhado com o Truffle
     ports:
       - "8000:8000"
     networks:
       - backend-network
+    environment:
+      - ETHEREUM_NETWORK=http://blockchain_ganache:8545
+      - OTHER_ENV_VAR=value  
     depends_on:
       db:
         condition: service_healthy
       cache:
         condition: service_healthy
+      ganache:
+        condition: service_healthy
     restart: unless-stopped
     env_file:
       - .env
+
   ganache:
     image: trufflesuite/ganache-cli
-    container_name: ganache_blockchain
+    # image: trufflesuite/ganache:v7.0.0
+    container_name: blockchain_ganache
     restart: always
     command: ["-p", "8545", "-m", "myth like bonus scare over problem client lizard pioneer submit female collect"]
     ports:
@@ -43,19 +51,30 @@ services:
       - ganache_data:/ganache
     networks:
       - backend-network
+    healthcheck:
+      test: ["CMD", "echo", "Ganache is running"]
+      interval: 10s
+      retries: 3
 
   truffle:
+    container_name: blockchain_truffle
     build:
       context: ./truffle
       dockerfile: Dockerfile
     depends_on:
-      - ganache
+      ganache:
+        condition: service_healthy 
     volumes:
       - ./truffle:/usr/src/app
-      - shared-data:/usr/src/app/shared
-    command: ["sh", "/usr/src/app/deploy.sh"]
+      - shared-data:/usr/src/app/shared  # Volume compartilhado
+    command: ["sh", "/usr/src/app/deploy.sh"]  # Sobrescreve o CMD do Dockerfile
     networks:
       - backend-network
+    healthcheck:
+      test: ["CMD", "ls", "/usr/src/app/shared/deployedAddress.json"]
+      interval: 10s
+      retries: 3
+    
   db:
     container_name: transcendence_db
     image: postgres:17
@@ -114,7 +133,6 @@ volumes:
     driver: local
   ganache_data:
     driver: local
-  
   shared-data:
     driver: local
 
