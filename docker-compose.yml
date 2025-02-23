@@ -79,18 +79,27 @@ services:
     networks:
       - backend-network
 
-  hashiCorpVault:
-    container_name: hashiCorpVault
+  hashicorpvault:
+    container_name: hashicorpvault
     build:
-        context: ./hashiCorpVault
-        dockerfile: Dockerfile
+      context: ./hashiCorpVault
+      dockerfile: Dockerfile
     ports:
       - "8200:8200"
+    volumes:
+      - ./hashiCorpVault/src/vault-config.hcl:/vault/config/vault.hcl
+    environment:
+      - VAULT_ADDR=http://127.0.0.1:8200
+      - VAULT_API_ADDR=http://127.0.0.1:8200
+      - VAULT_CLUSTER_ADDR=http://127.0.0.1:8201
+      - VAULT_DEV_LISTEN_ADDRESS=
+      - VAULT_TOKEN=root
+      - VAULT_REDIRECT_ADDR=http://localhost:8200
+      - VAULT_UI=true
+    cap_add:
+      - IPC_LOCK
     networks:
       - backend-network
-    environment:
-      VAULT_DEV_ROOT_TOKEN_ID: ${VAULT_DEV_ROOT_TOKEN_ID}
-      VAULT_ADDR:
 
 networks:
   backend-network:
