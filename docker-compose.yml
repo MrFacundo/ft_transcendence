@@ -88,16 +88,22 @@ services:
       - "8200:8200"
     volumes:
       - ./hashiCorpVault/src/vault-config.hcl:/vault/config/vault.hcl
+      - ./hashiCorpVault/data/.root-token:/vault/data/.root-token
+      - ./hashiCorpVault/data/.unseal-key:/vault/data/.unseal-key
     environment:
-      - VAULT_ADDR=http://127.0.0.1:8200
-      - VAULT_API_ADDR=http://127.0.0.1:8200
-      - VAULT_CLUSTER_ADDR=http://127.0.0.1:8201
+      - VAULT_ADDR=http://localhost:8200
+      - VAULT_CLUSTER_ADDR=http://localhost:8201
       - VAULT_DEV_LISTEN_ADDRESS=
       - VAULT_TOKEN=root
-      - VAULT_REDIRECT_ADDR=http://localhost:8200
       - VAULT_UI=true
     cap_add:
       - IPC_LOCK
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8200/v1/sys/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
     networks:
       - backend-network
 
