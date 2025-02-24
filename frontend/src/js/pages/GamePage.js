@@ -40,6 +40,8 @@ export default class GamePage extends Page {
         const { mainElement } = this;
         const gameEl = mainElement.querySelector("pong-game");
         const scoreBoardEl = mainElement.querySelector("score-board");
+        if (!scoreBoardEl)
+            return;
         scoreBoardEl.page = this;
         scoreBoardEl.displayMatch(await this.app.api.getGame(gameId));
         gameEl.remove();
