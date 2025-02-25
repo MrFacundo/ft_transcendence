@@ -9,7 +9,8 @@ export class StateManager {
         this.state = {
             onlineStatuses: null,
             currentTournament: null,
-            currentGame: null
+            currentGame: null,
+            openTournaments: null,
         };
         this.init();
     }
@@ -44,7 +45,8 @@ export class StateManager {
 
         const promises = [
             this.state.onlineStatuses === null ? this.setInitialOnlineStatuses() : null,
-            this.state.currentTournament === null ? this.setInitialCurrentTournament() : null
+            this.state.currentTournament === null ? this.setInitialCurrentTournament() : null,
+            this.state.openTournaments === null ? this.setInitialOpenTournaments() : null,
         ].filter(Boolean);
 
         await Promise.all(promises);
@@ -75,6 +77,15 @@ export class StateManager {
             currentTournament && this.updateState('currentTournament', currentTournament);
         } catch (error) {
             console.error("Error fetching current tournament data:", error);
+        }
+    }
+
+    async setInitialOpenTournaments() {
+        try {
+            const openTournaments = await this.app.api.getTournaments();
+            openTournaments && this.updateState('openTournaments', openTournaments);
+        } catch (error) {
+            console.error("Error fetching open tournaments data:", error);
         }
     }
 

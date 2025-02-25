@@ -18,7 +18,7 @@ class TournamentPage extends Page {
 
     async render() {
         const { api, wsManager, stateManager } = this.app;
-        const openTournaments = await api.getTournaments();
+        const openTournaments = stateManager.state.openTournaments;
         const tournamentListElement = document.querySelector("#tournament-list");
 
         openTournaments.forEach(({ id, name, participants, participants_amount }) => {
