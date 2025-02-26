@@ -18,9 +18,6 @@ COPY crontab /etc/cron.d/crontab
 RUN chmod 0644 /etc/cron.d/crontab
 RUN crontab /etc/cron.d/crontab
 
-# Execute o script getPostgresV2.py após a instalação
-# RUN python3 /usr/src/app/scripts/getPostgresV2.py
-
 EXPOSE 8000
 
 CMD ["sh", "/usr/src/app/entrypoint.sh"]

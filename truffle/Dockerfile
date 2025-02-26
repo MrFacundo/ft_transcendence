@@ -1,17 +1,27 @@
-# filepath: /home/rprocopi/02_commoncore/ft_transcendence/truffle/Dockerfile
-# truffle/Dockerfile
-FROM node:16
+FROM node:18-alpine
+
+# Instalar dependências
+RUN apk add --no-cache \
+    bash \
+    git \
+    python3 \
+    make \
+    g++ \
+    libc6-compat \
+    linux-headers
 
 WORKDIR /usr/src/app
 
-COPY package.json ./
-RUN npm install -g truffle
+# Copiar package.json primeiro
+COPY package*.json ./
+RUN npm install -g truffle@5.8.2
 RUN npm install
 
+# Copiar resto dos arquivos
 COPY . .
+RUN chmod +x deploy.sh
 
-# Copie o script de deploy
-COPY deploy.sh /usr/src/app/deploy.sh
+# Definir volume
+VOLUME ["/usr/src/app"]
 
-# Execute o script de deploy
-CMD ["sh", "/usr/src/app/deploy.sh"]
+CMD ["sh", "deploy.sh"]

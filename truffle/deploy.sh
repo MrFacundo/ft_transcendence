@@ -1,24 +1,25 @@
 #!/bin/bash
 
-# Navegue até o diretório do projeto Truffle
-cd /usr/src/app
+set -e  # Parar em caso de erro
 
-# Compile os contratos
+# Aguardar Ganache estar pronto
+echo "Aguardando Ganache..."
+sleep 10
+
+# Compilar e migrar contratos
+echo "Compilando contratos..."
 truffle compile
+echo "Migrando contratos..."
+truffle migrate --network development --reset
 
-# Migrar os contratos para a rede de desenvolvimento
-truffle migrate --network development
-
-# Executar testes (opcional)
-truffle test --network development
-
-# Mover `deployedAddress.json` para o volume compartilhado
+# Mover arquivo de endereço
 if [ -f /usr/src/app/deployedAddress.json ]; then
-  mv /usr/src/app/deployedAddress.json /usr/src/app/shared/deployedAddress.json
-  echo "Arquivo deployedAddress.json movido para volume compartilhado."
+  cp /usr/src/app/deployedAddress.json /usr/src/app/shared/
+  echo "Arquivo deployedAddress.json copiado para volume compartilhado."
 else
   echo "Erro: deployedAddress.json não encontrado!"
+  exit 1
 fi
 
-# Manter o contêiner em execução
-# tail -f /dev/null
+# Manter container rodando
+tail -f /dev/null
