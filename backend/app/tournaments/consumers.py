@@ -9,7 +9,7 @@ import json
 """
 
 Tournament Consumer
-Handles events relative to the tournament the current user created or joined to.
+Handles events related to tournaments created or joined by the current user.
 
 """
 
@@ -132,7 +132,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
 """
 
 Tournament Consumer
-Updates the list of all open tournaments when a new tournament is created.
+Broadcasts newly created tournaments to all users.
 
 """
 class OpenTournamentsConsumer(AsyncWebsocketConsumer):

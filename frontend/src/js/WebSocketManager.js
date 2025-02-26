@@ -12,7 +12,7 @@ export class WebSocketManager {
         this.friendWs = null;
         this.onlineStatusWs = null;
         this.tournamentWs = null;
-        this.openTournamentWs = null;
+        this.openTournamenstWs = null;
     }
 
     async init() {
@@ -26,7 +26,7 @@ export class WebSocketManager {
         this.friendWs || this.setupFriendInvitationWebSocket(userId);
         this.onlineStatusWs || this.setupOnlineStatusWebSocket(userId);
         this.tournamentWs || this.setupTournamentWebSocket();
-        this.openTournamentWs || this.setupOpenTournamentWebSocket();
+        this.openTournamenstWs || this.setupOpenTournamentsWebSocket();
     }
 
     setupGameInvitationWebSocket(userId) {
@@ -47,8 +47,8 @@ export class WebSocketManager {
         this.tournamentWs = this.setupWebSocket(`tournament/${tournamentId}`, this.handleTournamentMessage.bind(this));
     }
 
-    setupOpenTournamentWebSocket() {
-        this.openTournamentWs = this.setupWebSocket('open-tournaments', this.handleOpenTournamentsMessage.bind(this));
+    setupOpenTournamentsWebSocket() {
+        this.openTournamenstWs = this.setupWebSocket('open-tournaments', this.handleOpenTournamentsMessage.bind(this));
     }
 
     setupWebSocket(path, messageHandler) {
