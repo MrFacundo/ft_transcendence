@@ -6,6 +6,13 @@ from app.tournaments.serializers import TournamentSerializer
 from django.utils import timezone
 import json
 
+"""
+
+Tournament Consumer
+Handles events related to tournaments created or joined by the current user.
+
+"""
+
 class TournamentConsumer(AsyncWebsocketConsumer):
     start_messages = {'semifinal_1': set(), 'semifinal_2': set(), 'final': set()}
 
@@ -121,3 +128,32 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             tournament.save()
         
         final_game.save()
+
+"""
+
+Tournament Consumer
+Broadcasts newly created tournaments to all users.
+
+"""
+class OpenTournamentsConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
+        self.group_name = 'open_tournaments'
+        
+        await self.channel_layer.group_add(
+            self.group_name,
+            self.channel_name
+        )
+        
+        await self.accept()
+
+    async def disconnect(self, close_code):
+        await self.channel_layer.group_discard(
+            self.group_name,
+            self.channel_name
+        )
+    
+    async def tournament_created(self, event):
+        await self.send(text_data=json.dumps({
+            'type': 'tournament_created',
+            'tournament': event['tournament']
+        }))
