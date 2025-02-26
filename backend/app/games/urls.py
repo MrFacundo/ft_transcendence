@@ -7,6 +7,7 @@ from app.games.views import (
     PongGameDetailView,
     MatchHistoryListView,
     game_data_view,
+	get_total_game_count,  # Adicionar import
 )
 
 urlpatterns = [
@@ -20,6 +21,10 @@ urlpatterns = [
     # Match History
     path('match-history/<int:id>/', MatchHistoryListView.as_view(), name='match-history'),
     
-    # # Dados da blockchain
+    # Dados da blockchain
     path('game/<int:game_id>/', game_data_view, name='game_data'),
+
+	# Contador total de jogos
+    path('games/count/', get_total_game_count, name='total-games'),
 ]
+		

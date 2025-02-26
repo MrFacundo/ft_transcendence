@@ -34,14 +34,15 @@ services:
       cache:
         condition: service_healthy
       ganache:
-        condition: service_healthy
+        condition: service_started
     restart: unless-stopped
     env_file:
       - .env
 
   ganache:
-    image: trufflesuite/ganache-cli
-    # image: trufflesuite/ganache:v7.0.0
+  
+    # image: trufflesuite/ganache-cli
+    image: trufflesuite/ganache:v7.0.0
     container_name: blockchain_ganache
     restart: always
     command: ["-p", "8545", "-m", "myth like bonus scare over problem client lizard pioneer submit female collect"]
@@ -61,12 +62,12 @@ services:
     build:
       context: ./truffle
       dockerfile: Dockerfile
-    depends_on:
-      ganache:
-        condition: service_healthy 
     volumes:
       - ./truffle:/usr/src/app
       - shared-data:/usr/src/app/shared  # Volume compartilhado
+    depends_on:
+      ganache:
+        condition: service_healthy 
     command: ["sh", "/usr/src/app/deploy.sh"]  # Sobrescreve o CMD do Dockerfile
     networks:
       - backend-network
@@ -98,6 +99,7 @@ services:
     restart: unless-stopped
   cache:
     image: redis:6
+    container_name: transcendence_cache
     expose:
       - 6379
     networks:
