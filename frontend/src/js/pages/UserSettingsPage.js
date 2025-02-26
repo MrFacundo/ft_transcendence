@@ -129,12 +129,8 @@ class UserSettingsPage extends Page {
                 setTimeout(() => this.app.navigate(this.url), 3000);
             })
             .catch(error => {
-                const errors = error.response.data;
-                const firstErrorKey = Object.keys(errors)[0];
-                if (firstErrorKey && errors[firstErrorKey][0]) {
-                    return showMessage(capitalizeFirstLetter(errors[firstErrorKey][0]), "error");
-                }
-                showMessage("An error occurred while updating the settings.", "error");
+                const errorMessage = error.response?.data?.[Object.keys(error.response.data)[0]]?.[0];
+                showMessage(capitalizeFirstLetter(errorMessage) || "An error occurred while updating the settings.", "error");
             });
     }
 }

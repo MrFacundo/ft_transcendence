@@ -1,6 +1,7 @@
 import { settings } from "./settings.js";
 
 export function capitalizeFirstLetter(message) {
+    if (!message) return;
 	return message.charAt(0).toUpperCase() + message.slice(1);
 }
 

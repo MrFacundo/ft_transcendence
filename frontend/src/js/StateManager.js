@@ -83,9 +83,21 @@ export class StateManager {
     async setInitialOpenTournaments() {
         try {
             const openTournaments = await this.app.api.getTournaments();
-            openTournaments && this.updateState('openTournaments', openTournaments);
+            const tournamentsMap = new Map(openTournaments.map(tournament => [tournament.id, tournament]));
+            this.updateState('openTournaments', tournamentsMap);
         } catch (error) {
             console.error("Error fetching open tournaments data:", error);
+        }
+    }
+
+    updateOpenTournaments(tournament) {
+        const openTournaments = this.state.openTournaments;
+        if (!openTournaments) return;
+
+        if (!openTournaments.has(tournament.id)) {
+            const updatedTournaments = new Map(openTournaments);
+            updatedTournaments.set(tournament.id, tournament);
+            this.app.stateManager.updateState("openTournaments", updatedTournaments);
         }
     }
 
