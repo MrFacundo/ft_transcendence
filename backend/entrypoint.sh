@@ -3,6 +3,7 @@
 python ./manage.py makemigrations 
 python ./manage.py migrate
 
+env > /etc/environment
 service cron start
 crontab /usr/src/app/crontab
 

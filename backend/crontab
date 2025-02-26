@@ -1,2 +1,2 @@
-* * * * * /usr/local/bin/python /usr/src/app/manage.py expire_invitations >> /var/log/cron.log 2>&1
-* * * * * /usr/local/bin/python /usr/src/app/manage.py expire_tournaments >> /var/log/cron.log 2>&1
+* * * * * bash -c 'source /etc/environment && /usr/local/bin/python /usr/src/app/manage.py expire_invitations >> /var/log/cron.log 2>&1'
+* * * * * bash -c 'source /etc/environment && /usr/local/bin/python /usr/src/app/manage.py expire_tournaments >> /var/log/cron.log 2>&1'
