@@ -100,4 +100,8 @@ contract PongGameHistory {
             game.tournamentId
         );
     }
+	
+	function getGameCount() public view returns (uint256) {
+        return gameCount;
+    }
 }
