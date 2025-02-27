@@ -35,7 +35,7 @@
                     <custom-form id="login-form">
                         <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
                         <div class="form-floating mb-3">
-                            <input type="email" class="form-control" id="login-email"/>
+                            <input type="email" class="form-control" id="login-email" />
                             <label for="Email">Username or email</label>
                         </div>
                         <div class="form-floating mb-3">
@@ -69,7 +69,8 @@
                             <label for="Username">Username</label>
                         </div>
                         <div class="form-floating mb-3">
-                            <input type="email" class="form-control" id="register-email" placeholder="name@example.com" />
+                            <input type="email" class="form-control" id="register-email"
+                                placeholder="name@example.com" />
                             <label for="Email">Email address</label>
                         </div>
                         <div class="form-floating mb-3">
@@ -77,8 +78,7 @@
                             <label for="Password">Password</label>
                         </div>
                         <div class="form-floating mb-3">
-                            <input type="password" class="form-control" id="ConfirmPassword"
-                                placeholder="Password" />
+                            <input type="password" class="form-control" id="ConfirmPassword" placeholder="Password" />
                             <label for="ConfirmPassword">Confirm Password</label>
                         </div>
                         <button class="btn btn-primary w-100 py-2" type="submit">
@@ -242,15 +242,18 @@
                     </div>
 
                     <!-- Two-Factor Authentication Modal -->
-                    <div class="modal fade" id="authenticatorModal" tabindex="-1" aria-labelledby="authenticatorModalLabel" aria-hidden="true">
+                    <div class="modal fade" id="authenticatorModal" tabindex="-1"
+                        aria-labelledby="authenticatorModalLabel" aria-hidden="true">
                         <div class="modal-dialog">
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <h5 class="modal-title" id="authenticatorModalLabel">Authenticator Setup</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
-                                    <p>Scan the QR code below with your authenticator app. Once scanned, enter the OTP below to finish the setup.</p>
+                                    <p>Scan the QR code below with your authenticator app. Once scanned, enter the OTP
+                                        below to finish the setup.</p>
                                     <div class="row">
                                         <div class="col-md-6">
                                             <img src="" id="QRCode" alt="QR Code" class="img-fluid">
@@ -259,7 +262,7 @@
                                             <custom-form>
                                                 <div class="mb-3">
                                                     <label for="otp-input" class="form-label">Enter OTP</label>
-                                                    <input type="text" class="form-control" id="otp-input" >
+                                                    <input type="text" class="form-control" id="otp-input">
                                                 </div>
                                                 <button type="submit" class="btn btn-primary">Verify OTP</button>
                                             </custom-form>
@@ -303,7 +306,6 @@
                     <div class="card-body text-center" data-href="/onevsone">
                         <h5 class="card-title">Online 1vs1</h5>
                         <img src="/static/images/people.svg" alt="Robot Icon" width="130" height="130">
-                        <p class="card-text mt-4">Compete against another player online.</p>
                     </div>
                 </div>
             </div>
@@ -312,26 +314,15 @@
                     <div class="card-body text-center" data-href="/tournament">
                         <h5 class="card-title">Tournaments</h5>
                         <img src="/static/images/trophy.svg" alt="Robot Icon" width="130" height="130">
-                        <p class="card-text mt-4">Join online tournaments.</p>
-                <div class="card bg-light my-4 shadow-sm" style="min-height: 250px; cursor: pointer;" data-href="/pvp_offline">
-                    <div class="card-body text-center">
-                        <h5 class="card-title">Play Offline</h5>
-                        <img src="/static/images/offline-pvp.svg" alt="Offline Icon" width="130" height="130">
-                        <p class="card-text mt-4">Play Pong Offline.</p>
                     </div>
                 </div>
             </div>
             <div class="col-md-3">
-                <div class="card bg-light my-4 shadow-sm" style="min-height: 250px; cursor: pointer;" data-href="/pvp_offline">
+                <div class="card bg-light my-4 shadow-sm" style="min-height: 250px; cursor: pointer;"
+                    data-href="/pvp_offline">
                     <div class="card-body text-center">
                         <h5 class="card-title">Local 1vs1</h5>
                         <img src="/static/images/offline-pvp.svg" alt="Offline Icon" width="130" height="130">
-                        <p class="card-text mt-4">Play against another player on the same device.</p>
-                <div class="card bg-light my-4 shadow-sm" style="min-height: 250px; cursor: pointer;">
-                    <div class="card-body text-center" data-href="/onevsone">
-                        <h5 class="card-title">1vs1</h5>
-                        <img src="/static/images/people.svg" alt="Robot Icon" width="130" height="130">
-                        <p class="card-text mt-4">Compete against another player.</p>
                     </div>
                 </div>
             </div>
@@ -340,7 +331,6 @@
                     <div class="card-body text-center" data-href="/ai">
                         <h5 class="card-title">Play against AI</h5>
                         <img src="/static/images/robot.svg" alt="Robot Icon" width="130" height="130">
-                        <p class="card-text mt-4">Challenge our AI and test your skills.</p>
                     </div>
                 </div>
             </div>
@@ -416,7 +406,7 @@
             </div>
         </div>
         <div id="tournament-details" class="row justify-content-center d-none">
-            <h2  id="tournament-name" class="mb-4 text-center text-warning display-6"></h2>
+            <h2 id="tournament-name" class="mb-4 text-center text-warning display-6"></h2>
             <div id="participants-info" class="row d-none">
                 <div class="col-md-4">
                     <p>Participants</p>
