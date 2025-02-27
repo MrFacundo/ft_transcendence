@@ -88,7 +88,7 @@ def get_novos_jogos():
     cur.execute("""
         SELECT id, channel_group_name, date_played, score_player1, score_player2, match_date, status, player1_id, player2_id, winner_id, tournament_id
         FROM games_ponggame
-        WHERE registrado_blockchain = FALSE
+        WHERE status = 'interrupted' AND registrado_blockchain = FALSE
     """)
     
     jogos = cur.fetchall()
@@ -125,6 +125,11 @@ def registrar_jogo_na_blockchain(jogo):
     ).transact({'from': web3.eth.accounts[0]})
     web3.eth.wait_for_transaction_receipt(tx_hash)
 
+
+# Função para converter lista de jogos em DataFrame
+def convert_to_dataframe(jogos):
+    return pd.DataFrame(jogos)
+
 # Função para listar jogos cadastrados na blockchain
 def listar_jogos_blockchain():
     game_count = contract.functions.getGameCount().call()
@@ -144,7 +149,7 @@ def listar_jogos_blockchain():
             "winnerId": jogo[9],
             "tournamentId": jogo[10]
         })
-        df = convert_to_dataframe(jogos)
+    df = convert_to_dataframe(jogos)
     return df
 
 # Função principal para monitorar jogos e registrar na blockchain
@@ -187,5 +192,5 @@ if __name__ == "__main__":
         monitorar_jogos()
 
     elif args.listar_jogos_blockchain:
-        jogos = listar_jogos_blockchain()
-        print(jogos)
+        db = listar_jogos_blockchain()
+        print(db)
