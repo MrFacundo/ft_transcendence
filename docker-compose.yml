@@ -68,7 +68,6 @@ services:
       - .env
 
   ganache:
-  
     # image: trufflesuite/ganache-cli
     image: trufflesuite/ganache:v7.0.0
     container_name: blockchain_ganache
