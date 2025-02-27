@@ -46,11 +46,11 @@ echo "🔄 Aguardando Ganache em $GANACHE_HOST:$GANACHE_PORT..."
 
 # Iniciar monitor_games.py
 echo "Iniciando monitor_games.py..."
-python /usr/src/app/app/scripts/monitor_games.py
+python /usr/src/app/app/scripts/monitor_games_.py --monitorar
 
 # Verificar o código de saída
 if [ $? -eq 0 ]; then
-  echo "monitor_games.py executado com sucesso!"
+  echo "monitor_games_.py executado com sucesso!"
 else
   echo "Erro ao executar monitor_games.py"
 fi

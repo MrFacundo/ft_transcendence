@@ -6,7 +6,6 @@ ALIAS_FILE="$HOME/.bashrc"
 # Adiciona os aliases ao .bashrc
 echo "Adicionando aliases ao $ALIAS_FILE..."
 
-
 cat <<EOL >> $ALIAS_FILE
 
 # --- Aliases Personalizados ---
