@@ -12,6 +12,7 @@ export class WebSocketManager {
         this.friendWs = null;
         this.onlineStatusWs = null;
         this.tournamentWs = null;
+        this.openTournamenstWs = null;
     }
 
     async init() {
@@ -25,6 +26,7 @@ export class WebSocketManager {
         this.friendWs || this.setupFriendInvitationWebSocket(userId);
         this.onlineStatusWs || this.setupOnlineStatusWebSocket(userId);
         this.tournamentWs || this.setupTournamentWebSocket();
+        this.openTournamenstWs || this.setupOpenTournamentsWebSocket();
     }
 
     setupGameInvitationWebSocket(userId) {
@@ -43,6 +45,10 @@ export class WebSocketManager {
         const tournamentId = this.app.stateManager.state.currentTournament?.id;
         if (!tournamentId) return;
         this.tournamentWs = this.setupWebSocket(`tournament/${tournamentId}`, this.handleTournamentMessage.bind(this));
+    }
+
+    setupOpenTournamentsWebSocket() {
+        this.openTournamenstWs = this.setupWebSocket('open-tournaments', this.handleOpenTournamentsMessage.bind(this));
     }
 
     setupWebSocket(path, messageHandler) {
@@ -144,6 +150,17 @@ export class WebSocketManager {
         stateManager.updateState('currentTournament', data.tournament);
         if (currentPage.name === "game") {
             this.app.navigate("/tournament");
+        }
+    }
+
+    handleOpenTournamentsMessage(event) {
+        const data = JSON.parse(event.data);
+        console.log("Open tournaments WS message:", data);
+        data.tournament && this.app.stateManager.updateOpenTournaments(data.tournament);
+        
+        const tournamentCreator = data.tournament.participants[0];
+        if (tournamentCreator.id !== this.app.auth.user.id) {
+            showMessage(tournamentCreator.username + " created the" + data.tournament.name + " tournament.");
         }
     }
 
