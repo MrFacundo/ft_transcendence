@@ -11,6 +11,11 @@ class TournamentPage extends Page {
             app: app,
         });
         this.handleStartButtonClick = this.handleStartButtonClick.bind(this);
+        this.unsubscribe = this.app.stateManager.subscribe(
+            'currentTournament',
+            (currentTournament) => this.updatePartcipantsList(currentTournament),
+            this
+        );
     }
 
     render() {
@@ -56,6 +61,15 @@ class TournamentPage extends Page {
                 type: "start",
             }));
         }
+    }
+
+    updatePartcipantsList(currentTournament) {
+        const partcipantsListEl = document.querySelector("#tournament-participants");
+        const selectedUserCard = document.querySelector("user-profile#selected-participant");
+        [partcipantsListEl, selectedUserCard].forEach(el => (el.page = this));
+
+        partcipantsListEl.config = { selectedUserCard };
+        partcipantsListEl.setState({ users: currentTournament.participants });
     }
 }
 

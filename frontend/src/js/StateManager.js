@@ -15,19 +15,41 @@ export class StateManager {
         this.init();
     }
     
-    subscribe(key, callback) {
+    /**
+     * Subscribes a callback function to a specific key in the state manager.
+     * The callback will be invoked whenever the state associated with the key changes.
+     * If a page is specified, the callback will only be invoked when the current page matches the specified page.
+     *
+     * @param {string} key - The key to subscribe to.
+     * @param {function} callback - The callback function to invoke when the state changes.
+     * @param {string|null} [page=null] - When a callback is subscribed from a Page class, the page name should be passed so it's only invoked when the page is active. 
+     * @returns {function} - A function to unsubscribe the callback from the key.
+     */
+    subscribe(key, callback, page = null) {
         if (!this.subscribers.has(key)) {
             this.subscribers.set(key, new Set());
         }
-        this.subscribers.get(key).add(callback);
+        const wrappedCallback = (value, additionalData) => {
+            if (!page || this.app.currentPage === page) {
+                callback(value, additionalData);
+            }
+        };
+        this.subscribers.get(key).add(wrappedCallback);
         return () => {
             if (this.subscribers.has(key)) {
-                const unsubscribed = this.subscribers.get(key).delete(callback);
+                const unsubscribed = this.subscribers.get(key).delete(wrappedCallback);
                 console.log(`Unsubscribing from ${key}: ${unsubscribed ? 'Success' : 'Failed'}`);
             }
         };
     }
     
+    /**
+     * Updates the state associated with a specific key and notifies all subscribers.
+     *
+     * @param {string} key - The key of the state to update.
+     * @param {*} newValue - The new value to set for the state.
+     * @param {*} [additionalData] - Optional additional data to pass to the subscribers.
+     */
     updateState(key, newValue, additionalData) {
         console.log("Updating state:", key, newValue);
         this.state[key] = newValue;
@@ -83,8 +105,7 @@ export class StateManager {
     async setInitialOpenTournaments() {
         try {
             const openTournaments = await this.app.api.getTournaments();
-            const tournamentsMap = new Map(openTournaments.map(tournament => [tournament.id, tournament]));
-            this.updateState('openTournaments', tournamentsMap);
+            this.updateState('openTournaments', openTournaments);
         } catch (error) {
             console.error("Error fetching open tournaments data:", error);
         }
@@ -94,10 +115,9 @@ export class StateManager {
         const openTournaments = this.state.openTournaments;
         if (!openTournaments) return;
 
-        if (!openTournaments.has(tournament.id)) {
-            const updatedTournaments = new Map(openTournaments);
-            updatedTournaments.set(tournament.id, tournament);
-            this.app.stateManager.updateState("openTournaments", updatedTournaments);
+        if (!openTournaments.some(t => t.id === tournament.id)) {
+            const updatedTournaments = [...openTournaments, tournament];
+            this.updateState("openTournaments", updatedTournaments);
         }
     }
 

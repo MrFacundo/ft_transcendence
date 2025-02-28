@@ -12,7 +12,8 @@ class TournamentPage extends Page {
         });
         this.unsubscribe = this.app.stateManager.subscribe(
             'openTournaments',
-            (openTournaments) => this.updateTournamentsList(openTournaments)
+            (openTournaments) => this.updateTournamentsList(openTournaments),
+            this
         );
     }
 
@@ -25,6 +26,7 @@ class TournamentPage extends Page {
     }
 
     updateTournamentsList(openTournaments) {
+        console.log("Updating tournaments list", openTournaments);
         const tournamentListElement = document.querySelector("#tournament-list");
         const { api, wsManager, stateManager } = this.app;
         this.populateTournamentList(openTournaments, tournamentListElement, api, stateManager, wsManager);
@@ -32,7 +34,7 @@ class TournamentPage extends Page {
     }
 
     populateTournamentList(openTournaments, tournamentListElement, api, stateManager, wsManager) {
-        tournamentListElement.innerHTML = ''; // Clear the list before populating
+        tournamentListElement.innerHTML = '';
         openTournaments.forEach(({ id, name, participants, participants_amount }) => {
             const tournamentItem = document.createElement("li");
             tournamentItem.id = `tournament-${id}`;
@@ -44,7 +46,6 @@ class TournamentPage extends Page {
                 try {
                     const response = await api.joinTournament(id);
                     stateManager.updateState('currentTournament', response);
-                    this.updateTournamentsList(response);
                     wsManager.setupTournamentWebSocket();
                     showMessage(`Joined tournament: ${name}`);
                 } catch (error) {
