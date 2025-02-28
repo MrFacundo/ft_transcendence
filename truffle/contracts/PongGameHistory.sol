@@ -6,6 +6,7 @@ contract PongGameHistory {
 
     struct Game {
         uint256 gameId;
+		uint256 id;
         string channelGroupName;
         uint256 datePlayed;
         uint256 scorePlayer1;
@@ -23,7 +24,7 @@ contract PongGameHistory {
     mapping(uint256 => uint256[]) private playerGames; // Jogos por jogador
     uint256 private gameCount;
 
-    event GameAdded(uint256 indexed gameId, uint256 tournamentId, uint256 player1Id, uint256 player2Id, uint256 winnerId);
+    event GameAdded(uint256 indexed gameId, uint256 id, uint256 tournamentId, uint256 player1Id, uint256 player2Id, uint256 winnerId);
 
     modifier onlyAdmin() {
         require(msg.sender == admin, "Apenas o administrador pode adicionar jogos");
@@ -35,6 +36,7 @@ contract PongGameHistory {
     }
 
     function addGame(
+		uint256 _id,
         string memory _channelGroupName,
         uint256 _datePlayed,
         uint256 _scorePlayer1,
@@ -49,7 +51,8 @@ contract PongGameHistory {
         gameCount++;
 
         games[gameCount] = Game(
-            gameCount,
+			gameCount,
+            _id,
             _channelGroupName,
             _datePlayed,
             _scorePlayer1,
@@ -69,11 +72,12 @@ contract PongGameHistory {
             playerGames[_winnerId].push(gameCount);
         }
 
-        emit GameAdded(gameCount, _tournamentId, _player1Id, _player2Id, _winnerId);
+        emit GameAdded(gameCount, _id, _tournamentId, _player1Id, _player2Id, _winnerId);
     }
 
     function getGame(uint256 _gameId) public view returns (
         uint256 gameId,
+		uint256 id,
         string memory channelGroupName,
         uint256 datePlayed,
         uint256 scorePlayer1,
@@ -88,6 +92,7 @@ contract PongGameHistory {
         Game memory game = games[_gameId];
         return (
             game.gameId,
+			game.id,
             game.channelGroupName,
             game.datePlayed,
             game.scorePlayer1,

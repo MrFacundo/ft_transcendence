@@ -18,10 +18,10 @@ RUN npm install -g truffle@5.8.2
 RUN npm install
 
 # Copiar resto dos arquivos
-COPY . .
-RUN chmod +x deploy.sh
+COPY . /usr/src/app/
+RUN chmod +x entrypoint.sh
 
 # Definir volume
 VOLUME ["/usr/src/app"]
 
-CMD ["sh", "deploy.sh"]
+CMD ["sh", "entrypoint.sh"]

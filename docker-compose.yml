@@ -67,7 +67,7 @@ services:
     depends_on:
       ganache:
         condition: service_healthy 
-    command: ["sh", "/usr/src/app/deploy.sh"]  # Sobrescreve o CMD do Dockerfile
+    command: ["sh", "/usr/src/app/entrypoint.sh"]  # Sobrescreve o CMD do Dockerfile
     networks:
       - backend-network
     healthcheck:
