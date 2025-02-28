@@ -23,10 +23,11 @@ CONTRACT_ABI = [
     {
         "constant": False,
         "inputs": [
+            {"name": "_id", "type": "uint256"},
             {"name": "_channelGroupName", "type": "string"},
             {"name": "_datePlayed", "type": "uint256"},
             {"name": "_scorePlayer1", "type": "uint256"},
-            {"name": "_score_player2", "type": "uint256"},
+            {"name": "_scorePlayer2", "type": "uint256"},
             {"name": "_matchDate", "type": "uint256"},
             {"name": "_status", "type": "string"},
             {"name": "_player1Id", "type": "uint256"},
@@ -48,6 +49,7 @@ CONTRACT_ABI = [
         "name": "getGame",
         "outputs": [
             {"name": "gameId", "type": "uint256"},
+            {"name": "id", "type": "uint256"},
             {"name": "channelGroupName", "type": "string"},
             {"name": "datePlayed", "type": "uint256"},
             {"name": "scorePlayer1", "type": "uint256"},
@@ -112,6 +114,7 @@ def marcar_jogo_registrado(jogo_id):
 # Função para registrar um jogo na blockchain
 def registrar_jogo_na_blockchain(jogo):
     tx_hash = contract.functions.addGame(
+        jogo['id'],
         jogo['channel_group_name'],
         int(jogo['date_played'].timestamp()),
         jogo['score_player1'],
@@ -138,16 +141,17 @@ def listar_jogos_blockchain():
         jogo = contract.functions.getGame(game_id).call()
         jogos.append({
             "gameId": jogo[0],
-            "channelGroupName": jogo[1],
-            "datePlayed": jogo[2],
-            "scorePlayer1": jogo[3],
-            "scorePlayer2": jogo[4],
-            "matchDate": jogo[5],
-            "status": jogo[6],
-            "player1Id": jogo[7],
-            "player2Id": jogo[8],
-            "winnerId": jogo[9],
-            "tournamentId": jogo[10]
+            "id": jogo[1],
+            "channelGroupName": jogo[2],
+            "datePlayed": pd.to_datetime(jogo[3], unit='s'),
+            "scorePlayer1": jogo[4],
+            "scorePlayer2": jogo[5],
+            "matchDate": pd.to_datetime(jogo[6], unit='s') if jogo[6] != 0 else None,
+            "status": jogo[7],
+            "player1Id": jogo[8],
+            "player2Id": jogo[9],
+            "winnerId": jogo[10],
+            "tournamentId": jogo[11]
         })
     df = convert_to_dataframe(jogos)
     return df

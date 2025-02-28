@@ -15,7 +15,6 @@ alias gg='python monitor_games_.py --get_novos_jogos'
 alias rg='python monitor_games_.py --registrar_jogo'
 alias lg='python monitor_games_.py --listar_jogos_blockchain'
 alias mg='python monitor_games_.py --monitorar'
-alias gp='python getPostgresV2.py
 
 EOL
 
