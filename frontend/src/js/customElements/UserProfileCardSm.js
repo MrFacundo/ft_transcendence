@@ -19,7 +19,7 @@ class UserProfileCardSm extends BaseElement {
         usernameEl.textContent = this.state.user.username;
 
         const { stateManager } = this.page.app;
-        this.updateOnlineStatus(stateManager.state.onlineStatuses.get(this.state.user.id)?.is_online);
+        stateManager.state.onlineStatuses && this.updateOnlineStatus(stateManager.state.onlineStatuses.get(this.state.user.id)?.is_online);
     }
 
     appendPendingButton(expiresAt = null) {
