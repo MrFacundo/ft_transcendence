@@ -18,12 +18,7 @@ class TournamentBracket extends BaseElement {
                 finalPlayer2: null
             }
         };
-        this._pageSetCallback = () => {
-            this.unsubscribe = this.page.app.stateManager.subscribe(
-                'currentTournament',
-                (currentTournament) => this.setTournament(currentTournament)
-            );
-        };
+
     }
 
     checkIsParticipant(tournament) {
@@ -55,14 +50,6 @@ class TournamentBracket extends BaseElement {
         };
 
         this.setState({ tournament, startButtonEnabled, participants });
-
-        if (final_game.status === "completed") {
-            if (typeof this.unsubscribe === 'function') {
-                this.unsubscribe();
-                this.unsubscribe = null;
-            }
-            this.page.app.stateManager.updateState('currentTournament', null);
-        }
     }
 
     async render() {
