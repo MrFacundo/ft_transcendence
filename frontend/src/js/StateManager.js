@@ -18,11 +18,9 @@ export class StateManager {
     /**
      * Subscribes a callback function to a specific key in the state manager.
      * The callback will be invoked whenever the state associated with the key changes.
-     * If a page is specified, the callback will only be invoked when the current page matches the specified page.
      *
      * @param {string} key - The key to subscribe to.
      * @param {function} callback - The callback function to invoke when the state changes.
-     * @param {string|null} [page=null] - When a callback is subscribed from a Page class, the page name should be passed so it's only invoked when the page is active. 
      * @returns {function} - A function to unsubscribe the callback from the key.
      */
     subscribe(key, callback) {
@@ -58,19 +56,20 @@ export class StateManager {
     }
 
     async init() {
-        if (!this.app.auth.authenticated) {
+        if (!this.app.auth.authenticated || this.initialized) {
             return;
         }
-
+        
         const promises = [
             this.state.onlineStatuses === null ? this.setInitialOnlineStatuses() : null,
             this.state.currentTournament === null ? this.setInitialCurrentTournament() : null,
             this.state.openTournaments === null ? this.setInitialOpenTournaments() : null,
         ].filter(Boolean);
-
+        
         await Promise.all(promises);
+        this.initialized = true;
     }
-
+    
     async setInitialOnlineStatuses() {
         try {
             const response = await this.app.api.getOnlineStatuses();

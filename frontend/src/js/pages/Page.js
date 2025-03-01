@@ -28,7 +28,6 @@ class Page {
      */
     async open() {
         const { app } = this;
-
         document.querySelectorAll("section").forEach((section) => { section.remove() });
         const tempElement = document.createElement(this.pageElement.tagName);
         tempElement.innerHTML = this.pageElement.innerHTML;
