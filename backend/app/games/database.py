@@ -6,8 +6,8 @@ class GameDatabase:
         self.socket = game_instance.socket
 
     @database_sync_to_async
-    def set_game_active(self):
-        self.socket.db_game.status = "in_progress"
+    def set_game_status(self, status: str):
+        self.socket.db_game.status = status
         self.socket.db_game.save()
 
     @database_sync_to_async
@@ -35,9 +35,13 @@ class GameDatabase:
     def set_winner(self, winner: int):
         game = self.socket.db_game
         game.winner = game.player1 if winner == 0 else game.player2
+        game.save()
+
+    @database_sync_to_async
+    def set_score(self):
+        game = self.socket.db_game
         game.score_player1 = self.game.score[0]
         game.score_player2 = self.game.score[1]
-        game.status = "completed"
         game.save()
 
     @database_sync_to_async

@@ -22,6 +22,14 @@ class Game:
     async def handle_disconnect(self):
         self.disconnected = True
 
+    async def handle_interruption(self):
+        await self.db.set_score()
+        winner = 0 if self.score[0] > self.score[1] else 1
+        await self.db.update_stats(winner)
+        await self.db.set_winner(winner)
+        await self.db.set_game_status("interrupted")
+        await self.comm.send_game_over()
+
     async def game_loop(self):
         if not self.socket:
             return
@@ -35,8 +43,10 @@ class Game:
 
             if self.score[0] >= 3 or self.score[1] >= 3:
                 winner = 0 if self.score[0] >= 3 else 1
+                await self.db.set_score()
                 await self.db.update_stats(winner)
                 await self.db.set_winner(winner)
+                await self.db.set_game_status("completed")
                 await self.comm.send_game_over()
                 return
 
@@ -75,6 +85,6 @@ class Game:
         self.db = GameDatabase(self)
         self.comm = GameCommunication(self)
         
-        await self.db.set_game_active()
+        await self.db.set_game_status("in_progress")
         await self.comm.send_game_state()
         asyncio.create_task(self.game_loop())

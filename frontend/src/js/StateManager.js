@@ -25,23 +25,20 @@ export class StateManager {
      * @param {string|null} [page=null] - When a callback is subscribed from a Page class, the page name should be passed so it's only invoked when the page is active. 
      * @returns {function} - A function to unsubscribe the callback from the key.
      */
-    subscribe(key, callback, page = null) {
+    subscribe(key, callback) {
         if (!this.subscribers.has(key)) {
-            this.subscribers.set(key, new Set());
+          this.subscribers.set(key, new Set());
         }
-        const wrappedCallback = (value, additionalData) => {
-            if (!page || this.app.currentPage === page) {
-                callback(value, additionalData);
-            }
-        };
-        this.subscribers.get(key).add(wrappedCallback);
+        console.log("Subscribing callback " + callback + " to " + key);
+        this.subscribers.get(key).add(callback);
+        
         return () => {
-            if (this.subscribers.has(key)) {
-                const unsubscribed = this.subscribers.get(key).delete(wrappedCallback);
-                console.log(`Unsubscribing from ${key}: ${unsubscribed ? 'Success' : 'Failed'}`);
-            }
+          if (this.subscribers.has(key)) {
+            const unsubscribed = this.subscribers.get(key).delete(callback);
+            console.log(`Unsubscribing from ${key}: ${unsubscribed ? 'Success' : 'Failed'}`);
+          }
         };
-    }
+      }
     
     /**
      * Updates the state associated with a specific key and notifies all subscribers.

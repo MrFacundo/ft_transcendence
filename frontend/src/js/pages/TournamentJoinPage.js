@@ -10,13 +10,16 @@ class TournamentPage extends Page {
             isProtected: true,
             app: app,
         });
-        this.unsubscribe = this.app.stateManager.subscribe(
-            'openTournaments',
-            (openTournaments) => this.updateTournamentsList(openTournaments),
-            this
-        );
     }
 
+    async open() {
+        super.open();
+        this.unsubscribe = this.app.stateManager.subscribe(
+            'openTournaments',
+            (openTournaments) => this.updateTournamentsList(openTournaments)
+        );
+    }
+    
     async render() {
         const { api, wsManager, stateManager } = this.app;
         const openTournaments = stateManager.state.openTournaments;
