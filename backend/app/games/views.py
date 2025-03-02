@@ -17,7 +17,6 @@ from django_ratelimit.decorators import ratelimit
 from django.utils.decorators import method_decorator
 from django.http import JsonResponse
 
-
 User = get_user_model()
 
 class CreateGameInvitationView(APIView):

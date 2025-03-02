@@ -18,6 +18,4 @@ urlpatterns = [
 
     # Match History
     path('match-history/<int:id>/', MatchHistoryListView.as_view(), name='match-history'),
-
 ]
-		

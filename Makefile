@@ -1,11 +1,11 @@
 # Variables
-DOCKER_COMPOSE = docker-compose
+DOCKER_COMPOSE = docker compose
 DOCKER_COMPOSE_FILE = docker-compose.yml
 
 # Targets
 .PHONY: up down build clean
 
-all: build up users
+all: build up
 
 up:
 	$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) up -d
@@ -37,6 +37,3 @@ db:
 
 cache:
 	$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) up -d cache
-
-users:
-	./create_users.sh
