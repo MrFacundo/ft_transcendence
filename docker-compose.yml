@@ -58,6 +58,7 @@ services:
 
   truffle:
     container_name: blockchain_truffle
+    restart: always
     build:
       context: ./truffle
       dockerfile: Dockerfile

@@ -12,6 +12,7 @@ truffle compile
 echo "Migrando contratos..."
 truffle migrate --network development --reset
 
+
 # Mover arquivo de endereço
 if [ -f /usr/src/app/deployedAddress.json ]; then
   cp /usr/src/app/deployedAddress.json /usr/src/app/shared/
@@ -21,5 +22,8 @@ else
   exit 1
 fi
 
+#Executar aliases
+./scripts/setup_aliases.sh
+
 # Manter container rodando
-#tail -f /dev/null
+tail -f /dev/null

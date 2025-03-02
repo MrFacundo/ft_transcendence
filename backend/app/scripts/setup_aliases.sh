@@ -11,10 +11,10 @@ cat <<EOL >> $ALIAS_FILE
 # --- Aliases Personalizados ---
 alias c='clear'
 alias s='cd app/scripts'
-alias gg='python monitor_games_.py --get_novos_jogos'
-alias rg='python monitor_games_.py --registrar_jogo'
-alias lg='python monitor_games_.py --listar_jogos_blockchain'
-alias mg='python monitor_games_.py --monitorar'
+
+alias lag='python app/scripts/list_all_games.py --listar_jogos_blockchain'
+alias gbp='python app/scripts/get_game_by_player.py --games_by_player'
+alias gbt='python app/scripts/get_game_by_tournament.py --games_by_tournament'
 
 EOL
 
