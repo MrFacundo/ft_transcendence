@@ -15,7 +15,6 @@ from django.db.models import Q
 from django.utils import timezone
 from django.http import JsonResponse
 
-
 User = get_user_model()
 
 class CreateGameInvitationView(APIView):

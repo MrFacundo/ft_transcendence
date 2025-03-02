@@ -22,7 +22,6 @@ COPY . /usr/src/app/
 COPY crontab /etc/cron.d/crontab
 
 RUN chmod 0644 /etc/cron.d/crontab
-RUN chmod +x /usr/src/app/app/scripts/*
 RUN crontab /etc/cron.d/crontab
 
 
