@@ -9,7 +9,8 @@ RUN apt-get update && apt-get install -y \
 	cron \
 	postgresql-client \
 	procps \
-	netcat-openbsd
+	netcat-openbsd \
+	nano
 
 WORKDIR /usr/src/app
 
