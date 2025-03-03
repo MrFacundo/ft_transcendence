@@ -36,11 +36,11 @@
                         <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
                         <div class="form-floating mb-3">
                             <input type="email" class="form-control" id="login-email" />
-                            <label for="Email">Username or email</label>
+                            <label for="login-email">Username or email</label>
                         </div>
                         <div class="form-floating mb-3">
                             <input type="password" class="form-control" id="login-password" />
-                            <label for="Password">Password</label>
+                            <label for="login-password">Password</label>
                         </div>
                         <button class="btn btn-primary w-100 py-2" type="submit">
                             Sign in
@@ -65,17 +65,17 @@
                     <custom-form>
                         <h1 class="h3 mb-3 fw-normal">Let's get you registered :)</h1>
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="Username" placeholder="littlefrenchboy" />
+                            <input type="text" class="form-control" id="Username" placeholder="Username" autocomplete="off" />
                             <label for="Username">Username</label>
                         </div>
                         <div class="form-floating mb-3">
                             <input type="email" class="form-control" id="register-email"
                                 placeholder="name@example.com" />
-                            <label for="Email">Email address</label>
+                            <label for="register-email">Email address</label>
                         </div>
                         <div class="form-floating mb-3">
                             <input type="password" class="form-control" id="register-password" placeholder="Password" />
-                            <label for="Password">Password</label>
+                            <label for="register-password">Password</label>
                         </div>
                         <div class="form-floating mb-3">
                             <input type="password" class="form-control" id="ConfirmPassword" placeholder="Password" />
@@ -322,47 +322,35 @@
             </div>
             <div class="col-md-4">
                 <div class="card bg-light my-4 shadow-sm" style="min-height: 250px; cursor: pointer;">
-                    <div class="card-body text-center" data-href="/onevsone">
+                    <div class="d-flex flex-column card-body text-center align-items-center" data-href="/onlinepvp">
                         <h5 class="card-title">Online 1vs1</h5>
-                        <img src="/static/images/people.svg" alt="Robot Icon" width="130" height="130">
+                        <img src="/static/images/people.svg" class="margin-0" alt="Robot Icon" width="130" height="130">
                     </div>
                 </div>
             </div>
             <div class="col-md-3">
             <div class="col-md-3">
                 <div class="card bg-light my-4 shadow-sm" style="min-height: 250px; cursor: pointer;">
-                    <div class="card-body text-center" data-href="/tournament">
+                    <div class="d-flex flex-column card-body text-center align-items-center" data-href="/tournament">
                         <h5 class="card-title">Tournaments</h5>
-                        <img src="/static/images/trophy.svg" alt="Robot Icon" width="130" height="130">
-                        <p class="card-text mt-4">Join online tournaments.</p>
-                <div class="card bg-light my-4 shadow-sm" style="min-height: 250px; cursor: pointer;" data-href="/pvp_offline">
-                    <div class="card-body text-center">
-                        <h5 class="card-title">Play Offline</h5>
-                        <img src="/static/images/offline-pvp.svg" alt="Offline Icon" width="130" height="130">
-                        <p class="card-text mt-4">Play Pong Offline.</p>
+                        <img src="/static/images/trophy.svg" class="margin-0" alt="Robot Icon" width="130" height="130">
                     </div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="card bg-light my-4 shadow-sm" style="min-height: 250px; cursor: pointer;"
                     data-href="/pvp_offline">
-                    <div class="card-body text-center">
+                    <div class="d-flex flex-column card-body text-center align-items-center">
                         <h5 class="card-title">Local 1vs1</h5>
-                        <img src="/static/images/offline-pvp.svg" alt="Offline Icon" width="130" height="130">
-                        <p class="card-text mt-4">Play against another player on the same device.</p>
-                <div class="card bg-light my-4 shadow-sm" style="min-height: 250px; cursor: pointer;">
-                    <div class="card-body text-center" data-href="/onevsone">
-                        <h5 class="card-title">1vs1</h5>
-                        <img src="/static/images/people.svg" alt="Robot Icon" width="130" height="130">
-                        <p class="card-text mt-4">Compete against another player.</p>
+                        <img src="/static/images/offline-pvp.svg" class="margin-0" alt="Offline Icon" width="130" height="130">
                     </div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="card bg-light my-4 shadow-sm" style="min-height: 250px; cursor: pointer;">
-                    <div class="card-body text-center" data-href="/ai">
+                    <div class="d-flex flex-column card-body text-center align-items-center" data-href="/ai">
                         <h5 class="card-title">Play against AI</h5>
-                        <img src="/static/images/robot.svg" alt="Robot Icon" width="130" height="130">
+                        <img src="/static/images/robot.svg" class="margin-0" alt="Robot Icon" width="130" height="130">
                     </div>
                 </div>
             </div>
@@ -393,8 +381,8 @@
         </div>
     </section>
 
-    <section id="OneVsOne" class="container mt-5">
-        <h1 class="mb-4">1v1 Game</h1>
+    <section id="OnlinePvp" class="container mt-5">
+        <h1 class="mb-4">Online Pong</h1>
         <div class="row">
             <div class="col-md-4">
                 <p>Invitations Received</p>
@@ -420,7 +408,7 @@
         <div id="cards-container" class="row justify-content-around d-none">
             <div class="col-md-4" data-href="/tournament-create">
                 <div class="card bg-light my-4 shadow-sm" style="min-height: 250px; cursor: pointer;">
-                    <div class="card-body text-center">
+                    <div class="d-flex flex-column card-body text-center align-items-center">
                         <h5 class="card-title">Create</h5>
                         <img src="/static/images/pencil-square.svg" alt="Pencil Icon" width="130" height="130">
                         <p class="card-text mt-4">Create a new tournament.</p>
@@ -429,7 +417,7 @@
             </div>
             <div class="col-md-4" data-href="/tournament-join">
                 <div class="card bg-light my-4 shadow-sm" style="min-height: 250px; cursor: pointer;">
-                    <div class="card-body text-center">
+                    <div class="d-flex flex-column card-body text-center align-items-center">
                         <h5 class="card-title">Join</h5>
                         <img src="/static/images/person-plus-fill.svg" alt="Person Icon" width="130" height="130">
                         <p class="card-text mt-4">Join an existing tournament.</p>
@@ -438,7 +426,7 @@
             </div>
         </div>
         <div id="tournament-details" class="row justify-content-center d-none">
-            <h2 id="tournament-name" class="mb-4 text-center text-warning display-6"></h2>
+            <h2 id="tournament-title" class="mb-4 text-center text-warning display-6"></h2>
             <div id="participants-info" class="row d-none">
                 <div class="col-md-4">
                     <p>Participants</p>
@@ -460,12 +448,12 @@
             <custom-form class="col-md-8">
                 <h1 class="h3 mb-3 fw-normal">Enter your tournament settings</h1>
                 <div class="form-check mb-3">
-                    <label for="tournament_name">Tournament Name</label>
-                    <input type="text" class="form-control" id="tournament_name" />
+                    <label for="tournament-name">Tournament Name</label>
+                    <input type="text" class="form-control" id="tournament-name" />
                 </div>
                 <div class="form-check mb-3">
-                    <label for="participants_amount">Participants</label>
-                    <select class="form-control" id="participants_amount">
+                    <label for="participants-amount">Participants</label>
+                    <select class="form-control" id="participants-amount">
                         <option value="4">4</option>
                     </select>
                 </div>

@@ -33,7 +33,7 @@ class Page {
         tempElement.innerHTML = this.pageElement.innerHTML;
         this.mainElement.innerHTML = tempElement.innerHTML;
         this.mainElement.querySelectorAll("[data-href]").forEach((element) => {
-            element.addEventListener("click", (event) => this.handleClick(event, app));
+            element.addEventListener("click", (event) => this.handleClick(event));
         });
         document.title = this.name;
         this.renderNavbar(this);
