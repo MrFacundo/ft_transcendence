@@ -3,15 +3,15 @@ import argparse
 import pandas as pd
 from web3 import Web3
 
-# Configurações do Ganache
+# Ganache Configurations
 GANACHE_URL = "http://blockchain_ganache:8545"
 
-# Ler o endereço do contrato a partir do arquivo JSON
+# Read contract address from JSON file
 with open('/usr/src/app/shared/deployedAddress.json') as f:
     data = json.load(f)
     CONTRACT_ADDRESS = data['address']
     
-# ABI do contrato inteligente
+# Smart contract ABI
 CONTRACT_ABI = [
     {
         "constant": False,
@@ -71,44 +71,44 @@ CONTRACT_ABI = [
     }
 ]
 
-# Conectar ao Ganache
+# Connect to Ganache
 web3 = Web3(Web3.HTTPProvider(GANACHE_URL))
 contract = web3.eth.contract(address=CONTRACT_ADDRESS, abi=CONTRACT_ABI)
 
-# Função para converter lista de jogos em DataFrame
-def convert_to_dataframe(jogos):
-    df = pd.DataFrame(jogos)
+# Function to convert list of games to DataFrame
+def convert_to_dataframe(games):
+    df = pd.DataFrame(games)
     return df.reset_index(drop=True)
 
-# Função para listar jogos cadastrados na blockchain
-def listar_jogos_blockchain():
+# Function to list games registered on the blockchain
+def list_blockchain_games():
     game_count = contract.functions.getGameCount().call()
-    jogos = []
+    games = []
     for game_id in range(1, game_count + 1):
-        jogo = contract.functions.getGame(game_id).call()
-        jogos.append({
-            "gameId": jogo[0],
-            "id": jogo[1],
-            "channelGroupName": jogo[2],
-            "datePlayed": pd.to_datetime(jogo[3], unit='s'),
-            "scorePlayer1": jogo[4],
-            "scorePlayer2": jogo[5],
-            "matchDate": pd.to_datetime(jogo[6], unit='s') if jogo[6] != 0 else None,
-            "status": jogo[7],
-            "player1Id": jogo[8],
-            "player2Id": jogo[9],
-            "winnerId": jogo[10],
-            "tournamentId": jogo[11]
+        game = contract.functions.getGame(game_id).call()
+        games.append({
+            "gameId": game[0],
+            "id": game[1],
+            "channelGroupName": game[2],
+            "datePlayed": pd.to_datetime(game[3], unit='s'),
+            "scorePlayer1": game[4],
+            "scorePlayer2": game[5],
+            "matchDate": pd.to_datetime(game[6], unit='s') if game[6] != 0 else None,
+            "status": game[7],
+            "player1Id": game[8],
+            "player2Id": game[9],
+            "winnerId": game[10],
+            "tournamentId": game[11]
         })
-    df = convert_to_dataframe(jogos)
+    df = convert_to_dataframe(games)
     return df
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Listar jogos cadastrados na blockchain")
-    parser.add_argument("--listar_jogos_blockchain", action="store_true", help="Listar jogos cadastrados na blockchain")
+    parser = argparse.ArgumentParser(description="List games registered on the blockchain")
+    parser.add_argument("--list_blockchain_games", action="store_true", help="List games registered on the blockchain")
     
     args = parser.parse_args()
 
-    if args.listar_jogos_blockchain:
-        db = listar_jogos_blockchain()
+    if args.list_blockchain_games:
+        db = list_blockchain_games()
         print(db.to_string(index=False))

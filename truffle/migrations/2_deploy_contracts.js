@@ -9,7 +9,7 @@ module.exports = function (deployer) {
         JSON.stringify({ address: PongGameHistory.address }, null, 2),
         (err) => {
           if (err) throw err;
-          console.log('Endereço do contrato salvo em deployedAddress.json');
+          console.log('Contract address saved in deployedAddress.json');
         }
       );
     }

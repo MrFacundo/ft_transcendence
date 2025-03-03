@@ -2,15 +2,15 @@ import json
 import pandas as pd
 from web3 import Web3
 
-# Configurações do Ganache
+# Ganache Configurations
 GANACHE_URL = "http://blockchain_ganache:8545"
 
-# Ler o endereço do contrato a partir do arquivo JSON
+# Read contract address from JSON file
 with open('/usr/src/app/shared/deployedAddress.json') as f:
     data = json.load(f)
     CONTRACT_ADDRESS = data['address']
     
-# ABI do contrato inteligente
+# Smart contract ABI
 CONTRACT_ABI = [
     {
         "constant": True,
@@ -44,11 +44,11 @@ CONTRACT_ABI = [
     }
 ]
 
-# Conectar ao Ganache
+# Connect to Ganache
 web3 = Web3(Web3.HTTPProvider(GANACHE_URL))
 contract = web3.eth.contract(address=CONTRACT_ADDRESS, abi=CONTRACT_ABI)
 
-# Função para obter jogos por torneio e converter para DataFrame
+# Function to list tournaments registered on the blockchain
 def get_games_by_tournament(tournament_id):
     try:
         print(f"Chamando getGamesByTournament para tournament_id: {tournament_id}")
@@ -70,14 +70,14 @@ def get_games_by_tournament(tournament_id):
         } for game in games]
         return pd.DataFrame(games_list)
     except Exception as e:
-        print(f"Erro ao obter jogos por torneio: {e}")
+        print(f"Error getting games by tournament: {e}")
         return pd.DataFrame()
 
 if __name__ == "__main__":
     import argparse
 
-    parser = argparse.ArgumentParser(description="Listar jogos de um determinado torneio na blockchain")
-    parser.add_argument("--games_by_tournament", type=int, help="Listar todos os jogos de um determinado torneio pelo ID do torneio")
+    parser = argparse.ArgumentParser(description="List games of a specific tournament on the blockchain")
+    parser.add_argument("--games_by_tournament", type=int, help="List all games of a specific tournament by tournament ID")
     
     args = parser.parse_args()
 

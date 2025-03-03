@@ -19,20 +19,20 @@ contract PongGameHistory {
         uint256 tournamentId;
     }
 
-    mapping(uint256 => Game) private games; // Mapeamento de jogos por ID
-    mapping(uint256 => uint256[]) private tournamentGames; // Jogos por torneio
-    mapping(uint256 => uint256[]) private playerGames; // Jogos por jogador
+    mapping(uint256 => Game) private games; // Mapping of games by ID
+    mapping(uint256 => uint256[]) private tournamentGames; // Games by tournament
+    mapping(uint256 => uint256[]) private playerGames; // Games by player
     uint256 private gameCount;
 
     event GameAdded(uint256 indexed gameId, uint256 id, uint256 tournamentId, uint256 player1Id, uint256 player2Id, uint256 winnerId);
     
     modifier onlyAdmin() {
-        require(msg.sender == admin, "Apenas o administrador pode adicionar jogos");
+        require(msg.sender == admin, "Only the administrator can add games");
         _;
     }
 
     constructor() {
-        admin = msg.sender; // Define o deployer como administrador
+        admin = msg.sender; // Sets the deployer as the administrator
     }
 
     function addGame(

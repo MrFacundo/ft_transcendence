@@ -4,21 +4,21 @@ import json
 import argparse
 from web3 import Web3
 
-# Configurações do banco de dados PostgreSQL
+# PostgreSQL database configurations
 DB_NAME = "transcendence"
 DB_USER = "db_user"
 DB_PASSWORD = "db_password"
 DB_HOST = "transcendence_db"
 
-# Configurações do Ganache
+# Ganache Configurations"
 GANACHE_URL = "http://blockchain_ganache:8545"
 
-# Ler o endereço do contrato a partir do arquivo JSON
+# Read contract address from JSON file
 with open('/usr/src/app/shared/deployedAddress.json') as f:
     data = json.load(f)
     CONTRACT_ADDRESS = data['address']
     
-# ABI do contrato inteligente
+# Smart contract ABI
 CONTRACT_ABI = [
     {
         "constant": False,
@@ -43,12 +43,12 @@ CONTRACT_ABI = [
     }
 ]
 
-# Conectar ao Ganache
+# Connect to Ganache
 web3 = Web3(Web3.HTTPProvider(GANACHE_URL))
 contract = web3.eth.contract(address=CONTRACT_ADDRESS, abi=CONTRACT_ABI)
 
-# Função para obter jogos recém-concluídos do PostgreSQL
-def get_novos_jogos():
+# Function to get recently completed games from PostgreSQL
+def get_new_game():
     conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASSWORD, host=DB_HOST)
     cur = conn.cursor()
 
@@ -58,58 +58,58 @@ def get_novos_jogos():
         WHERE (status = 'interrupted' OR status = 'completed' ) AND registrado_blockchain = FALSE
     """)
     
-    jogos = cur.fetchall()
+    games = cur.fetchall()
     
     cur.close()
     conn.close()
     
-    return [{"id": j[0], "channel_group_name": j[1], "date_played": j[2], "score_player1": j[3], "score_player2": j[4], "match_date": j[5], "status": j[6], "player1_id": j[7], "player2_id": j[8], "winner_id": j[9], "tournament_id": j[10]} for j in jogos]
+    return [{"id": j[0], "channel_group_name": j[1], "date_played": j[2], "score_player1": j[3], "score_player2": j[4], "match_date": j[5], "status": j[6], "player1_id": j[7], "player2_id": j[8], "winner_id": j[9], "tournament_id": j[10]} for j in games]
 
-# Função para marcar um jogo como registrado no PostgreSQL
-def marcar_jogo_registrado(jogo_id):
+# Function to mark a game as registered in PostgreSQL
+def mark_game_registered(game_id):
     conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASSWORD, host=DB_HOST)
     cur = conn.cursor()
 
-    cur.execute("UPDATE games_ponggame SET registrado_blockchain = TRUE WHERE id = %s", (jogo_id,))
+    cur.execute("UPDATE games_ponggame SET registrado_blockchain = TRUE WHERE id = %s", (game_id,))
     
     conn.commit()
     cur.close()
     conn.close()
 
-# Função para registrar um jogo na blockchain
-def registrar_jogo_na_blockchain(jogo):
+# Function to register a game on the blockchain
+def register_game_on_blockchain(game):
     tx_hash = contract.functions.addGame(
-        jogo['id'],
-        jogo['channel_group_name'],
-        int(jogo['date_played'].timestamp()),
-        jogo['score_player1'],
-        jogo['score_player2'],
-        int(jogo['match_date'].timestamp()) if jogo['match_date'] else 0,
-        jogo['status'],
-        jogo['player1_id'],
-        jogo['player2_id'],
-        jogo['winner_id'] if jogo['winner_id'] else 0,
-        jogo['tournament_id'] if jogo['tournament_id'] else 0
+        game['id'],
+        game['channel_group_name'],
+        int(game['date_played'].timestamp()),
+        game['score_player1'],
+        game['score_player2'],
+        int(game['match_date'].timestamp()) if game['match_date'] else 0,
+        game['status'],
+        game['player1_id'],
+        game['player2_id'],
+        game['winner_id'] if game['winner_id'] else 0,
+        game['tournament_id'] if game['tournament_id'] else 0
     ).transact({'from': web3.eth.accounts[0]})
     web3.eth.wait_for_transaction_receipt(tx_hash)
 
-# Função principal para monitorar jogos e registrar na blockchain
-def monitorar_jogos():
+# Main function to monitor games and register on the blockchain
+def monitor_games():
     while True:
-        novos_jogos = get_novos_jogos()
+        new_game = get_new_game()
 
-        for jogo in novos_jogos:
-            print(f"Registrando jogo {jogo['id']} na blockchain...")
-            registrar_jogo_na_blockchain(jogo)
-            marcar_jogo_registrado(jogo['id'])
+        for game in new_game:
+            print(f"Registering game {game['id']} on the blockchain...")
+            register_game_on_blockchain(game)
+            mark_game_registered(game['id'])
 
         time.sleep(5)
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Monitorar e registrar jogos na blockchain")
-    parser.add_argument("--monitorar", action="store_true", help="Iniciar o monitoramento contínuo de novos jogos")
+    parser = argparse.ArgumentParser(description="Monitor and register games on the blockchain")
+    parser.add_argument("--monitor", action="store_true", help="Start continuous monitoring of new games")
     
     args = parser.parse_args()
 
-    if args.monitorar:
-        monitorar_jogos()
+    if args.monitor:
+        monitor_games()
