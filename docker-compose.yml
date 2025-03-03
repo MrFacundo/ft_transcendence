@@ -20,18 +20,60 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./backend:/usr/src/app
+      - shared-data:/usr/src/app/shared
     ports:
       - "8000:8000"
     networks:
       - backend-network
+    environment:
+      - ETHEREUM_NETWORK=http://blockchain_ganache:8545
+      - OTHER_ENV_VAR=value  
     depends_on:
       db:
         condition: service_healthy
       cache:
         condition: service_healthy
+      ganache:
+        condition: service_started
     restart: unless-stopped
     env_file:
       - .env
+
+  ganache:
+    image: trufflesuite/ganache:v7.0.0
+    container_name: blockchain_ganache
+    restart: always
+    command: ["-p", "8545", "-m", "myth like bonus scare over problem client lizard pioneer submit female collect"]
+    ports:
+      - "8545:8545"
+    volumes:
+      - ganache_data:/ganache
+    networks:
+      - backend-network
+    healthcheck:
+      test: ["CMD", "echo", "Ganache is running"]
+      interval: 10s
+      retries: 3
+
+  truffle:
+    container_name: blockchain_truffle
+    build:
+      context: ./truffle
+      dockerfile: Dockerfile
+    volumes:
+      - ./truffle:/usr/src/app
+      - shared-data:/usr/src/app/shared
+    depends_on:
+      ganache:
+        condition: service_healthy 
+    command: ["sh", "/usr/src/app/entrypoint.sh"]
+    networks:
+      - backend-network
+    healthcheck:
+      test: ["CMD", "ls", "/usr/src/app/shared/deployedAddress.json"]
+      interval: 10s
+      retries: 3
+    
   db:
     container_name: transcendence_db
     image: postgres:17
@@ -55,6 +97,7 @@ services:
     restart: unless-stopped
   cache:
     image: redis:6
+    container_name: transcendence_cache
     expose:
       - 6379
     networks:
@@ -87,5 +130,9 @@ volumes:
   postgres_data:
     driver: local
   cache_data:
+    driver: local
+  ganache_data:
+    driver: local
+  shared-data:
     driver: local
 
