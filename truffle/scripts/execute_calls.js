@@ -4,28 +4,28 @@ module.exports = async function(callback) {
     try {
         const instance = await PongGameHistory.deployed();
 
-        // Capturar argumentos da linha de comando
-        const args = process.argv.slice(4); // Os primeiros 4 argumentos são reservados pelo Node e Truffle
+        //  Capture command-line arguments
+        const args = process.argv.slice(4); // The first 4 arguments are reserved by Node and Truffle
         const option = args[0];
         const id = args[1];
 
         if (!option || !id) {
-            console.error("Por favor, forneça a opção ('p' para player ou 't' para tournament) e o ID como argumentos.");
-            callback(new Error("Argumentos insuficientes"));
+            console.error("Please provide the option ('p' for player or 't' for tournament) and the ID as arguments.");
+            callback(new Error("Insufficient arguments"));
             return;
         }
 
         if (option === 'p') {
             // Chamar getGamesByPlayer
             const gamesByPlayer = await instance.getGamesByPlayer(id);
-            console.log(`Jogos do jogador ${id}:`, gamesByPlayer);
+            console.log(`Player's games ${id}:`, gamesByPlayer);
         } else if (option === 't') {
             // Chamar getGamesByTournament
             const gamesByTournament = await instance.getGamesByTournament(id);
-            console.log(`Jogos do torneio ${id}:`, gamesByTournament);
+            console.log(`Tournament games ${id}:`, gamesByTournament);
         } else {
-            console.error("Opção inválida. Use 'p' para player ou 't' para tournament.");
-            callback(new Error("Opção inválida"));
+            console.error("Invalid option. Use 'p' for player or 't' for tournament.");
+            callback(new Error("Invalid option"));
             return;
         }
 

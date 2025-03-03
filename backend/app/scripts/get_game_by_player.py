@@ -2,15 +2,15 @@ import json
 import pandas as pd
 from web3 import Web3
 
-# Configurações do Ganache
+# Ganache Configurations
 GANACHE_URL = "http://blockchain_ganache:8545"
 
-# Ler o endereço do contrato a partir do arquivo JSON
+# Read contract address from JSON file
 with open('/usr/src/app/shared/deployedAddress.json') as f:
     data = json.load(f)
     CONTRACT_ADDRESS = data['address']
     
-# ABI do contrato inteligente
+# Smart contract ABI
 CONTRACT_ABI = [
     {
         "constant": True,
@@ -44,16 +44,16 @@ CONTRACT_ABI = [
     }
 ]
 
-# Conectar ao Ganache
+# Connect to Ganache
 web3 = Web3(Web3.HTTPProvider(GANACHE_URL))
 contract = web3.eth.contract(address=CONTRACT_ADDRESS, abi=CONTRACT_ABI)
 
-# Função para obter jogos por jogador e converter para DataFrame
+# Function to get games by player and convert to DataFrame
 def get_games_by_player(player_id):
     try:
-        print(f"Chamando getGamesByPlayer para player_id: {player_id}")
+        print(f"Chamando getGamesByPlayer for player_id: {player_id}")
         games = contract.functions.getGamesByPlayer(player_id).call()
-        print(f"Jogos obtidos: {games}")
+        print(f"Games obtained: {games}")
         games_list = [{
             "gameId": game[0],
             "id": game[1],
@@ -70,14 +70,14 @@ def get_games_by_player(player_id):
         } for game in games]
         return pd.DataFrame(games_list)
     except Exception as e:
-        print(f"Erro ao obter jogos por jogador: {e}")
+        print(f"Error getting games by player: {e}")
         return pd.DataFrame()
 
 if __name__ == "__main__":
     import argparse
 
-    parser = argparse.ArgumentParser(description="Interagir com jogos na Blockchain")
-    parser.add_argument("--games_by_player", type=int, help="Listar todos os jogos em que um jogador participou pelo ID do jogador")
+    parser = argparse.ArgumentParser(description="Interacting with games on the Blockchain")
+    parser.add_argument("--games_by_player", type=int, help="List all games in which a player participated by player ID")
     
     args = parser.parse_args()
 

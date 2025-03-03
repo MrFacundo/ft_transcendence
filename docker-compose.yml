@@ -20,7 +20,7 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./backend:/usr/src/app
-      - shared-data:/usr/src/app/shared  # Volume compartilhado com o Truffle
+      - shared-data:/usr/src/app/shared
     ports:
       - "8000:8000"
     networks:
@@ -40,7 +40,6 @@ services:
       - .env
 
   ganache:
-    # image: trufflesuite/ganache-cli
     image: trufflesuite/ganache:v7.0.0
     container_name: blockchain_ganache
     restart: always
@@ -64,11 +63,11 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./truffle:/usr/src/app
-      - shared-data:/usr/src/app/shared  # Volume compartilhado
+      - shared-data:/usr/src/app/shared
     depends_on:
       ganache:
         condition: service_healthy 
-    command: ["sh", "/usr/src/app/entrypoint.sh"]  # Sobrescreve o CMD do Dockerfile
+    command: ["sh", "/usr/src/app/entrypoint.sh"]
     networks:
       - backend-network
     healthcheck:
