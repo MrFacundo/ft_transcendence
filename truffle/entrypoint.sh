@@ -1,29 +1,25 @@
 #!/bin/bash
 
-set -e  # Parar em caso de erro
+set -e
 
-# Aguardar Ganache estar pronto
-echo "Aguardando Ganache..."
+# Wait for Ganache to be ready
+echo "AWaiting for Ganache..."
 sleep 10
 
-# Compilar e migrar contratos
-echo "Compilando contratos..."
+# Compile and migrate contracts
+echo "Compiling contracts..."
 truffle compile
-echo "Migrando contratos..."
+echo "Migrating contracts..."
 truffle migrate --network development --reset
 
-
-# Mover arquivo de endereço
+# Move address file
 if [ -f /usr/src/app/deployedAddress.json ]; then
   cp /usr/src/app/deployedAddress.json /usr/src/app/shared/
-  echo "✅Arquivo deployedAddress.json copiado para volume compartilhado."
+  echo "✅File deployedAddress.json Copied to shared volume."
 else
-  echo "❌Erro: deployedAddress.json não encontrado!"
+  echo "❌Error: deployedAddress.json not found!"
   exit 1
 fi
 
-#Executar aliases
-./scripts/setup_aliases.sh
-
-# Manter container rodando
-tail -f /dev/null
+# Keep container running
+# tail -f /dev/null

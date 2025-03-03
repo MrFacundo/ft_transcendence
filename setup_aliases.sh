@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 ALIAS_FILE="$HOME/.bashrc"
 
 
@@ -15,7 +14,6 @@ alias gbp='docker exec transcendence_back python app/scripts/get_game_by_player.
 alias gbt='docker exec transcendence_back python app/scripts/get_game_by_tournament.py --games_by_tournament'
 
 EOL
-
 
 source $ALIAS_FILE
 
