@@ -25,7 +25,6 @@ class TournamentCreatePage extends Page {
 
         form.submitForm = async (formData) => {
             try {
-                console.log("formData", formData);
                 if (!formData['tournament-name'] || formData['tournament-name'].length < 3 || formData['tournament-name'].length > 20) {
                     throw new Error('Tournament name must be between 3 and 20 characters.');
                 }
