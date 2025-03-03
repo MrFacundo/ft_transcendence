@@ -13,7 +13,6 @@ from django.db import models
 from app.users.models import Friendship
 from django.db.models import Q
 from django.utils import timezone
-from django.http import JsonResponse
 
 User = get_user_model()
 
@@ -125,5 +124,3 @@ class MatchHistoryListView(ListAPIView):
     def get_queryset(self):
         user_id = self.kwargs.get('id')
         return PongGame.objects.filter(player1_id=user_id, status="completed") | PongGame.objects.filter(player2_id=user_id, status="completed")
-
-

@@ -49,32 +49,43 @@ contract = web3.eth.contract(address=CONTRACT_ADDRESS, abi=CONTRACT_ABI)
 
 # Function to get recently completed games from PostgreSQL
 def get_new_game():
-    conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASSWORD, host=DB_HOST)
-    cur = conn.cursor()
+    while True:
+        try:
+            conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASSWORD, host=DB_HOST)
+            cur = conn.cursor()
 
-    cur.execute("""
-        SELECT id, channel_group_name, date_played, score_player1, score_player2, match_date, status, player1_id, player2_id, winner_id, tournament_id
-        FROM games_ponggame
-        WHERE (status = 'interrupted' OR status = 'completed' ) AND registrado_blockchain = FALSE
-    """)
-    
-    games = cur.fetchall()
-    
-    cur.close()
-    conn.close()
-    
-    return [{"id": j[0], "channel_group_name": j[1], "date_played": j[2], "score_player1": j[3], "score_player2": j[4], "match_date": j[5], "status": j[6], "player1_id": j[7], "player2_id": j[8], "winner_id": j[9], "tournament_id": j[10]} for j in games]
+            cur.execute("""
+                SELECT id, channel_group_name, date_played, score_player1, score_player2, match_date, status, player1_id, player2_id, winner_id, tournament_id
+                FROM games_ponggame
+                WHERE (status = 'interrupted' OR status = 'completed' ) AND registrado_blockchain = FALSE
+            """)
+            
+            games = cur.fetchall()
+            
+            cur.close()
+            conn.close()
+            
+            return [{"id": j[0], "channel_group_name": j[1], "date_played": j[2], "score_player1": j[3], "score_player2": j[4], "match_date": j[5], "status": j[6], "player1_id": j[7], "player2_id": j[8], "winner_id": j[9], "tournament_id": j[10]} for j in games]
+        except psycopg2.OperationalError:
+            print("Database is not available. Retrying in 5 seconds...")
+            time.sleep(5)
 
 # Function to mark a game as registered in PostgreSQL
 def mark_game_registered(game_id):
-    conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASSWORD, host=DB_HOST)
-    cur = conn.cursor()
+    while True:
+        try:
+            conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASSWORD, host=DB_HOST)
+            cur = conn.cursor()
 
-    cur.execute("UPDATE games_ponggame SET registrado_blockchain = TRUE WHERE id = %s", (game_id,))
-    
-    conn.commit()
-    cur.close()
-    conn.close()
+            cur.execute("UPDATE games_ponggame SET registrado_blockchain = TRUE WHERE id = %s", (game_id,))
+            
+            conn.commit()
+            cur.close()
+            conn.close()
+            break
+        except psycopg2.OperationalError:
+            print("Database is not available. Retrying in 5 seconds...")
+            time.sleep(5)
 
 # Function to register a game on the blockchain
 def register_game_on_blockchain(game):

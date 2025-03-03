@@ -37,10 +37,9 @@ Check the Makefile for more commands.
 	- Using the 42 OAuth2 login (requires the 42 OAuth2 credentials to be setin the `.env` file).
 
 ## Modulo Blockchain
-This project implements a blockchain module to record and retrieve Pong tournament results, using a smart contract on the local Ethereum Ganache network for testing.
+This project implements a blockchain module to record and retrieve Pong tournament results, using a smart contract on the local Ethereum Ganache network for testing. The development and deployment of the smart contract are managed by the Truffle framework, which facilitates the creation, testing, and migration of smart contracts.
 
 ### Smart Contract (Solidity)
-
 The smart contract, developed in Solidity, defines the fields to store game records.
 It allows access and retrieval of information recorded on the Ethereum Ganache blockchain.
 After deployment, the smart contract address on the Ganache network is saved in a shared folder between the Truffle and backend containers.
@@ -53,18 +52,18 @@ The app/scripts folder in the backend contains the following Python files:
 #### Monitoring_push_to_blockchain.py:
 * Monitors the games_ponggame table in PostgreSQL for new records.
 * Sends the data to the smart contract on the blockchain.
-* Note: Currently, the routine captures records with "interrupted" and "completed" status. In the final version, it should filter only records with "completed" status.
+  
 #### list_all_games.py:
 * Retrieves all game records stored in the smart contract.
+  
 #### get_game_by_player.py:
 * Retrieves game records for a specific player, filtering by player ID.
+  
 #### get_game_by_tournament.py:
 * Retrieves game records for a specific tournament, filtering by tournament ID.
 
 ### Aliases (Command Facilitators)
-
 To simplify interaction with the scripts, the following aliases have been created, which can be activated by running the setup_aliases.sh script:
-
 * lag (list all games): Lists all games recorded on the blockchain.
 * gbp (game by player) <player_ID>: Lists games for a specific player. Example: gbp 3.
 * gbt (game by tournament) <tournament_ID>: Lists games for a specific tournament. Example: gbt 2.
@@ -88,3 +87,26 @@ The games_ponggame table in PostgreSQL has the following fields:
 gameId  id      channelGroupName        datePlayed            scorePlayer1  scorePlayer2  matchDate             status          player1Id       player2Id       winnerId        tournamentId
 1       1       1_2                     2025-03-03 13:25:14   0             0             2025-03-03 13:25:14   interrupted     2               3               0               0
 2       2       2_3                     2025-03-03 13:25:38   0             0             2025-03-03 13:25:38   interrupted     3               2               0               0
+
+
+### Blockchain Test Procedure
+#### Environment Setup:
+* Run the alias setup script: ./setup_aliases.sh
+* Compile and migrate the contracts: make
+#### System Interaction:
+* Access the website and play some games and tournaments.
+#### Data Persistence Test (Blockchain):
+* Stop the PostgreSQL database: docker stop transcendence_db
+* Run the blockchain query commands to check previous game records:
+- lag (list all games)
+- dbp <player id> (list games by player ID)
+- dbt <tournament id> (list games by tournament ID)
+* Expected Result: The game records created before the database shutdown should be returned.
+#### New Data Registration Test:
+* Restart PostgreSQL: docker start transcendence_db
+* Play new games on the website.
+* Run the blockchain query commands again to check for new records:
+- lag
+- dbp <player id>
+- dbt <tournament id>
+* Expected Result: The new games played after the database reactivation should be included in the query results.
