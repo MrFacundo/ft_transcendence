@@ -45,8 +45,6 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         game_stage = await self.get_game_stage()
         if not game_stage:
             return
-        print("message received from", self.user.id)
-        print("game stage:", game_stage)
         
         self.start_messages[game_stage].add(self.user.id)
         participants = await self.get_game_participants(game_stage)

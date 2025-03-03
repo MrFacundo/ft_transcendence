@@ -17,6 +17,8 @@ class ProfilePage extends Page {
         matchItem.className = "list-group-item";
         const formattedDate = formatDate(match.date_played);
         matchItem.textContent = `${match.opponent.username} - ${match.result} - ${formattedDate}`;
+        matchItem.setAttribute("data-href", `/profile/${match.opponent.id}`);
+        matchItem.addEventListener("click", (event) => { this.handleClick(event) });
         return matchItem;
     }
 
@@ -37,6 +39,7 @@ class ProfilePage extends Page {
 
         const userProfile = await api.getProfile(profileId);
         const matchHistory = await api.getMatchHistory(profileId);
+        matchHistory.sort((a, b) => new Date(b.date_played) - new Date(a.date_played));
         const friends = await api.getFriends(profileId);
 
         UserProfileCard.setState({user: userProfile});

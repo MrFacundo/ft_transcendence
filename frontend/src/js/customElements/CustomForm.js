@@ -54,8 +54,7 @@ class CustomForm extends HTMLElement {
         } else {
             this.loading = true;
             try {
-                const response = await this.submitForm(this.formData);
-                console.log("Form submitted successfully", response);
+                await this.submitForm(this.formData);
             } catch (error) {
                 console.error("Form submission error", error);
             } finally {

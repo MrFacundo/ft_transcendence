@@ -37,12 +37,17 @@ class MatchHistorySerializer(serializers.ModelSerializer):
     def get_opponent(self, obj):
         user_id = self.context['request'].parser_context['kwargs']['id']
         opponent = obj.player2 if obj.player1.id == user_id else obj.player1
-        return UserSerializer(opponent).data
+        return {
+            'id': opponent.id,
+            'username': opponent.username
+        }
 
     def get_result(self, obj):
         user_id = self.context['request'].parser_context['kwargs']['id']
+        if obj.winner is None:
+            return 'unknown'
         return 'win' if obj.winner.id == user_id else 'loss'
-
+        
 class UserOnlineStatusSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source='user.username', read_only=True)
 

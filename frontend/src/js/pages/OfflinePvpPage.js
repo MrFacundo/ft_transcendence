@@ -1,6 +1,6 @@
 import Page from "./Page";
 
-class OfflinePage extends Page {
+class OffinePvpPage extends Page {
     constructor(app) {
         super({
             name: "pvp_offline",
@@ -328,4 +328,4 @@ class OfflinePage extends Page {
     }
 }
 
-export default OfflinePage;
+export default OffinePvpPage;

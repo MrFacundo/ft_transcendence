@@ -123,4 +123,7 @@ class MatchHistoryListView(ListAPIView):
 
     def get_queryset(self):
         user_id = self.kwargs.get('id')
-        return PongGame.objects.filter(player1_id=user_id, status="completed") | PongGame.objects.filter(player2_id=user_id, status="completed")
+        return PongGame.objects.filter(
+            (Q(player1_id=user_id) | Q(player2_id=user_id)) & 
+            (Q(status="completed") | Q(status="interrupted"))
+        )
