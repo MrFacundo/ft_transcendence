@@ -11,16 +11,18 @@ class TournamentPage extends Page {
             app: app,
         });
         this.handleStartButtonClick = this.handleStartButtonClick.bind(this);
+        this.elements = null;
+    }
+
+    async open() {
+        super.open();
         this.unsubscribe = this.app.stateManager.subscribe(
             'currentTournament',
-            (currentTournament) => this.updatePartcipantsList(currentTournament),
-            this
+            (currentTournament) => this.render()
         );
     }
 
     render() {
-        const { stateManager } = this.app;
-        const tournament = stateManager.state.currentTournament;
         const cardsContainerEl = document.querySelector("#cards-container");
         const tournamentDetailsEl = document.querySelector("#tournament-details");
         const tournamentNameEl = document.querySelector("#tournament-name");
@@ -29,27 +31,32 @@ class TournamentPage extends Page {
         const selectedUserCard = document.querySelector("user-profile#selected-participant");
         const tournamentBracketContainerEl = document.querySelector("#tournament-bracket-container");
         const tournamentBracketEl = document.querySelector("tournament-bracket");
+        const tournament = this.app.stateManager.state.currentTournament;
 
         if (!tournament) {
-            // Show Join/create cards 
             cardsContainerEl.classList.remove("d-none");
         } else {
+            const { name, participants, participants_amount } = tournament;
+            const isTournamentFull = participants.length === participants_amount;
+
             tournamentDetailsEl.classList.remove("d-none");
-            tournamentNameEl.textContent = tournament.name + " 🏆";
+            tournamentNameEl.textContent = name + " 🏆";
 
-            const isTournamentFull = tournament.participants.length === tournament.participants_amount;
             if (!isTournamentFull) {
-                // Show participants list
+                this.updatePartcipantsList(tournament);
                 participantsInfoEl.classList.remove("d-none");
-                [partcipantsListEl, selectedUserCard].forEach(el => (el.page = this));
-
-                partcipantsListEl.config = { selectedUserCard };
-                partcipantsListEl.setState ({ users: tournament.participants });
             } else {
-                // Show tournament bracket
+                partcipantsListEl.classList.add("d-none");
+                selectedUserCard.classList.add("d-none");
+                participantsInfoEl.classList.add("d-none");
+
                 tournamentBracketContainerEl.classList.remove("d-none");
                 tournamentBracketEl.page = this;
                 tournamentBracketEl.setTournament(tournament);
+                if (tournament.final_game.status === "completed" || tournament.final_game.status === "interrupted") { 
+                    if (this.unsubscribe) this.unsubscribe();
+                    this.app.stateManager.updateState('currentTournament', null);
+                }
             }
         }
     }
@@ -64,6 +71,7 @@ class TournamentPage extends Page {
     }
 
     updatePartcipantsList(currentTournament) {
+        if (!currentTournament) return;
         const partcipantsListEl = document.querySelector("#tournament-participants");
         const selectedUserCard = document.querySelector("user-profile#selected-participant");
         [partcipantsListEl, selectedUserCard].forEach(el => (el.page = this));

@@ -113,9 +113,8 @@ class GameConsumer(AsyncWebsocketConsumer):
             await self.game.handle_disconnect()
         
         if hasattr(self, 'db_game') and self.db_game:
-            if not self.db_game.winner and self.db_game.status == 'in_progress':
-                self.db_game.status = 'interrupted'
-                await database_sync_to_async(self.db_game.save)()
+            if self.db_game.status == 'in_progress':
+             await self.game.handle_interruption()
         
         if game_id and game_id in game_timers:
             game_timers[game_id].cancel()

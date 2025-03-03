@@ -51,7 +51,7 @@ class OneVsOne extends Page {
 			actionButton,
 			actionText: "Accept",
             actionCallback: async (user) => {
-                if (!stateManager.onlineStatuses.get(user.id)?.is_online) {
+                if (!stateManager.state.onlineStatuses?.get(user.id)?.is_online) {
                     alert(`${user.username} is offline, try again later.`);
                     return;
                 }

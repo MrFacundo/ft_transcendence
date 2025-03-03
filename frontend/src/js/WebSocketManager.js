@@ -130,11 +130,11 @@ export class WebSocketManager {
     }
 
     handleJoinMessage(data, auth, stateManager) {
+        stateManager.updateState('currentTournament', data.tournament);
         if (data.tournament.participants.length === data.tournament.participants_amount) {
             return this.app.navigate("/tournament");
         }
         if (data.participant_id !== auth.user.id) {
-            stateManager.updateState('currentTournament', data.tournament);
             const participant = data.tournament.participants.find(p => p.id === Number(data.participant_id));
             showMessage(`${participant.username} joined ${data.tournament.name} tournament.`);
         }
