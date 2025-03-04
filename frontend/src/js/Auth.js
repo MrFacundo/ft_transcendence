@@ -77,11 +77,14 @@ export class Auth {
         if (!username || !email || !password || !password_confirmation) {
             throw new Error("All fields are required");
         }
+        if (username.length > 20 || email.length > 20 || password.length > 20) {
+            throw new Error("Invalid email or password");
+        }
         if (password !== password_confirmation) {
             throw new Error("Passwords do not match");
         }
         try {
-            return await this.app.api.createUser({ username, email, password });
+            return await this.app.api.createUser(username, email, password);
         } catch (error) {
             console.error("Auth: Error response data:", error.response.data);
             throw error;
@@ -98,6 +101,9 @@ export class Auth {
     async login(email, password) {
         if (!email || !password) {
             throw new Error("Email and password are required");
+        }
+        if (email.length > 30 || password.length > 20) {
+            throw new Error("Invalid email or password");
         }
         try {
             const responseData = await this.app.api.login(email, password);
@@ -139,6 +145,9 @@ export class Auth {
         }
         if (!otp) {
             throw new Error("Please enter your one-time password");
+        }
+        if (!/^\d{6}$/.test(otp)) {
+            throw new Error("Invalid one-time password");
         }
         try {
             const responseData = await this.app.api.verifyOtp(otp, OtpToken);

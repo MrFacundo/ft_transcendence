@@ -57,7 +57,8 @@ export class Api {
      * @param {Object} data - The user email, password, and username.
      * @returns {Promise<Object>} The created user.
      */
-    async createUser(data) {
+    async createUser(username, email, password) {
+        const data = { username, email, password };
         return this.request("post", "/user", data);
     }
 
