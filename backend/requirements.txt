@@ -16,3 +16,4 @@ faker
 qrcode
 django-crontab
 drf_yasg
+django-ratelimit
