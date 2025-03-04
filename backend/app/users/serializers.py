@@ -6,6 +6,7 @@ from .models import CustomUser, GameStats, Friendship
 from django.db.models import Q
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth import get_user_model
+from django.core.validators import MaxLengthValidator
 
 User = get_user_model()
 
@@ -19,8 +20,8 @@ class AvatarUploadMixin:
         return representation
 
 class UserSerializer(serializers.ModelSerializer, AvatarUploadMixin):
-    password = serializers.CharField(write_only=True, validators=[validate_password])
-    new_password = serializers.CharField(write_only=True, required=False, validators=[validate_password])
+    password = serializers.CharField(write_only=True, validators=[validate_password, MaxLengthValidator(20)])
+    new_password = serializers.CharField(write_only=True, required=False, validators=[validate_password, MaxLengthValidator(20)])
     game_stats = serializers.SerializerMethodField()
     friendship_status = serializers.SerializerMethodField()
 
@@ -35,6 +36,14 @@ class UserSerializer(serializers.ModelSerializer, AvatarUploadMixin):
         fields = ['id', 'username', 'email', 'password', 'avatar_oauth', 'avatar_upload', 'two_factor_method', 'new_email', 'new_password', 'date_joined', 'game_stats', 'friendship_status']
         read_only_fields = ['id', 'avatar_oauth', 'date_joined', 'game_stats']
 
+    def validate(self, attrs):
+        if not self.instance:
+            allowed_fields = ['username', 'email', 'password']
+            invalid_fields = [field for field in attrs if field not in allowed_fields]
+            if invalid_fields:
+                raise serializers.ValidationError(f"Fields {', '.join(invalid_fields)} are not allowed during user creation.")
+        return attrs
+        
     def get_friendship_status(self, obj):
         request = self.context.get('request', None)
         if request and request.user.is_authenticated:

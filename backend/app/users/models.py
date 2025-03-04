@@ -16,7 +16,7 @@ class CustomUser(AbstractUser):
         validators=[
             MinLengthValidator(4, message='Username must be at least 4 characters long.'),
             RegexValidator(
-                regex=r'^[\w.@+-]+$', 
+                regex=r'^[\w._]+$', 
                 message=_('Enter a valid username.')
             )
         ]
