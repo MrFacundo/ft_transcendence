@@ -124,5 +124,6 @@ export class StateManager {
                 this.updateState(key, null);
             }
         });
+        this.initialized = false;
     }
 }

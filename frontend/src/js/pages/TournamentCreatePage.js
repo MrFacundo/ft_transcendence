@@ -25,10 +25,10 @@ class TournamentCreatePage extends Page {
 
         form.submitForm = async (formData) => {
             try {
-                if (formData.tournament_name.length < 3 || formData.tournament_name.length > 20) {
-                    throw new Error("Tournament name must be between 3 and 20 characters.");
+                if (!formData['tournament-name'] || formData['tournament-name'].length < 3 || formData['tournament-name'].length > 20) {
+                    throw new Error('Tournament name must be between 3 and 20 characters.');
                 }
-                const response = await api.createTournament(formData.tournament_name, formData.participants_amount);
+                const response = await api.createTournament(formData['tournament-name'], formData['participants-amount']);
                 stateManager.updateState('currentTournament', response);
                 wsManager.setupTournamentWebSocket();
                 showMessage("Tournament created successfully.");

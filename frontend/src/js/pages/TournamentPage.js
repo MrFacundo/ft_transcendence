@@ -25,7 +25,7 @@ class TournamentPage extends Page {
     render() {
         const cardsContainerEl = document.querySelector("#cards-container");
         const tournamentDetailsEl = document.querySelector("#tournament-details");
-        const tournamentNameEl = document.querySelector("#tournament-name");
+        const tournamentNameEl = document.querySelector("#tournament-title");
         const participantsInfoEl = document.querySelector("#participants-info");
         const partcipantsListEl = document.querySelector("#tournament-participants");
         const selectedUserCard = document.querySelector("user-profile#selected-participant");
@@ -63,8 +63,8 @@ class TournamentPage extends Page {
 
     handleStartButtonClick() {
         const { wsManager } = this.app;
-        if (wsManager.tournamentWs) {
-            wsManager.tournamentWs.send(JSON.stringify({
+        if (wsManager.ws.currentTournament) {
+            wsManager.ws.currentTournament.send(JSON.stringify({
                 type: "start",
             }));
         }

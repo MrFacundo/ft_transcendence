@@ -27,14 +27,14 @@ class App {
             twoFactorAuth: new Pages.TwoFactorAuthPage(this),
             settings: new Pages.UserSettingsPage(this),
             home: new Pages.HomePage(this),
-            oneVsOne: new Pages.OneVsOne(this),
+            OnlinePvp: new Pages.OnlinePvpPage(this),
             tournament: new Pages.TournamentPage(this),
             tournamentCreate: new Pages.TournamentCreatePage(this),
             tournamentJoin: new Pages.TournamentJoinPage(this),
             profile: new Pages.ProfilePage(this),
             AI: new Pages.AIPage(this),
             game: new Pages.GamePage(this),
-            offline: new Pages.OfflinePage(this),
+            offline: new Pages.OfflinePvpPage(this),
         };
         this.currentPage = null;
         this.init();

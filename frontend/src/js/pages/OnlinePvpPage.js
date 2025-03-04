@@ -3,12 +3,12 @@ import "../customElements/UserProfileCard.js";
 import "../customElements/UserProfileCardSm.js";
 import "../customElements/UserList.js";
 
-class OneVsOne extends Page {
+class OnlinePvpPage extends Page {
     constructor(app) {
         super({
-            name: "onevsone",
-            url: "/onevsone",
-            pageElement: "#OneVsOne",
+            name: "onlinepvp",
+            url: "/onlinepvp",
+            pageElement: "#OnlinePvp",
             isProtected: true,
             app: app,
         });
@@ -65,4 +65,4 @@ class OneVsOne extends Page {
     }
 }
 
-export default OneVsOne;
+export default OnlinePvpPage;
