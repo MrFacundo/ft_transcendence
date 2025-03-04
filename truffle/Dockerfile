@@ -19,7 +19,6 @@ RUN npm install
 
 # Copiar resto dos arquivos
 COPY . /usr/src/app/
-RUN chmod +x ./scripts/*
 RUN chmod +x entrypoint.sh
 
 # Definir volume
