@@ -29,8 +29,8 @@ SECRET_KEY = 'django-insecure-sm^l$qx=e&7q13f(o7&^@e$(^2ta7plc+b6&1yq-bdi4u=m%^%
 DEBUG = config('DEBUG', default=True, cast=bool)
 PRODUCTION = not DEBUG
 
-#ALLOWED_HOSTS = ["localhost", "127.0.0.1", "172.22.0.1"]
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost').split(',')
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "api.localhost"]
+# ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost').split(',')
 
 PASSWORD_HASHERS = [
     "django.contrib.auth.hashers.PBKDF2PasswordHasher",
@@ -118,11 +118,11 @@ MIDDLEWARE = [
 
 ]
 
-FRONTEND_URL = "http://localhost:8080"
-WAF_URL = "http://localhost:8081"
-
 CORS_ALLOWED_ORIGINS = [
-    FRONTEND_URL,
+    "http://localhost:8080",
+    "http://localhost:8081",
+    "https://api.localhost",
+    "https://localhost",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -215,8 +215,9 @@ EMAIL_HOST_USER = config('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')
 
-ADMIN_USER_NAME = config('ADMIN_USER_NAME', default='admin')
-ADMIN_EMAIL = config('ADMIN_EMAIL', default='')
+ADMIN_USER_NAME = config('DJANGO_SUPERUSER_USERNAME', default='admin')
+ADMIN_EMAIL = config('DJANGO_SUPERUSER_EMAIL', default='admin@admin.com')
+ADMIN_PASSWORD = config('DJANGO_SUPERUSER_PASSWORD', default='admin')
 
 MANAGERS = []
 ADMINS = []
