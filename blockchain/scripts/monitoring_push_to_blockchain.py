@@ -1,3 +1,4 @@
+import os
 import time
 import psycopg2
 import json
@@ -5,26 +6,17 @@ import argparse
 from web3 import Web3
 
 # PostgreSQL database configurations
-# de .env
-POSTGRES_DB=transcendence
-POSTGRES_USER=db_user
-POSTGRES_PASSWORD=db_password
-POSTGRES_HOST=db
-
-# DB_NAME = "transcendence"
-# DB_USER = "db_user"
-# DB_PASSWORD = "db_password"
-# DB_HOST = "transcendence_db"
-
-
-# Ganache Configurations"
-GANACHE_URL = "http://blockchain_ganache:8545"
+DB_NAME = os.getenv("POSTGRES_DB")
+DB_USER = os.getenv("POSTGRES_USER")
+DB_PASSWORD = os.getenv("POSTGRES_PASSWORD")
+DB_HOST = os.getenv("POSTGRES_HOST")
+GANACHE_URL = os.getenv("GANACHE_URL")
 
 # Read contract address from JSON file
-with open('/usr/src/deployedAddress.json') as f:
+with open('/usr/src/app/deployedAddress.json') as f:
     data = json.load(f)
     CONTRACT_ADDRESS = data['address']
-    
+
 # Smart contract ABI
 CONTRACT_ABI = [
     {
@@ -64,7 +56,7 @@ def get_new_game():
             cur.execute("""
                 SELECT id, channel_group_name, date_played, score_player1, score_player2, match_date, status, player1_id, player2_id, winner_id, tournament_id
                 FROM games_ponggame
-                WHERE (status = 'interrupted' OR status = 'completed' ) AND registrado_blockchain = FALSE
+                WHERE (status = 'interrupted' OR status = 'completed' ) AND registered_on_blockchain = FALSE
             """)
             
             games = cur.fetchall()
@@ -84,7 +76,7 @@ def mark_game_registered(game_id):
             conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASSWORD, host=DB_HOST)
             cur = conn.cursor()
 
-            cur.execute("UPDATE games_ponggame SET registrado_blockchain = TRUE WHERE id = %s", (game_id,))
+            cur.execute("UPDATE games_ponggame SET registered_on_blockchain = TRUE WHERE id = %s", (game_id,))
             
             conn.commit()
             cur.close()

@@ -1,7 +1,8 @@
 # Variables
 DOCKER_COMPOSE = docker compose
 DOCKER_COMPOSE_FILE = docker-compose.yml
-
+blockchain = blockchain
+transcendence_back= transcendence_back
 # Targets
 .PHONY: up down build clean
 
@@ -46,14 +47,14 @@ db:
 cache:
 	$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) up -d cache
 
-create_users:
+users:
 	docker exec -it $(transcendence_back) bash -c "python manage.py create_users"
 
 lag:
-	docker exec $(transcendence_blockchain) python app/scripts/list_all_games.py --list_blockchain_games
+	docker exec $(blockchain) python /usr/src/app/scripts/list_all_games.py --list_blockchain_games
 
 gbp:
-	docker exec $(transcendence_blockchain) python app/scripts/get_game_by_player.py --games_by_player
+	docker exec $(blockchain) python /usr/src/app/scripts/get_game_by_player.py --games_by_player $(ARGS)
 
 gbt:
-	docker exec $(transcendence_blockchain) python app/scripts/get_game_by_tournament.py --games_by_tournament
+	docker exec $(blockchain) python /usr/src/app/scripts/get_game_by_tournament.py --games_by_tournament $(ARGS)
