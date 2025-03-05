@@ -20,60 +20,45 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./backend:/usr/src/app
-      - shared-data:/usr/src/app/shared
     ports:
       - "8000:8000"
     networks:
       - backend-network
-    environment:
-      - ETHEREUM_NETWORK=http://blockchain_ganache:8545
-      - OTHER_ENV_VAR=value  
     depends_on:
       db:
         condition: service_healthy
       cache:
         condition: service_healthy
-      ganache:
+      blockchain:
         condition: service_started
     restart: unless-stopped
     env_file:
       - .env
-
-  ganache:
-    image: trufflesuite/ganache:v7.0.0
-    container_name: blockchain_ganache
+  blockchain:
+    container_name: blockchain
+    environment:
+      - NODE_ENV=development
+      - GANACHE_COD=${GANACHE_COD}  # Adicionado para garantir que a variável esteja disponível
     restart: always
-    command: ["-p", "8545", "-m", "myth like bonus scare over problem client lizard pioneer submit female collect"]
+    build:
+      context: ./blockchain
+      args:
+        GANACHE_ENV: ${GANACHE_COD}
+      dockerfile: Dockerfile
     ports:
       - "8545:8545"
     volumes:
-      - ganache_data:/ganache
+      - ./blockchain:/usr/src/app:delegated  # Corrigido para garantir a montagem correta do diretório
     networks:
       - backend-network
     healthcheck:
-      test: ["CMD", "echo", "Ganache is running"]
-      interval: 10s
+      test: ["CMD", "sh", "-c", "test -x /usr/src/app/healthcheck.sh && /usr/src/app/healthcheck.sh"]
+      interval: 30s
+      timeout: 10s
       retries: 3
+    env_file:
+      - .env
 
-  truffle:
-    container_name: blockchain_truffle
-    build:
-      context: ./truffle
-      dockerfile: Dockerfile
-    volumes:
-      - ./truffle:/usr/src/app
-      - shared-data:/usr/src/app/shared
-    depends_on:
-      ganache:
-        condition: service_healthy 
-    command: ["sh", "/usr/src/app/entrypoint.sh"]
-    networks:
-      - backend-network
-    healthcheck:
-      test: ["CMD", "ls", "/usr/src/app/shared/deployedAddress.json"]
-      interval: 10s
-      retries: 3
-    
   db:
     container_name: transcendence_db
     image: postgres:17
@@ -131,8 +116,6 @@ volumes:
     driver: local
   cache_data:
     driver: local
-  ganache_data:
-    driver: local
-  shared-data:
+  blockchain_data:
     driver: local
 

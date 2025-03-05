@@ -5,16 +5,23 @@ import argparse
 from web3 import Web3
 
 # PostgreSQL database configurations
-DB_NAME = "transcendence"
-DB_USER = "db_user"
-DB_PASSWORD = "db_password"
-DB_HOST = "transcendence_db"
+# de .env
+POSTGRES_DB=transcendence
+POSTGRES_USER=db_user
+POSTGRES_PASSWORD=db_password
+POSTGRES_HOST=db
+
+# DB_NAME = "transcendence"
+# DB_USER = "db_user"
+# DB_PASSWORD = "db_password"
+# DB_HOST = "transcendence_db"
+
 
 # Ganache Configurations"
 GANACHE_URL = "http://blockchain_ganache:8545"
 
 # Read contract address from JSON file
-with open('/usr/src/app/shared/deployedAddress.json') as f:
+with open('/usr/src/deployedAddress.json') as f:
     data = json.load(f)
     CONTRACT_ADDRESS = data['address']
     
