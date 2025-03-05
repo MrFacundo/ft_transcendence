@@ -84,3 +84,6 @@ backend/media/
 
 #other
 test.sql
+
+#schema generation
+schema.json

@@ -18,7 +18,7 @@ class RegisterPage extends Page {
         const form = this.mainElement.querySelector("custom-form");
         form.submitForm = async (formData) => {
             try {
-                const response = await this.app.auth.register(
+                await this.app.auth.register(
                     formData.username,
                     formData['register-email'],
                     formData['register-password'],

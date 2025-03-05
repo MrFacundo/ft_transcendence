@@ -48,14 +48,14 @@ class VerifyEmailView(APIView):
             user = User.objects.get(pk=user_id)
             
             if user.new_email: # User is updating email
-                user.email = user.new_email
+                user.email = user.new_email.lower()
                 user.email_is_verified = True
                 user.new_email = None
-                user.new_email_is_verified = False
                 user.save()
                 return Response({'message': 'Email verified and updated successfully.'}, status=status.HTTP_200_OK)
             elif not user.email_is_verified: # User is verifying email for the first time
                 user.email_is_verified = True
+                user.email = user.email.lower()
                 user.save()
                 return Response({'message': 'Email verified successfully.'}, status=status.HTTP_200_OK)
             else:
