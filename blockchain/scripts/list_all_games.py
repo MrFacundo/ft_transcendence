@@ -7,7 +7,7 @@ from web3 import Web3
 GANACHE_URL = "http://blockchain_ganache:8545"
 
 # Read contract address from JSON file
-with open('/usr/src/app/shared/deployedAddress.json') as f:
+with open('/usr/src/deployedAddress.json') as f:
     data = json.load(f)
     CONTRACT_ADDRESS = data['address']
     

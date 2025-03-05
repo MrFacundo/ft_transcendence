@@ -23,6 +23,14 @@ clean:
 	$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) down --volumes --remove-orphans
 	@echo "All services, volumes and orphans are removed"
 
+setup_aliases:
+	@if ! alias my_alias > /dev/null 2>&1; then \
+		./setup_aliases.sh; \
+		echo "Aliases set up"; \
+	else \
+		echo "Alias already exists"; \
+	fi
+
 # Additional targets
 .PHONY: backend frontend db cache
 
@@ -37,3 +45,15 @@ db:
 
 cache:
 	$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) up -d cache
+
+create_users:
+	docker exec -it $(transcendence_back) bash -c "python manage.py create_users"
+
+lag:
+	docker exec $(transcendence_blockchain) python app/scripts/list_all_games.py --list_blockchain_games
+
+gbp:
+	docker exec $(transcendence_blockchain) python app/scripts/get_game_by_player.py --games_by_player
+
+gbt:
+	docker exec $(transcendence_blockchain) python app/scripts/get_game_by_tournament.py --games_by_tournament
