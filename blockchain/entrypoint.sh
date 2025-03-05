@@ -12,15 +12,16 @@ fi
 
 # Iniciar Ganache em segundo plano
 echo "Iniciando Ganache..."
-ganache-cli -p 8545 -m "$GANACHE_COD" &
+ganache-cli -h $GANACHE_HOST -p 8545 -m "$GANACHE_COD" &
 GANACHE_PID=$!
 
 # Aguardar Ganache estar pronto
-sleep 5
-if ! nc -z localhost 8545; then
-  echo "Erro: Ganache não iniciou corretamente."
-  exit 1
-fi
+
+#sleep 2
+echo "Aguardando Ganache estar pronto..."
+while ! nc -z $GANACHE_HOST $GANACHE_PORT; do
+  sleep 1
+done
 echo "Ganache está pronto!"
 
 # Compilar e migrar os smart contracts com Truffle
@@ -32,9 +33,9 @@ truffle migrate --reset || { echo "Erro ao fazer deploy dos smart contracts."; e
 
 # Verificar se o contrato foi implantado corretamente
 if [ -f /usr/src/app/deployedAddress.json ]; then
-  echo "Smart contract deployed successfully"
+  echo " ✅ Smart contract deployed successfully"
 else
-  echo "Smart contract deployment failed"
+  echo "❌ Smart contract deployment failed"
   exit 1
 fi
 

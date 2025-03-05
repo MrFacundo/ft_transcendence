@@ -1,7 +1,7 @@
 module.exports = {
   networks: {
     development: {
-      host: "ganache", // Name of the Docker service for Ganache
+      host: "127.0.0.1", // Name of the Docker service for Ganache
       port: 8545,
       network_id: "*",  // Match any network id
     },

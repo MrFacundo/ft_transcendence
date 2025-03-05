@@ -1,12 +1,13 @@
+import os
 import json
 import pandas as pd
 from web3 import Web3
 
 # Ganache Configurations
-GANACHE_URL = "http://blockchain_ganache:8545"
+GANACHE_URL = os.getenv("GANACHE_URL")
 
 # Read contract address from JSON file
-with open('/usr/src/deployedAddress.json') as f:
+with open('/usr/src/app/deployedAddress.json') as f:
     data = json.load(f)
     CONTRACT_ADDRESS = data['address']
     
