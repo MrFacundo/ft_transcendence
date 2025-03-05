@@ -53,6 +53,9 @@ class TournamentJoinView(RetrieveUpdateAPIView):
 
         tournament = self.get_object()
 
+        if tournament.end_date is not None:
+            return Response({"message": "The tournament has already ended."}, status=status.HTTP_400_BAD_REQUEST)
+
         if tournament.participants.count() >= tournament.participants_amount:
             return Response({"message": "The tournament is full."}, status=status.HTTP_400_BAD_REQUEST)
 

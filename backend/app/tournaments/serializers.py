@@ -27,6 +27,7 @@ class TournamentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tournament
         fields = '__all__'
+        read_only_fields = ['start_date', 'end_date', 'semifinal_1_game', 'semifinal_2_game', 'final_game', 'winner']
 
     def validate(self, data):
         user = self.context['request'].user

@@ -21,26 +21,24 @@ class LoginSerializer(serializers.Serializer):
     email_or_username = serializers.CharField(write_only=True)
     password = serializers.CharField(write_only=True, style={'input_type': 'password'})
 
-    def validate(self, attrs):
-        email_or_username = attrs.get('email_or_username')
-        password = attrs.get('password')
-
-        if not email_or_username or not password:
-            raise serializers.ValidationError(
-                ('Must include "email_or_username" and "password".'),
-                'missing_fields'
-            )
-
+    def validate_email_or_username(self, value):
         user = User.objects.filter(
-            Q(email__iexact=email_or_username) | 
-            Q(username__iexact=email_or_username)
+            Q(email__iexact=value) | Q(username__iexact=value)
         ).first()
 
-        if not user or not user.check_password(password):
-            raise AuthenticationFailed()
+        if not user:
+            raise AuthenticationFailed('Invalid credentials.')
+
+        return user
+
+    def validate(self, attrs):
+        user = attrs.get('email_or_username')
+
+        if not user.check_password(attrs.get('password')):
+            raise AuthenticationFailed('Invalid credentials.')
 
         if not user.email_is_verified:
             raise EmailNotVerifiedException()
 
-        return {'user': user}
-
+        attrs['user'] = user
+        return attrs
