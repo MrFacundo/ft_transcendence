@@ -29,7 +29,8 @@ class Command(BaseCommand):
             user = CustomUser.objects.create_user(
                 email=email,
                 username=username,
-                password="pass"
+                password="pass",
+                email_is_verified=True
             )
 
             self.stdout.write(self.style.NOTICE(f"User {username} created. Downloading avatar..."))

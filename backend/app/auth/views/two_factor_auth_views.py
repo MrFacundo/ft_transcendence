@@ -67,7 +67,10 @@ class AuthenticatorSetupView(TwoFactorAuthView):
         if user.two_factor_method == 'authenticator':
             return Response({'error': 'Authenticator already set up'}, status=status.HTTP_400_BAD_REQUEST)
         
-        totp = user.generate_totp()
+        if not user.validation_secret:
+            user.validation_secret = pyotp.random_base32()
+            user.save()
+        totp = pyotp.TOTP(user.validation_secret, interval=300)
 
         # Create provisioning URI
         uri = totp.provisioning_uri(

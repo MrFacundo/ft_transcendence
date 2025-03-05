@@ -77,7 +77,7 @@ export class Auth {
         if (!username || !email || !password || !password_confirmation) {
             throw new Error("All fields are required");
         }
-        if (username.length > 20 || email.length > 20 || password.length > 20) {
+        if (username.length > 20 || email.length > 30 || password.length > 20) {
             throw new Error("Invalid email or password");
         }
         if (password !== password_confirmation) {
