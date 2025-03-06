@@ -32,7 +32,6 @@ else
   exit 1
 fi
 
-
 echo "Executing monitoring_push_to_blockchain.py..."
 python3 scripts/monitoring_push_to_blockchain.py --monitor &
 if [ $? -eq 0 ]; then
