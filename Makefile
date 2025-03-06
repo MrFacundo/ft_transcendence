@@ -51,6 +51,5 @@ gbp:
 gbt:
 	docker exec $(blockchain) python /usr/src/app/scripts/get_game_by_tournament.py --games_by_tournament $(filter-out $@,$(MAKECMDGOALS))
 
-# Evitar erro "No rule to make target"
 %:
     @:
