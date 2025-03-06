@@ -4,8 +4,6 @@ import argparse
 import pandas as pd
 from web3 import Web3
 
-# Ganache Configurations
-
 GANACHE_URL = os.getenv("GANACHE_URL")
 
 # Read contract address from JSON file

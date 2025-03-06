@@ -54,7 +54,11 @@ lag:
 	docker exec $(blockchain) python /usr/src/app/scripts/list_all_games.py --list_blockchain_games
 
 gbp:
-	docker exec $(blockchain) python /usr/src/app/scripts/get_game_by_player.py --games_by_player $(ARGS)
+	docker exec $(blockchain) python /usr/src/app/scripts/get_game_by_player.py --games_by_player $(filter-out $@,$(MAKECMDGOALS))
 
 gbt:
-	docker exec $(blockchain) python /usr/src/app/scripts/get_game_by_tournament.py --games_by_tournament $(ARGS)
+	docker exec $(blockchain) python /usr/src/app/scripts/get_game_by_tournament.py --games_by_tournament $(filter-out $@,$(MAKECMDGOALS))
+
+# Evitar erro "No rule to make target"
+%:
+    @:

@@ -30,7 +30,7 @@ Check the Makefile for more commands.
 
 ## User creation
 
-- Users can be created using the `python manage.py create_users` management command in the backend container.
+- Users can be created using the 'make users' management command in the backend container.
 - Users can also be created manually through the Django Admin interface. Superuser needs to be created first with the `createsuperuser` management command.
 - Users can also be created through the frontend interface.
 	- Using an email and password. (requires the email credentials to be set in the `.env` file).
@@ -62,26 +62,6 @@ The app/scripts folder in the backend contains the following Python files:
 #### get_game_by_tournament.py:
 * Retrieves game records for a specific tournament, filtering by tournament ID.
 
-### Aliases (Command Facilitators)
-To simplify interaction with the scripts, the following aliases have been created, which can be activated by running the setup_aliases.sh script:
-* lag (list all games): Lists all games recorded on the blockchain.
-* gbp (game by player) <player_ID>: Lists games for a specific player. Example: gbp 3.
-* gbt (game by tournament) <tournament_ID>: Lists games for a specific tournament. Example: gbt 2.
-Data Structure (games_ponggame Table)
-
-The games_ponggame table in PostgreSQL has the following fields:
-* gameId
-* id
-* channelGroupName
-* datePlayed
-* scorePlayer1
-* scorePlayer2
-* matchDate
-* status
-* player1Id
-* player2Id
-* winnerId
-* tournamentId
 
 #### Data Example
 gameId  id      channelGroupName        datePlayed            scorePlayer1  scorePlayer2  matchDate             status          player1Id       player2Id       winnerId        tournamentId
@@ -91,22 +71,21 @@ gameId  id      channelGroupName        datePlayed            scorePlayer1  scor
 
 ### Blockchain Test Procedure
 #### Environment Setup:
-* Run the alias setup script: ./setup_aliases.sh
 * Compile and migrate the contracts: make
 #### System Interaction:
 * Access the website and play some games and tournaments.
 #### Data Persistence Test (Blockchain):
 * Stop the PostgreSQL database: docker stop transcendence_db
 * Run the blockchain query commands to check previous game records:
-- lag (list all games)
-- dbp <player id> (list games by player ID)
-- dbt <tournament id> (list games by tournament ID)
+- make lag (list all games)
+- make dbp <player id> (list games by player ID)
+- make dbt <tournament id> (list games by tournament ID)
 * Expected Result: The game records created before the database shutdown should be returned.
 #### New Data Registration Test:
 * Restart PostgreSQL: docker start transcendence_db
 * Play new games on the website.
 * Run the blockchain query commands again to check for new records:
-- lag
-- dbp <player id>
-- dbt <tournament id>
+- make lag (list all games)
+- make dbp <player id> (list games by player ID)
+- make dbt <tournament id> (list games by tournament ID)
 * Expected Result: The new games played after the database reactivation should be included in the query results.

@@ -3,12 +3,9 @@ import json
 import pandas as pd
 from web3 import Web3
 
-# Ganache Configurations
 
 GANACHE_URL = os.getenv("GANACHE_URL")
 
-# Read contract address from JSON file
-# Read contract address from JSON file
 with open('/usr/src/app/deployedAddress.json') as f:
     data = json.load(f)
     CONTRACT_ADDRESS = data['address']
@@ -54,9 +51,7 @@ contract = web3.eth.contract(address=CONTRACT_ADDRESS, abi=CONTRACT_ABI)
 # Function to get games by player and convert to DataFrame
 def get_games_by_player(player_id):
     try:
-        print(f"Chamando getGamesByPlayer for player_id: {player_id}")
         games = contract.functions.getGamesByPlayer(player_id).call()
-        print(f"Games obtained: {games}")
         games_list = [{
             "gameId": game[0],
             "id": game[1],

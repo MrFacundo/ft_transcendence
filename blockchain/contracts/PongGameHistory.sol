@@ -21,6 +21,7 @@ contract PongGameHistory {
 
     mapping(uint256 => Game) private games; // Mapping of games by ID
     mapping(uint256 => uint256[]) private tournamentGames; // Games by tournament
+    mapping(uint256 => mapping(uint256 => bool)) private playerGameExists; // Check if game exists for player
     mapping(uint256 => uint256[]) private playerGames; // Games by player
     uint256 private gameCount;
 
@@ -66,10 +67,20 @@ contract PongGameHistory {
         );
 
         tournamentGames[_tournamentId].push(gameCount);
-        playerGames[_player1Id].push(gameCount);
-        playerGames[_player2Id].push(gameCount);
-        if (_winnerId != 0) {
+
+        if (!playerGameExists[_player1Id][gameCount]) {
+            playerGames[_player1Id].push(gameCount);
+            playerGameExists[_player1Id][gameCount] = true;
+        }
+
+        if (!playerGameExists[_player2Id][gameCount]) {
+            playerGames[_player2Id].push(gameCount);
+            playerGameExists[_player2Id][gameCount] = true;
+        }
+
+        if (_winnerId != 0 && !playerGameExists[_winnerId][gameCount]) {
             playerGames[_winnerId].push(gameCount);
+            playerGameExists[_winnerId][gameCount] = true;
         }
 
         emit GameAdded(gameCount, _id, _tournamentId, _player1Id, _player2Id, _winnerId);
