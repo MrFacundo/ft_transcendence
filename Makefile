@@ -24,14 +24,6 @@ clean:
 	$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) down --volumes --remove-orphans
 	@echo "All services, volumes and orphans are removed"
 
-setup_aliases:
-	@if ! alias my_alias > /dev/null 2>&1; then \
-		./setup_aliases.sh; \
-		echo "Aliases set up"; \
-	else \
-		echo "Alias already exists"; \
-	fi
-
 # Additional targets
 .PHONY: backend frontend db cache
 
