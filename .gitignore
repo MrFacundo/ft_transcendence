@@ -86,4 +86,4 @@ backend/media/
 test.sql
 
 #file blockchain
-truffle/deployedAddress.json
+blockchain/deployedAddress.json

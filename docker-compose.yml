@@ -29,8 +29,6 @@ services:
         condition: service_healthy
       cache:
         condition: service_healthy
-      # blockchain:
-      #   condition: service_started
     restart: unless-stopped
     env_file:
       - .env
@@ -39,25 +37,26 @@ services:
     environment:
       - GANACHE_URL=${GANACHE_URL}
       - GANACHE_PORT=${GANACHE_PORT}
-      - GANACHE_NETWORK_ID=${GANACHE_NETWORK_ID}
+      # - GANACHE_NETWORK_ID=${GANACHE_NETWORK_ID}
       - GANACHE_COD=${GANACHE_COD}
       - NODE_ENV=development
       - DB_NAME=${POSTGRES_DB}
       - DB_USER=${POSTGRES_USER}
       - DB_PASSWORD=${POSTGRES_PASSWORD}
       - DB_HOST=${POSTGRES_HOST}
-
     restart: unless-stopped
     build:
       context: ./blockchain
       args:
         GANACHE_ENV: ${GANACHE_COD}
+        GANACHE_URL: ${GANACHE_URL}
+        GANACHE_PORT: ${GANACHE_PORT}
       dockerfile: Dockerfile
     image: blockchain:local
     ports:
       - "8545:8545"
     volumes:
-      - ./blockchain:/usr/src/app:delegated  # Corrigido para garantir a montagem correta do diretório
+      - ./blockchain:/usr/src/app:delegated
     networks:
       - backend-network
     depends_on:

@@ -67,7 +67,7 @@ def get_new_game():
             return [{"id": j[0], "channel_group_name": j[1], "date_played": j[2], "score_player1": j[3], "score_player2": j[4], "match_date": j[5], "status": j[6], "player1_id": j[7], "player2_id": j[8], "winner_id": j[9], "tournament_id": j[10]} for j in games]
         except psycopg2.OperationalError:
             print("Database is not available. Retrying in 5 seconds...")
-            time.sleep(5)
+            time.sleep(3)
 
 # Function to mark a game as registered in PostgreSQL
 def mark_game_registered(game_id):
@@ -84,7 +84,7 @@ def mark_game_registered(game_id):
             break
         except psycopg2.OperationalError:
             print("Database is not available. Retrying in 5 seconds...")
-            time.sleep(5)
+            time.sleep(3)
 
 # Function to register a game on the blockchain
 def register_game_on_blockchain(game):
@@ -113,7 +113,7 @@ def monitor_games():
             register_game_on_blockchain(game)
             mark_game_registered(game['id'])
 
-        time.sleep(5)
+        time.sleep(3)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Monitor and register games on the blockchain")

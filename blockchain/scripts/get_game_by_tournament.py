@@ -3,7 +3,6 @@ import json
 import pandas as pd
 from web3 import Web3
 
-# Ganache Configurations
 GANACHE_URL = os.getenv("GANACHE_URL")
 
 # Read contract address from JSON file
@@ -52,9 +51,7 @@ contract = web3.eth.contract(address=CONTRACT_ADDRESS, abi=CONTRACT_ABI)
 # Function to list tournaments registered on the blockchain
 def get_games_by_tournament(tournament_id):
     try:
-        print(f"Chamando getGamesByTournament para tournament_id: {tournament_id}")
         games = contract.functions.getGamesByTournament(tournament_id).call()
-        print(f"Jogos obtidos: {games}")
         games_list = [{
             "gameId": game[0],
             "id": game[1],
