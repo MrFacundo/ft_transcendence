@@ -11,6 +11,8 @@ COPY . .
 
 RUN npm install dotenv
 
+RUN chmod +x entrypoint.sh
+
 RUN pip install --no-cache-dir --break-system-packages -r requirements.txt
 
 RUN npm install -g ganache-cli@latest truffle@latest

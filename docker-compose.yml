@@ -37,9 +37,7 @@ services:
     environment:
       - GANACHE_URL=${GANACHE_URL}
       - GANACHE_PORT=${GANACHE_PORT}
-      # - GANACHE_NETWORK_ID=${GANACHE_NETWORK_ID}
       - GANACHE_COD=${GANACHE_COD}
-      - NODE_ENV=development
       - DB_NAME=${POSTGRES_DB}
       - DB_USER=${POSTGRES_USER}
       - DB_PASSWORD=${POSTGRES_PASSWORD}
@@ -62,14 +60,8 @@ services:
     depends_on:
       backend:
         condition: service_started
-    healthcheck:
-      test: ["CMD", "sh", "-c", "test -x /usr/src/app/healthcheck.sh && /usr/src/app/healthcheck.sh"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
     env_file:
       - .env
-
   db:
     container_name: transcendence_db
     image: postgres:17
