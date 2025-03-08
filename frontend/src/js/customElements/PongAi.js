@@ -27,8 +27,8 @@ class PongAi extends HTMLElement {
       x: this.canvas.width / 2,
       y: this.canvas.height / 2,
       size: 10,
-      vx: 4,
-      vy: 4,
+      vx: 3,
+      vy: 3,
     };
 
     this.playerScore = 0;
@@ -175,16 +175,15 @@ class PongAi extends HTMLElement {
     }
     if (this.ball.x < 0) {
       this.aiScore++;
-      if (this.aiScore >= 1) {
-        this.endGame("Loooooser");
-        console.log("Game over 3");
+      if (this.aiScore >= 11) {
+        this.endGame("Loooooser!!!");
         return;
       } else {
         this.resetBall();
       }
     } else if (this.ball.x + this.ball.size > this.canvas.width) {
       this.playerScore++;
-      if (this.playerScore >= 1) {
+      if (this.playerScore >= 11) {
         this.endGame("Congrats");
         return;
       } else {
@@ -230,28 +229,32 @@ class PongAi extends HTMLElement {
     if (this.aiInterval) clearInterval(this.aiInterval);
     cancelAnimationFrame(this.animationFrameId);
 
-    // Clear and fill the canvas
-    this.ctx.fillStyle = "#f0f0f0";
-    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    const overlay = document.createElement("div");
+    overlay.style.position = "absolute";
+    overlay.style.top = "0";
+    overlay.style.left = "0";
+    overlay.style.width = "100%";
+    overlay.style.height = "100%";
+    overlay.style.backgroundColor = "white";
+    overlay.style.display = "flex";
+    overlay.style.justifyContent = "center";
+    overlay.style.alignItems = "center";
+    overlay.style.fontSize = "48px";
+    overlay.style.color = "black";
+    overlay.style.zIndex = "1000";
 
-    // Optionally, briefly show the message on the canvas (or skip this)
-    this.ctx.fillStyle = "black";
-    this.ctx.font = "48px Arial";
-    this.ctx.textAlign = "center";
-    this.ctx.textBaseline = "middle";
-    this.ctx.fillText(message, this.canvas.width / 2, this.canvas.height / 2);
+    this.shadowRoot.appendChild(overlay);
 
-    // After 3 seconds, return to the AI page with the result
     setTimeout(() => {
-      window.location.href = "/ai?result=" + encodeURIComponent(message);
-    }, 10);
+      window.location.href = "/ai";
+    }, 1500);
   }
 
   resetBall() {
     this.ball.x = this.canvas.width / 2;
     this.ball.y = this.canvas.height / 2;
-    this.ball.vx = 4 * (Math.random() > 0.5 ? 1 : -1);
-    this.ball.vy = 4 * (Math.random() > 0.5 ? 1 : -1);
+    this.ball.vx = 3 * (Math.random() > 0.5 ? 1 : -1);
+    this.ball.vy = 3 * (Math.random() > 0.5 ? 1 : -1);
   }
 
   handleKeyDown(e) {
