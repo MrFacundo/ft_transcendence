@@ -326,11 +326,12 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-3" data-href="/ai">
                 <div class="card bg-light my-4 shadow-sm" style="min-height: 250px; cursor: pointer;">
-                    <div class="d-flex flex-column card-body text-center align-items-center" data-href="/ai">
+                    <div class="card-body text-center">
                         <h5 class="card-title">Play against AI</h5>
-                        <img src="/static/images/robot.svg" class="margin-0" alt="Robot Icon" width="130" height="130">
+                        <img src="/static/images/robot.svg" alt="Robot Icon" width="130" height="130">
+                        <p class="card-text mt-4">Challenge our AI and test your skills.</p>
                     </div>
                 </div>
             </div>
@@ -349,15 +350,6 @@
                 <user-profile></user-profile>
                 <button class="btn btn-primary mt-3 d-none" id="action-friend"></button>
             </div>
-        </div>
-    </section>
-
-    <section id="AI" class="container mt-5">
-        <h1 class="mb-4">AI Game</h1>
-        </div>
-        <div id="pong-simulator" class="bg-secondary text-white rounded"
-            style="width: 500px; height: 500px; font-size: 2rem; margin: 0 auto">
-            <p>Pong</p>
         </div>
     </section>
 
@@ -470,6 +462,42 @@
             </div>
             <div class="col-md-4 d-flex flex-column align-items-center text-center">
                 <user-profile id="selected-friend"></user-profile>
+            </div>
+        </div>
+    </section>
+
+    <section id="AI" class="container mt-5">
+        <h1 class="mb-4">AI Game</h1>
+        <div id="resultModal" class="result-modal d-none">
+            <h2 id="resultText" class="result-text" style="font-size: 32px; color: green;"></h2>
+            <button class="btn btn-primary"
+                onclick="document.querySelector('#resultModal').classList.add('d-none'); document.querySelector('#AI').classList.remove('blur-background');">
+                Play Again
+            </button>
+        </div>
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card shadow">
+                    <div class="card-body">
+                        <h2 class="text-center mb-4">Game Settings</h2>
+                        <div class="form-group mb-4">
+                            <label for="difficulty">Select Difficulty</label>
+                            <select class="form-select" id="difficulty">
+                                <option value="easy">Easy</option>
+                                <option value="medium">Medium</option>
+                                <option value="hard">Hard</option>
+                            </select>
+                        </div>
+                        <button id="startGame" class="btn btn-primary w-100">Start Game</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 d-flex flex-column align-items-center text-center">
+                <user-profile bot="true"></user-profile>
+                <div class="mt-3">
+                    <h4>AI Opponent</h4>
+                    <p class="text-muted">Challenge our AI bot to improve your skills!</p>
+                </div>
             </div>
         </div>
     </section>
