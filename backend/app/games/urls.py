@@ -6,6 +6,7 @@ from app.games.views import (
     AcceptGameInvitationView,
     PongGameDetailView,
     MatchHistoryListView,
+    CreateAIGameView,
 )
 
 urlpatterns = [
@@ -18,4 +19,7 @@ urlpatterns = [
 
     # Match History
     path('match-history/<int:id>/', MatchHistoryListView.as_view(), name='match-history'),
+    # Ai game
+    path('games/ai/', CreateAIGameView.as_view(), name='create-ai-game'),
+
 ]
