@@ -48,7 +48,7 @@ class FriendInvitationConsumer(AsyncWebsocketConsumer):
 
 """
 
-User Status Consumer
+User Online Status Consumer
 
 """
 
@@ -67,7 +67,7 @@ class UserOnlineStatusConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_send(
             self.group_name,
             {
-                "type": "user_status",
+                "type": "online_status",
                 "user_id": self.user.id,
                 "username": self.user.username,
                 "is_online": True,
@@ -77,12 +77,12 @@ class UserOnlineStatusConsumer(AsyncWebsocketConsumer):
         
         await self.accept()
 
-    async def disconnect(self, close_code):
+    async def disconnect(self, close_code): # TODO: SOMETIMES MESSAGE IS NOT SENT. RACE CONDITION? THIS MUST BE FIXED
         if hasattr(self, 'user') and self.user.is_authenticated:
             await self.channel_layer.group_send(
                 self.group_name,
                 {
-                    "type": "user_status",
+                    "type": "online_status",
                     "user_id": self.user.id,
                     "username": self.user.username,
                     "is_online": False,
@@ -93,7 +93,7 @@ class UserOnlineStatusConsumer(AsyncWebsocketConsumer):
             await self.set_user_offline()
             await self.channel_layer.group_discard(self.group_name, self.channel_name)
 
-    async def user_status(self, event):
+    async def online_status(self, event):
         await self.send(text_data=json.dumps(event))
 
     @database_sync_to_async

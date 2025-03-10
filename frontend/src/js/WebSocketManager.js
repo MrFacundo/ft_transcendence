@@ -59,11 +59,9 @@ export class WebSocketManager {
         ws.onmessage = messageHandler;
         ws.onerror = (error) => {
             console.error(`${path} WebSocket error:`, error);
-            this[`${path.split('/')[0]}Ws`] = null;
         };
         ws.onclose = () => {
             console.warn(`WebSocket connection closed: ${path}`);
-            this[`${path.split('/')[0]}Ws`] = null;
         };
         return ws;
     }
