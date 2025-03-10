@@ -300,6 +300,10 @@ export class Api {
         });
     }
 
+    async createAIGame(params) {
+    return this.request("post", "/games/ai/", params);
+  }
+
     /**
      * Fetches the avatar image as a blob object URL.
      * @param {string} path - The path to the avatar image.
