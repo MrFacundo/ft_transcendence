@@ -1,5 +1,0 @@
-sqlalchemy
-psycopg2-binary
-pandas
-web3
-python-decouple
