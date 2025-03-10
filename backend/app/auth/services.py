@@ -17,7 +17,7 @@ def get_or_create_user_from_oauth(user_info):
         oauth_uid=str(user_info['id']),
         defaults={
             'username': user_info['login'],
-            'email': user_info['email'],
+            'email': user_info['email'].lower(),
             'avatar_oauth': user_info['image']['versions']['medium'],
             'email_is_verified': True,
         }

@@ -63,6 +63,7 @@ class UserSettingsPage extends Page {
                 const QrCodeImgEl = document.getElementById('QRCode');
                 QrCodeImgEl.src = `data:image/png;base64,${response.qr_code}`;
                 const authenticatorModal = new Modal(document.getElementById('authenticatorModal'));
+                console.log("authenticatorModal", authenticatorModal);
                 authenticatorModal.show();
             } catch (error) {
                 console.error("Error setting up authenticator app:", error);
@@ -73,9 +74,20 @@ class UserSettingsPage extends Page {
     }
 
     async submitAuthenticatorForm(form, formData) {
+        const otp = formData["otp-input"];
+        if (!otp) {
+            form.showFormError("Please enter the OTP code.");
+            return;
+        }
+        if (!/^\d{6}$/.test(otp)) {
+            form.showFormError("Invalid one-time password.");
+            return;
+        }
         try {
-            await this.app.api.verifyAuthenticatorSetup(formData["otp-input"].trim());
-            form.showFormSuccess("Authenticator setup successfully");
+            await this.app.api.verifyAuthenticatorSetup(otp.trim());
+            const authenticatorModal = Modal.getInstance(document.getElementById('authenticatorModal'));
+            authenticatorModal.hide();
+            showMessage("Authenticator setup successfully");
         } catch (error) {
             console.error(error);
             form.showFormError(error.response.data.error);
@@ -97,45 +109,53 @@ class UserSettingsPage extends Page {
     }
 
     /* Update password, username, email, avatar */
-    handleChange(field, newValue, successMessage, confirmPasswordValue = null) {
-        newValue = newValue.trim();
-        if (field === "new_password" && newValue !== confirmPasswordValue) {
-            showMessage("Passwords do not match.", "error");
-            return;
-        }
-        if (field === "avatar") {
-            const fileInput = document.querySelector("#new-avatar");
-            if (fileInput.files.length === 0) {
-                showMessage("Please select an image to upload.", "error");
+    async handleChange(field, newValue, successMessage, confirmPasswordValue = null) {
+        try {
+            if (field === "new_password") {
+                if (newValue !== confirmPasswordValue) {
+                    showMessage("Passwords do not match.", "error");
+                    return;
+                }
+            }
+    
+            if (field === "avatar") {
+                const fileInput = document.querySelector("#new-avatar");
+                if (fileInput.files.length === 0) {
+                    showMessage("Please select an image to upload.", "error");
+                    return;
+                }
+                const file = fileInput.files[0];
+                const updatedUser = await this.app.api.uploadAvatar(file);
+                this.updateUserAndRefresh(updatedUser, successMessage);
                 return;
             }
-            const file = fileInput.files[0];
-            this.app.api.uploadAvatar(file)
-                .then(() => {
-                    showMessage(successMessage);
-                    setTimeout(() => this.app.navigate(this.url), 3000);
-                })
-                .catch(error => {
-                    showMessage("An error occurred while updating the avatar.", "error");
-                });
-            return;
+    
+            newValue = newValue.trim();
+            if (!newValue || newValue === this.app.auth.user[field]) {
+                return;
+            }
+    
+            const updatedUser = await this.app.api.updateUser({ [field]: newValue });
+            this.updateUserAndRefresh(updatedUser, successMessage);
+        } catch (error) {
+            this.handleUpdateError(error);
         }
-        if (!newValue || newValue === this.app.auth.user[field]) {
-            return;
-        }
-        this.app.api.updateUser({ [field]: newValue })
-            .then(() => {
-                showMessage(successMessage);
-                setTimeout(() => this.app.navigate(this.url), 3000);
-            })
-            .catch(error => {
-                const errors = error.response.data;
-                const firstErrorKey = Object.keys(errors)[0];
-                if (firstErrorKey && errors[firstErrorKey][0]) {
-                    return showMessage(capitalizeFirstLetter(errors[firstErrorKey][0]), "error");
-                }
-                showMessage("An error occurred while updating the settings.", "error");
-            });
+    }
+    
+    handleUpdateError(error) {
+        const errorMessage = error.response?.data?.[Object.keys(error.response.data)[0]]?.[0];
+        showMessage(
+            capitalizeFirstLetter(errorMessage) || 
+            "An error occurred while updating the settings.", 
+            "error"
+        );
+    }
+    
+    updateUserAndRefresh(updatedUser, successMessage) {
+        this.app.auth.user = updatedUser;
+        showMessage(successMessage);
+        this.close();
+        this.open();
     }
 }
 

@@ -11,10 +11,6 @@ class UserList extends BaseElement {
                 'onlineStatuses',
                 (statuses, updatedUserId) => this.handleOnlineStatusUpdate(statuses, updatedUserId)
             );
-            this.unsubscribe = this.page.app.stateManager.subscribe(
-                'currentTournament',
-                (currentTournament) => this.handleTournamentUpdate(currentTournament)
-            );
         };
     }
 
@@ -27,12 +23,6 @@ class UserList extends BaseElement {
         const selectedUser = this.selectedUserCard?.state?.user?.id === updatedUserId;
         if (selectedUser) {
             this.selectedUserCard.updateOnlineStatus(statuses.get(updatedUserId));
-        }
-    }
-
-    handleTournamentUpdate(currentTournament) { //TODO: this should be done by the page, not the component
-        if (this.page.name === "tournament") {
-            this.setState({ users: currentTournament.participants });
         }
     }
 

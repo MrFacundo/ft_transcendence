@@ -3,12 +3,12 @@ import "../customElements/UserProfileCard.js";
 import "../customElements/UserProfileCardSm.js";
 import "../customElements/UserList.js";
 
-class OneVsOne extends Page {
+class OnlinePvpPage extends Page {
     constructor(app) {
         super({
-            name: "onevsone",
-            url: "/onevsone",
-            pageElement: "#OneVsOne",
+            name: "onlinepvp",
+            url: "/onlinepvp",
+            pageElement: "#OnlinePvp",
             isProtected: true,
             app: app,
         });
@@ -51,7 +51,7 @@ class OneVsOne extends Page {
 			actionButton,
 			actionText: "Accept",
             actionCallback: async (user) => {
-                if (!stateManager.onlineStatuses.get(user.id)?.is_online) {
+                if (!stateManager.state.onlineStatuses?.get(user.id)?.is_online) {
                     alert(`${user.username} is offline, try again later.`);
                     return;
                 }
@@ -65,4 +65,4 @@ class OneVsOne extends Page {
     }
 }
 
-export default OneVsOne;
+export default OnlinePvpPage;

@@ -85,5 +85,8 @@ backend/media/
 #other
 test.sql
 
+#schema generation
+schema.json
+
 #file blockchain
 blockchain/deployedAddress.json

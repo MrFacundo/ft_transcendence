@@ -10,17 +10,34 @@ class TournamentPage extends Page {
             isProtected: true,
             app: app,
         });
-        this.unsubscribe = this.app.stateManager.subscribe(
-            'currentTournament',
-            (currentTournament) => this.updateTournamentsList(currentTournament)
-        );
     }
 
+    async open() {
+        super.open();
+        this.unsubscribe = this.app.stateManager.subscribe(
+            'openTournaments',
+            (openTournaments) => this.updateTournamentsList(openTournaments)
+        );
+    }
+    
     async render() {
         const { api, wsManager, stateManager } = this.app;
-        const openTournaments = await api.getTournaments();
+        const openTournaments = stateManager.state.openTournaments;
         const tournamentListElement = document.querySelector("#tournament-list");
 
+        this.populateTournamentList(openTournaments, tournamentListElement, api, stateManager, wsManager);
+    }
+
+    updateTournamentsList(openTournaments) {
+        console.log("Updating tournaments list", openTournaments);
+        const tournamentListElement = document.querySelector("#tournament-list");
+        const { api, wsManager, stateManager } = this.app;
+        this.populateTournamentList(openTournaments, tournamentListElement, api, stateManager, wsManager);
+        console.log("Updating tournaments list", openTournaments);
+    }
+
+    populateTournamentList(openTournaments, tournamentListElement, api, stateManager, wsManager) {
+        tournamentListElement.innerHTML = '';
         openTournaments.forEach(({ id, name, participants, participants_amount }) => {
             const tournamentItem = document.createElement("li");
             tournamentItem.id = `tournament-${id}`;
@@ -32,7 +49,6 @@ class TournamentPage extends Page {
                 try {
                     const response = await api.joinTournament(id);
                     stateManager.updateState('currentTournament', response);
-                    this.updateTournamentsList(response);
                     wsManager.setupTournamentWebSocket();
                     showMessage(`Joined tournament: ${name}`);
                 } catch (error) {
@@ -41,10 +57,6 @@ class TournamentPage extends Page {
                 }
             });
         });
-    }
-
-    // updates list of tournaments
-    updateTournamentsList(tournaments) {
     }
 }
 

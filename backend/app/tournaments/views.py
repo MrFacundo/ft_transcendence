@@ -5,6 +5,9 @@ from django.contrib.auth import get_user_model
 from .models import Tournament
 from .serializers import TournamentSerializer
 from app.tournaments.matchmaker import MatchMaker
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+from django.db.models import Count, F
 
 User = get_user_model()
 
@@ -19,6 +22,20 @@ class TournamentCreateView(CreateAPIView):
         user = self.request.user
         tournament = serializer.save()
         tournament.participants.add(user)
+        self.broadcast_tournament(tournament)
+
+    def broadcast_tournament(self, tournament):
+        tournament_data = TournamentSerializer(tournament).data
+        
+        channel_layer = get_channel_layer()
+        
+        async_to_sync(channel_layer.group_send)(
+            'open_tournaments',
+            {
+                'type': 'tournament_created',
+                'tournament': tournament_data
+            }
+        )
 
 class TournamentJoinView(RetrieveUpdateAPIView):
     """
@@ -36,6 +53,9 @@ class TournamentJoinView(RetrieveUpdateAPIView):
 
         tournament = self.get_object()
 
+        if tournament.end_date is not None:
+            return Response({"message": "The tournament has already ended."}, status=status.HTTP_400_BAD_REQUEST)
+
         if tournament.participants.count() >= tournament.participants_amount:
             return Response({"message": "The tournament is full."}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -50,11 +70,13 @@ class TournamentJoinView(RetrieveUpdateAPIView):
         return Response(TournamentSerializer(tournament).data, status=status.HTTP_200_OK)
 
 class TournamentListView(ListAPIView):
-	"""
-	List all tournaments.
-	"""
-	queryset = Tournament.objects.filter(end_date__isnull=True)
-	serializer_class = TournamentSerializer
+    """
+    List all open tournaments.
+    """
+    queryset = Tournament.objects.filter(end_date__isnull=True).annotate(
+        num_participants=Count("participants")
+    ).filter(num_participants__lt=F("participants_amount"))
+    serializer_class = TournamentSerializer
 
 class CurrentTournamentView(RetrieveAPIView):
     """

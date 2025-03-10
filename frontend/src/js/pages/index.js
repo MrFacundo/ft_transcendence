@@ -6,13 +6,14 @@ import OAuthResultPage from "./OAuthResult.js";
 import TwoFactorAuthPage from "./TwoFactorAuthPage.js";
 import UserSettingsPage from "./UserSettingsPage.js";
 import HomePage from "./HomePage.js";
-import OneVsOne from "./OneVsOne.js";
+import OnlinePvpPage from "./OnlinePvpPage.js";
 import TournamentPage from "./TournamentPage.js";
 import ProfilePage from "./ProfilePage.js";
 import AIPage from "./AIPage.js";
 import GamePage from "./GamePage.js";
 import TournamentCreatePage from "./TournamentCreatePage.js";
 import TournamentJoinPage from "./TournamentJoinPage.js";
+import OfflinePvpPage from "./OfflinePvpPage.js";
 
 export { 
     LoginPage, 
@@ -23,7 +24,8 @@ export {
     TwoFactorAuthPage, 
     UserSettingsPage,
     HomePage,
-    OneVsOne,
+    OnlinePvpPage,
+    OfflinePvpPage,
     TournamentPage,
     TournamentCreatePage,
     TournamentJoinPage,

@@ -28,13 +28,12 @@ class Page {
      */
     async open() {
         const { app } = this;
-
         document.querySelectorAll("section").forEach((section) => { section.remove() });
         const tempElement = document.createElement(this.pageElement.tagName);
         tempElement.innerHTML = this.pageElement.innerHTML;
         this.mainElement.innerHTML = tempElement.innerHTML;
         this.mainElement.querySelectorAll("[data-href]").forEach((element) => {
-            element.addEventListener("click", (event) => this.handleClick(event, app));
+            element.addEventListener("click", (event) => this.handleClick(event));
         });
         document.title = this.name;
         this.renderNavbar(this);

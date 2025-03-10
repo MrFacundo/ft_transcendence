@@ -35,12 +35,12 @@
                     <custom-form id="login-form">
                         <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
                         <div class="form-floating mb-3">
-                            <input type="email" class="form-control" id="login-email"/>
-                            <label for="Email">Username or email</label>
+                            <input type="email" class="form-control" id="login-email" />
+                            <label for="login-email">Username or email</label>
                         </div>
                         <div class="form-floating mb-3">
                             <input type="password" class="form-control" id="login-password" />
-                            <label for="Password">Password</label>
+                            <label for="login-password">Password</label>
                         </div>
                         <button class="btn btn-primary w-100 py-2" type="submit">
                             Sign in
@@ -65,20 +65,20 @@
                     <custom-form>
                         <h1 class="h3 mb-3 fw-normal">Let's get you registered :)</h1>
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="Username" placeholder="littlefrenchboy" />
+                            <input type="text" class="form-control" id="Username" placeholder="Username" autocomplete="off" />
                             <label for="Username">Username</label>
                         </div>
                         <div class="form-floating mb-3">
-                            <input type="email" class="form-control" id="register-email" placeholder="name@example.com" />
-                            <label for="Email">Email address</label>
+                            <input type="email" class="form-control" id="register-email"
+                                placeholder="name@example.com" />
+                            <label for="register-email">Email address</label>
                         </div>
                         <div class="form-floating mb-3">
                             <input type="password" class="form-control" id="register-password" placeholder="Password" />
-                            <label for="Password">Password</label>
+                            <label for="register-password">Password</label>
                         </div>
                         <div class="form-floating mb-3">
-                            <input type="password" class="form-control" id="ConfirmPassword"
-                                placeholder="Password" />
+                            <input type="password" class="form-control" id="ConfirmPassword" placeholder="Password" />
                             <label for="ConfirmPassword">Confirm Password</label>
                         </div>
                         <button class="btn btn-primary w-100 py-2" type="submit">
@@ -242,15 +242,18 @@
                     </div>
 
                     <!-- Two-Factor Authentication Modal -->
-                    <div class="modal fade" id="authenticatorModal" tabindex="-1" aria-labelledby="authenticatorModalLabel" aria-hidden="true">
+                    <div class="modal fade" id="authenticatorModal" tabindex="-1"
+                        aria-labelledby="authenticatorModalLabel" aria-hidden="true">
                         <div class="modal-dialog">
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <h5 class="modal-title" id="authenticatorModalLabel">Authenticator Setup</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
-                                    <p>Scan the QR code below with your authenticator app. Once scanned, enter the OTP below to finish the setup.</p>
+                                    <p>Scan the QR code below with your authenticator app. Once scanned, enter the OTP
+                                        below to finish the setup.</p>
                                     <div class="row">
                                         <div class="col-md-6">
                                             <img src="" id="QRCode" alt="QR Code" class="img-fluid">
@@ -259,7 +262,7 @@
                                             <custom-form>
                                                 <div class="mb-3">
                                                     <label for="otp-input" class="form-label">Enter OTP</label>
-                                                    <input type="text" class="form-control" id="otp-input" >
+                                                    <input type="text" class="form-control" id="otp-input">
                                                 </div>
                                                 <button type="submit" class="btn btn-primary">Verify OTP</button>
                                             </custom-form>
@@ -291,50 +294,57 @@
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
     </section>
-
     <section id="Home" class="container mt-5">
         <h1 class="mb-4 text-center display-4">CHOOSE YOUR DESTINY</h1>
         <div class="row">
-            <div class="col-md-4" data-href="/ai">
+            <div class="col-md-3">
                 <div class="card bg-light my-4 shadow-sm" style="min-height: 250px; cursor: pointer;">
-                    <div class="card-body text-center">
-                        <h5 class="card-title">Play against AI</h5>
-                        <img src="/static/images/robot.svg" alt="Robot Icon" width="130" height="130">
-                        <p class="card-text mt-4">Challenge our AI and test your skills.</p>
+                    <div class="d-flex flex-column card-body text-center align-items-center" data-href="/onlinepvp">
+                        <h5 class="card-title">Online 1vs1</h5>
+                        <img src="/static/images/people.svg" class="margin-0" alt="Robot Icon" width="130" height="130">
                     </div>
                 </div>
             </div>
-            <div class="col-md-4" data-href="/onevsone">
+            <div class="col-md-3">
                 <div class="card bg-light my-4 shadow-sm" style="min-height: 250px; cursor: pointer;">
-                    <div class="card-body text-center">
-                        <h5 class="card-title">1vs1</h5>
-                        <img src="/static/images/people.svg" alt="Robot Icon" width="130" height="130">
-                        <p class="card-text mt-4">Compete against another player.</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4" data-href="/tournament">
-                <div class="card bg-light my-4 shadow-sm" style="min-height: 250px; cursor: pointer;">
-                    <div class="card-body text-center">
+                    <div class="d-flex flex-column card-body text-center align-items-center" data-href="/tournament">
                         <h5 class="card-title">Tournaments</h5>
-                        <img src="/static/images/trophy.svg" alt="Robot Icon" width="130" height="130">
-                        <p class="card-text mt-4">Join tournaments and win prizes.</p>
+                        <img src="/static/images/trophy.svg" class="margin-0" alt="Robot Icon" width="130" height="130">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-light my-4 shadow-sm" style="min-height: 250px; cursor: pointer;"
+                    data-href="/pvp_offline">
+                    <div class="d-flex flex-column card-body text-center align-items-center">
+                        <h5 class="card-title">Local 1vs1</h5>
+                        <img src="/static/images/offline-pvp.svg" class="margin-0" alt="Offline Icon" width="130" height="130">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-light my-4 shadow-sm" style="min-height: 250px; cursor: pointer;">
+                    <div class="d-flex flex-column card-body text-center align-items-center" data-href="/ai">
+                        <h5 class="card-title">Play against AI</h5>
+                        <img src="/static/images/robot.svg" class="margin-0" alt="Robot Icon" width="130" height="130">
                     </div>
                 </div>
             </div>
         </div>
         <h2 class="my-5 text-center display-6">Add friends</h2>
         <div class="row">
-            <div class="row">
-                <div class="col-md-4">
-                    <p>Invitations Received</p>
-                    <user-list id="receive-list"></user-list>
-                </div>
-                <div class="col-md-4">
-                    <p>Send Invitations</p>
-                    <user-list id="send-list"></user-list>
-                </div>
+            <div class="col-md-4">
+                <p>Invitations Received</p>
+                <user-list id="receive-list"></user-list>
+            </div>
+            <div class="col-md-4">
+                <p>Send Invitations</p>
+                <user-list id="send-list"></user-list>
+            </div>
             <div class="col-md-4 d-flex flex-column align-items-center text-center">
                 <user-profile></user-profile>
                 <button class="btn btn-primary mt-3 d-none" id="action-friend"></button>
@@ -351,8 +361,8 @@
         </div>
     </section>
 
-    <section id="OneVsOne" class="container mt-5">
-        <h1 class="mb-4">1v1 Game</h1>
+    <section id="OnlinePvp" class="container mt-5">
+        <h1 class="mb-4">Online Pong</h1>
         <div class="row">
             <div class="col-md-4">
                 <p>Invitations Received</p>
@@ -364,7 +374,7 @@
             </div>
             <div class="col-md-4 d-flex flex-column align-items-center text-center">
                 <user-profile></user-profile>
-                <button class="btn btn-primary" id="action-friend">Invite</button>
+                <button class="btn btn-primary d-none" id="action-friend">Invite</button>
             </div>
         </div>
         <div id="pong-simulator" class="d-none bg-secondary text-white rounded"
@@ -378,7 +388,7 @@
         <div id="cards-container" class="row justify-content-around d-none">
             <div class="col-md-4" data-href="/tournament-create">
                 <div class="card bg-light my-4 shadow-sm" style="min-height: 250px; cursor: pointer;">
-                    <div class="card-body text-center">
+                    <div class="d-flex flex-column card-body text-center align-items-center">
                         <h5 class="card-title">Create</h5>
                         <img src="/static/images/pencil-square.svg" alt="Pencil Icon" width="130" height="130">
                         <p class="card-text mt-4">Create a new tournament.</p>
@@ -387,7 +397,7 @@
             </div>
             <div class="col-md-4" data-href="/tournament-join">
                 <div class="card bg-light my-4 shadow-sm" style="min-height: 250px; cursor: pointer;">
-                    <div class="card-body text-center">
+                    <div class="d-flex flex-column card-body text-center align-items-center">
                         <h5 class="card-title">Join</h5>
                         <img src="/static/images/person-plus-fill.svg" alt="Person Icon" width="130" height="130">
                         <p class="card-text mt-4">Join an existing tournament.</p>
@@ -396,7 +406,7 @@
             </div>
         </div>
         <div id="tournament-details" class="row justify-content-center d-none">
-            <h2  id="tournament-name" class="mb-4 text-center text-warning display-6"></h2>
+            <h2 id="tournament-title" class="mb-4 text-center text-warning display-6"></h2>
             <div id="participants-info" class="row d-none">
                 <div class="col-md-4">
                     <p>Participants</p>
@@ -418,12 +428,12 @@
             <custom-form class="col-md-8">
                 <h1 class="h3 mb-3 fw-normal">Enter your tournament settings</h1>
                 <div class="form-check mb-3">
-                    <label for="tournament_name">Tournament Name</label>
-                    <input type="text" class="form-control" id="tournament_name" />
+                    <label for="tournament-name">Tournament Name</label>
+                    <input type="text" class="form-control" id="tournament-name" />
                 </div>
                 <div class="form-check mb-3">
-                    <label for="participants_amount">Participants</label>
-                    <select class="form-control" id="participants_amount">
+                    <label for="participants-amount">Participants</label>
+                    <select class="form-control" id="participants-amount">
                         <option value="4">4</option>
                     </select>
                 </div>
@@ -469,6 +479,10 @@
         <h1>NOW YOU PONG</h1>
         <pong-game></pong-game>
         <score-board class="d-none"></score-board>
+    </section>
+
+    <section id="Offline">
+        <canvas style="text-align: center"></canvas>
     </section>
 </body>
 
