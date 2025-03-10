@@ -133,7 +133,7 @@ class GameConsumer(AsyncWebsocketConsumer):
                     self.db_game.status = 'interrupted'
                     await database_sync_to_async(self.db_game.save)()
                 
-                if self.game_group_name and self.is_connected:
+                if self.game_group_name and self.is_connected: # TODO: THIS IS NOT BEING CALLED. USER IS DISCONNECTED. NO MESSAGE IS SENT. THIS MUST BE FIXED.
                     try:
                         await self.channel_layer.group_send(
                             self.game_group_name,
