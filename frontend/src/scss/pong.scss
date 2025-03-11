@@ -1,42 +1,76 @@
 pong-game {
-    width: 1000px;
-    display: inline-block;
-    height: 700px;
-    background: #31313a;
-    position: relative;
+	width: 1000px;
+	display: inline-block;
+	height: 700px;
+	background: #31313a;
+	position: relative;
 
-    #scoreboard {
-        color: #f1f1f1;
-        font-size: 24px;
-        position: absolute;
-        top: 10px;
-        left: 50%;
-        transform: translateX(-50%);
-    }
+	#statusMessage {
+		position: absolute;
+		top: 20px;
+		left: 0;
+		right: 0;
+		text-align: center;
+		color: white;
+		font-size: 16px;
+		z-index: 10;
+	}
 
-    #leftPaddle,
-    #rightPaddle {
-        $paddleWidth: 0.02;
-        $paddleHeight: 0.25;
-        left: 0;
-        top: calc(50% - (100% * #{$paddleHeight} / 2));
-        height: calc(100% * #{$paddleHeight});
-        width: calc(100% * #{$paddleWidth});
-        background: #f1f1f1;
-        position: absolute;
-        transition: top 0.1s;
-    }
-    #ball {
-        width: 10px;
-        height: 10px;
-        background: #f1f1f1;
-        position: absolute;
-        left: calc(50% - 5px);
-        top: calc(50% - 5px);
-        transition: top 0.1s, left 0.1s;
-    }
-    #rightPaddle {
-        left: unset;
-        right: 0;
-    }
+	#readyButton {
+		position: absolute;
+		bottom: 30px;
+		left: 50%;
+		transform: translateX(-50%);
+		padding: 10px 20px;
+		background-color: #4caf50;
+		color: white;
+		border: none;
+		border-radius: 4px;
+		cursor: pointer;
+		font-size: 16px;
+	}
+
+	#readyButton:hover {
+		background-color: #45a049;
+	}
+
+	#readyButton:disabled {
+		background-color: #cccccc;
+		cursor: not-allowed;
+	}
+
+	#scoreboard {
+		color: #f1f1f1;
+		font-size: 24px;
+		position: absolute;
+		top: 60px;
+		left: 50%;
+		transform: translateX(-50%);
+	}
+
+	#leftPaddle,
+	#rightPaddle {
+		$paddleWidth: 0.02;
+		$paddleHeight: 0.25;
+		left: 0;
+		top: calc(50% - (100% * #{$paddleHeight} / 2));
+		height: calc(100% * #{$paddleHeight});
+		width: calc(100% * #{$paddleWidth});
+		background: #f1f1f1;
+		position: absolute;
+		transition: top 0.1s;
+	}
+	#ball {
+		width: 10px;
+		height: 10px;
+		background: #f1f1f1;
+		position: absolute;
+		left: calc(50% - 5px);
+		top: calc(50% - 5px);
+		transition: top 0.1s, left 0.1s;
+	}
+	#rightPaddle {
+		left: unset;
+		right: 0;
+	}
 }

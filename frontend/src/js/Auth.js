@@ -1,5 +1,5 @@
-import Cookies from "js-cookie";
 import { settings } from "./settings.js";
+import Cookies from "js-cookie";
 
 /**
  * Handles user authentication, including login, registration, token and OAuth2 management.
@@ -9,12 +9,12 @@ export class Auth {
         this.app = app;
         this.user = null;
         this.authenticated = false;
-        this.accessToken = Cookies.get("access_token");
+        this.accessToken = sessionStorage.getItem("access_token");
         this.oauthPopup = null;
     }
 
     /**
-     * Authenticates the user using the access token stored in cookies.
+     * Authenticates the user using the access token stored in session storage.
      * @returns {Promise<boolean>} True if authenticated, false otherwise.
      */
     async authenticate() {
@@ -27,8 +27,8 @@ export class Auth {
             } catch (error) {
                 console.error(error.response?.data || error.message);
                 this.accessToken = null;
-                Cookies.remove("access_token");
-                Cookies.remove("refresh_token");
+                sessionStorage.removeItem("access_token");
+                sessionStorage.removeItem("refresh_token");
                 this.authenticated = false;
                 return false;
             }
@@ -40,18 +40,18 @@ export class Auth {
     }
 
     /**
-     * Refreshes the access token using the refresh token stored in cookies.
+     * Refreshes the access token using the refresh token stored in session storage.
      * @returns {Promise<boolean>} True if the token was refreshed, false otherwise.
      */
     async refreshAccessToken() {
-        const refreshToken = Cookies.get("refresh_token");
+        const refreshToken = sessionStorage.getItem("refresh_token");
         if (!refreshToken) {
             console.error("No refresh token available");
             return false;
         }
         try {
             const response = await this.app.api.refreshToken(refreshToken);
-            Cookies.set("access_token", response.access);
+            sessionStorage.setItem("access_token", response.access);
             this.accessToken = response.access;
             console.log("Access token successfully refreshed");
             return true;
@@ -106,8 +106,8 @@ export class Auth {
         try {
             const responseData = await this.app.api.login(email, password);
             if (!responseData.two_factor_required) {
-                Cookies.set("access_token", responseData.access);
-                Cookies.set("refresh_token", responseData.refresh);
+                sessionStorage.setItem("access_token", responseData.access);
+                sessionStorage.setItem("refresh_token", responseData.refresh);
                 this.accessToken = responseData.access;
                 this.app.navigate("/home");
             } else {
@@ -146,8 +146,8 @@ export class Auth {
         try {
             const responseData = await this.app.api.verifyOtp(otp, OtpToken);
             console.log("2FA successful");
-            Cookies.set("access_token", responseData.access);
-            Cookies.set("refresh_token", responseData.refresh);
+            sessionStorage.setItem("access_token", responseData.access);
+            sessionStorage.setItem("refresh_token", responseData.refresh);
             this.accessToken = responseData.access;
         } catch (error) {
             console.error(error);
@@ -156,12 +156,12 @@ export class Auth {
     }
 
     /**
-   * Initiates OAuth login process:
-   * - Checks if user is already authenticated.
-   * - Opens a new which calls the OAuth endpoint.
-   * - Checks for token cookie every second.
-   * @throws {Error} If popup is blocked by the browser.
-   */
+     * Initiates OAuth login process:
+     * - Checks if user is already authenticated.
+     * - Opens a new which calls the OAuth endpoint.
+     * - Checks for token cookie every second.
+     * @throws {Error} If popup is blocked by the browser.
+     */
     async oAuthLogin() {
         await this.authenticate();
         if (this.authenticated) {
@@ -183,7 +183,13 @@ export class Auth {
 
                 const checkForTokenCookie = () => {
                     this.accessToken = Cookies.get("access_token");
-                    if (this.accessToken) return resolve();
+                    if (this.accessToken) {
+                        sessionStorage.setItem("access_token", this.accessToken);
+                        sessionStorage.setItem("refresh_token", Cookies.get("refresh_token"));
+                        Cookies.remove("access_token");
+                        Cookies.remove("refresh_token");
+                        return resolve();
+                    }
                     if (++attempts >= maxAttempts) return reject("Token not received.");
                     setTimeout(checkForTokenCookie, 1000);
                 };
@@ -206,8 +212,8 @@ export class Auth {
         console.log("Logging out");
         this.app.wsManager.closeConnections();
         this.app.stateManager.close();
-        Cookies.remove("access_token");
-        Cookies.remove("refresh_token");
+        sessionStorage.removeItem("access_token");
+        sessionStorage.removeItem("refresh_token");
         this.accessToken = null;
         this.authenticated = false;
         this.app.navigate("/login");
