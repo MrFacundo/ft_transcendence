@@ -17,7 +17,7 @@ class ScoreBoard extends HTMLElement {
             this.shadowRoot.getElementById(id).src = avatarSrc;
         };
         
-        setElement("scoreboard-title", match.status === "completed" ? "WELL PONGED" : "PONG INTERRUPTED");
+        setElement("scoreboard-title", match.status === "completed" ? "WELL PONGED" : "User disconnected. Pong interrupted");
         
         await setAvatar("avatar-1", match.player1);
         setElement("username-1", match.player1.username);

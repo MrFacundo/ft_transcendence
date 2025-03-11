@@ -12,3 +12,9 @@ export const settings = {
     "WS_URL": WS_URL,
     "DEBUG": DEBUG,
 };
+
+if (!DEBUG) {
+    console.log = function () {};
+    console.warn = function () {};
+    console.error = function () {};
+}

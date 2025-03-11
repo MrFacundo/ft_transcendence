@@ -47,7 +47,6 @@ class Pong extends HTMLElement {
                 }
                 break;
             case "gameState":
-                //console.log("Received game state:", data);
                 this.setPositions({
                     leftPaddle: { top: `calc(${data.paddles[0].y * 100}%)` },
                     rightPaddle: { top: `calc(${data.paddles[1].y * 100}%)` },

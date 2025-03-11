@@ -45,7 +45,7 @@ class MatchHistorySerializer(serializers.ModelSerializer):
     def get_result(self, obj):
         user_id = self.context['request'].parser_context['kwargs']['id']
         if obj.winner is None:
-            return 'unknown'
+            return 'unfinished'
         return 'win' if obj.winner.id == user_id else 'loss'
         
 class UserOnlineStatusSerializer(serializers.ModelSerializer):

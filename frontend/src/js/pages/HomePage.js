@@ -1,6 +1,5 @@
 import Page from "./Page.js";
 import { showMessage } from "../utils.js";
-import { settings } from "../settings.js";
 
 class HomePage extends Page {
 	constructor(app) {
@@ -15,7 +14,6 @@ class HomePage extends Page {
 	}
 
 	async render() {
-		console.log("settings.MEDIA_URL", settings.MEDIA_URL);
 		const { api, auth } = this.app;
 		const sendList = document.querySelector("#send-list");
 		const receiveList = document.querySelector("#receive-list");
@@ -41,9 +39,16 @@ class HomePage extends Page {
 			selectedUserCard,
 			actionButton,
 			actionText: "Invite",
-			actionCallback: async (user, userCardSm) => {
-				await api.friendRequest(user.id);
-				userCardSm.appendPendingButton();
+			actionCallback: async (user) => {
+				try {
+					await api.friendRequest(user.id);
+					user.isPending = true;
+					sendList.updateUser(user);
+					actionButton.classList.add("d-none");
+				}
+				catch (error) {
+					this.handleError(error);
+				}
 			}
 		};
 		sendList.setState ({ users: sendListData });
@@ -54,13 +59,25 @@ class HomePage extends Page {
 			actionButton,
 			actionText: "Accept",
 			actionCallback: async (user) => {
-				api.friendAccept(user.id)
-				receiveList.removeUser(user.id);
-				showMessage(`${user.username} is now your friend.`);
+				try {
+					await api.friendAccept(user.id);
+					receiveList.removeUser(user.id);
+					actionButton.classList.add("d-none");
+					showMessage(`${user.username} is now your friend.`);
+				}
+				catch (error) {
+					this.handleError(error);
+				}
 			}
 		};
 		receiveList.setState ({ users: receiveListData });
 	}
+
+	handleError(error) {
+		showMessage(error?.response?.data?.message, "error");
+        this.close();
+        this.open();
+    }
 }
 
 export default HomePage;
