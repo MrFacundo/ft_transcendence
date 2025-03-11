@@ -63,9 +63,6 @@ services:
   blockchain:
     container_name: blockchain
     environment:
-      - GANACHE_URL=${GANACHE_URL}
-      - GANACHE_PORT=${GANACHE_PORT}
-      - GANACHE_COD=${GANACHE_COD}
       - DB_NAME=${POSTGRES_DB}
       - DB_USER=${POSTGRES_USER}
       - DB_PASSWORD=${POSTGRES_PASSWORD}

@@ -24,6 +24,7 @@ contract PongGameHistory {
     mapping(uint256 => mapping(uint256 => bool)) private playerGameExists; // Check if game exists for player
     mapping(uint256 => uint256[]) private playerGames; // Games by player
     uint256 private gameCount;
+	uint256 private maxPostgresId;
 
     event GameAdded(uint256 indexed gameId, uint256 id, uint256 tournamentId, uint256 player1Id, uint256 player2Id, uint256 winnerId);
     
@@ -65,6 +66,10 @@ contract PongGameHistory {
             _winnerId,
             _tournamentId
         );
+
+		if (_id > maxPostgresId) {
+        maxPostgresId = _id;
+		}
 
         tournamentGames[_tournamentId].push(gameCount);
 
@@ -142,4 +147,8 @@ contract PongGameHistory {
     function getGameCount() public view returns (uint256) {
         return gameCount;
     }
+	
+	function getMaxPostgresId() public view returns (uint256) {
+    return maxPostgresId;
+	}
 }
