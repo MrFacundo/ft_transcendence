@@ -57,15 +57,29 @@ CONTRACT_ABI = [
 web3 = Web3(Web3.HTTPProvider(GANACHE_URL))
 contract = web3.eth.contract(address=CONTRACT_ADDRESS, abi=CONTRACT_ABI)
 
-def get_max_postgres_id():
+def get_max_postgres_id_from_blockchain():
     return contract.functions.getMaxPostgresId().call()
 
-# Function to get recently completed games from PostgreSQL
-last_checked_id = 0  # Armazena o último ID lido
+def get_max_postgres_id_from_db():
+    try:
+        conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASSWORD, host=DB_HOST)
+        cur = conn.cursor()
 
-def monitor_new_game():
-    global last_checked_id  # Usa a variável global para armazenar o último ID processado
-    
+        cur.execute("SELECT MAX(id) FROM games_ponggame")
+        max_id = cur.fetchone()[0]
+        
+        cur.close()
+        conn.close()
+
+        return max_id if max_id is not None else 0
+    except psycopg2.OperationalError:
+        print("Database is not available. Retrying in 5 seconds...")
+        time.sleep(3)
+        return 0
+
+
+# Function to get recently completed games from PostgreSQL
+def monitor_game(last_checked_id):
     while True:
         try:
             conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASSWORD, host=DB_HOST)
@@ -95,8 +109,7 @@ def monitor_new_game():
 
 
 def get_all_new_games():
-    last_blockchain_id = get_max_postgres_id()
-
+    last_blockchain_id = get_max_postgres_id_from_blockchain()
     while True:
         try:
             conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASSWORD, host=DB_HOST)
@@ -159,12 +172,13 @@ def register_game_on_blockchain(game):
 
 # Main function to monitor games and register on the blockchain
 def monitor_games():
+    last_checked_id = get_max_postgres_id_from_db()
     while True:
         if os.path.exists('/usr/src/app/stop_monitor.flag'):
             print("Stopping monitor_games loop...")
             os.remove('/usr/src/app/stop_monitor.flag')
             break
-        new_game = monitor_new_game()
+        new_game = monitor_game(last_checked_id)
         
         for game in new_game:
             print(f"Registering game {game['id']} on the blockchain...")
@@ -185,7 +199,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Monitor and register games on the blockchain")
     parser.add_argument("--startMonitor", action="store_true", help="Start continuous monitoring of new games")
     parser.add_argument("--stopMonitor", action="store_true", help="Stop monitor new games")
-    parser.add_argument("--allNewGames", action="store_true", help="Get all Games")
+    parser.add_argument("--allNewGames", action="store_true", help="Save all Games")
     
     args = parser.parse_args()
 
@@ -196,5 +210,6 @@ if __name__ == "__main__":
         with open('/usr/src/app/stop_monitor.flag', 'w') as f:
             f.write('stop')
         print("Signal to stop monitor_games loop has been sent.")
+
     if args.allNewGames:
         all_new_games()

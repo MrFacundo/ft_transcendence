@@ -48,7 +48,7 @@ startmonitor:
 stopmonitor:
 	docker exec $(blockchain) python /usr/src/app/scripts/push_to_blockchain.py --stopMonitor
 
-getallnewgames:
+saveallnewgames:
 	docker exec $(blockchain) python /usr/src/app/scripts/push_to_blockchain.py --allNewGames
 
 listallgames:
