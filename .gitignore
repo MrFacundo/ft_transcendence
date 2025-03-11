@@ -90,3 +90,4 @@ schema.json
 
 #file blockchain
 blockchain/deployedAddress.json
+menu.sh

@@ -36,7 +36,7 @@ Check the Makefile for more commands.
 	- Using an email and password. (requires the email credentials to be set in the `.env` file).
 	- Using the 42 OAuth2 login (requires the 42 OAuth2 credentials to be setin the `.env` file).
 
-## Modulo Blockchain
+## Blockchain Module
 This project implements a blockchain module to record and retrieve Pong tournament results, using a smart contract on the local Ethereum Ganache network for testing. The development and deployment of the smart contract are managed by the Truffle framework, which facilitates the creation, testing, and migration of smart contracts.
 
 ### Smart Contract (Solidity)
@@ -45,47 +45,35 @@ It allows access and retrieval of information recorded on the Ethereum Ganache b
 After deployment, the smart contract address on the Ganache network is saved in a shared folder between the Truffle and backend containers.
 This address is used to interact with the contract and perform data recording and retrieval operations.
 
-### Backend (Python)
+### Available Commands
+The following make commands allow interaction with the blockchain module to monitor, retrieve, and manage game records.
 
-The app/scripts folder in the backend contains the following Python files:
+1. Start Game Monitoring
+#### make startmonitor
+Starts monitoring games that have been completed or interrupted in the PostgreSQL database and saves them to the blockchain.
 
-#### Monitoring_push_to_blockchain.py:
-* Monitors the games_ponggame table in PostgreSQL for new records.
-* Sends the data to the smart contract on the blockchain.
-  
-#### list_all_games.py:
-* Retrieves all game records stored in the smart contract.
-  
-#### get_game_by_player.py:
-* Retrieves game records for a specific player, filtering by player ID.
-  
-#### get_game_by_tournament.py:
-* Retrieves game records for a specific tournament, filtering by tournament ID.
+2. Stop Game Monitoring
+#### make stopmonitor
+Stops the game monitoring process, preventing new games from being automatically recorded in the blockchain.
 
+3. Retrieve All Registered Games
+#### make listallgames
+Lists all games that have been recorded in the blockchain.
 
-#### Data Example
-gameId  id      channelGroupName        datePlayed            scorePlayer1  scorePlayer2  matchDate             status          player1Id       player2Id       winnerId        tournamentId
-1       1       1_2                     2025-03-03 13:25:14   0             0             2025-03-03 13:25:14   interrupted     2               3               0               0
-2       2       2_3                     2025-03-03 13:25:38   0             0             2025-03-03 13:25:38   interrupted     3               2               0               0
+4. Manually Register New Games
+#### make getallnewgames
+Retrieves and registers all new completed or interrupted games in the blockchain without requiring the startmonitor process to be active.
+5. Retrieve Games by Player
+make gamesbyplayers <player_id>
+Retrieves all games in which a specific player has participated, using their player ID.
 
+6. Retrieve Games by Tournament
 
-### Blockchain Test Procedure
-#### Environment Setup:
-* Compile and migrate the contracts: make
-#### System Interaction:
-* Access the website and play some games and tournaments.
-#### Data Persistence Test (Blockchain):
-* Stop the PostgreSQL database: docker stop transcendence_db
-* Run the blockchain query commands to check previous game records:
-- make lag (list all games)
-- make dbp <player id> (list games by player ID)
-- make dbt <tournament id> (list games by tournament ID)
-* Expected Result: The game records created before the database shutdown should be returned.
-#### New Data Registration Test:
-* Restart PostgreSQL: docker start transcendence_db
-* Play new games on the website.
-* Run the blockchain query commands again to check for new records:
-- make lag (list all games)
-- make dbp <player id> (list games by player ID)
-- make dbt <tournament id> (list games by tournament ID)
-* Expected Result: The new games played after the database reactivation should be included in the query results.
+#### make gamesbytournament <tournament_id>
+Retrieves all games associated with a specific tournament, using the tournament ID.
+
+#### Prerequisites
+Before using these commands, ensure the following:
+* Docker and Docker Compose are installed.
+* The containers defined in docker-compose.yml are running.
+* You have access to a terminal or shell.

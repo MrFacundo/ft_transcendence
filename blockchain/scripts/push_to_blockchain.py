@@ -39,6 +39,17 @@ CONTRACT_ABI = [
         "payable": False,
         "stateMutability": "nonpayable",
         "type": "function"
+    },
+	{
+        "constant": True,
+        "inputs": [],
+        "name": "getMaxPostgresId",
+        "outputs": [
+            {"name": "", "type": "uint256"}
+        ],
+        "payable": False,
+        "stateMutability": "view",
+        "type": "function"
     }
 ]
 
@@ -46,17 +57,58 @@ CONTRACT_ABI = [
 web3 = Web3(Web3.HTTPProvider(GANACHE_URL))
 contract = web3.eth.contract(address=CONTRACT_ADDRESS, abi=CONTRACT_ABI)
 
+def get_max_postgres_id():
+    return contract.functions.getMaxPostgresId().call()
+
 # Function to get recently completed games from PostgreSQL
-def get_new_game():
+last_checked_id = 0  # Armazena o último ID lido
+
+def monitor_new_game():
+    global last_checked_id  # Usa a variável global para armazenar o último ID processado
+    
     while True:
         try:
             conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASSWORD, host=DB_HOST)
             cur = conn.cursor()
 
-            cur.execute("""
+            cur.execute(f"""
                 SELECT id, channel_group_name, date_played, score_player1, score_player2, match_date, status, player1_id, player2_id, winner_id, tournament_id
                 FROM games_ponggame
-                WHERE (status = 'interrupted' OR status = 'completed' ) AND registered_on_blockchain = FALSE
+                WHERE (status = 'interrupted' OR status = 'completed') 
+                AND registered_on_blockchain = FALSE
+                AND id > {last_checked_id}
+                ORDER BY id ASC
+            """)
+
+            games = cur.fetchall()
+            
+            if games:
+                last_checked_id = games[-1][0]
+            
+            cur.close()
+            conn.close()
+            
+            return [{"id": j[0], "channel_group_name": j[1], "date_played": j[2], "score_player1": j[3], "score_player2": j[4], "match_date": j[5], "status": j[6], "player1_id": j[7], "player2_id": j[8], "winner_id": j[9], "tournament_id": j[10]} for j in games]
+        except psycopg2.OperationalError:
+            print("Database is not available. Retrying in 5 seconds...")
+            time.sleep(3)
+
+
+def get_all_new_games():
+    last_blockchain_id = get_max_postgres_id()
+
+    while True:
+        try:
+            conn = psycopg2.connect(dbname=DB_NAME, user=DB_USER, password=DB_PASSWORD, host=DB_HOST)
+            cur = conn.cursor()
+
+            cur.execute(f"""
+                SELECT id, channel_group_name, date_played, score_player1, score_player2, match_date, status, player1_id, player2_id, winner_id, tournament_id
+                FROM games_ponggame
+                WHERE (status = 'interrupted' OR status = 'completed') 
+                AND registered_on_blockchain = FALSE
+                AND id > {last_blockchain_id}
+                ORDER BY id ASC
             """)
             
             games = cur.fetchall()
@@ -68,6 +120,7 @@ def get_new_game():
         except psycopg2.OperationalError:
             print("Database is not available. Retrying in 5 seconds...")
             time.sleep(3)
+
 
 # Function to mark a game as registered in PostgreSQL
 def mark_game_registered(game_id):
@@ -103,11 +156,16 @@ def register_game_on_blockchain(game):
     ).transact({'from': web3.eth.accounts[0]})
     web3.eth.wait_for_transaction_receipt(tx_hash)
 
+
 # Main function to monitor games and register on the blockchain
 def monitor_games():
     while True:
-        new_game = get_new_game()
-
+        if os.path.exists('/usr/src/app/stop_monitor.flag'):
+            print("Stopping monitor_games loop...")
+            os.remove('/usr/src/app/stop_monitor.flag')
+            break
+        new_game = monitor_new_game()
+        
         for game in new_game:
             print(f"Registering game {game['id']} on the blockchain...")
             register_game_on_blockchain(game)
@@ -115,11 +173,28 @@ def monitor_games():
 
         time.sleep(3)
 
+def all_new_games():
+    new_game = get_all_new_games()
+    for game in new_game:
+        print(f"Registering game {game['id']} on the blockchain...")
+        register_game_on_blockchain(game)
+        mark_game_registered(game['id'])
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Monitor and register games on the blockchain")
-    parser.add_argument("--monitor", action="store_true", help="Start continuous monitoring of new games")
+    parser.add_argument("--startMonitor", action="store_true", help="Start continuous monitoring of new games")
+    parser.add_argument("--stopMonitor", action="store_true", help="Stop monitor new games")
+    parser.add_argument("--allNewGames", action="store_true", help="Get all Games")
     
     args = parser.parse_args()
 
-    if args.monitor:
+    if args.startMonitor:
         monitor_games()
+        
+    if args.stopMonitor:
+        with open('/usr/src/app/stop_monitor.flag', 'w') as f:
+            f.write('stop')
+        print("Signal to stop monitor_games loop has been sent.")
+    if args.allNewGames:
+        all_new_games()
