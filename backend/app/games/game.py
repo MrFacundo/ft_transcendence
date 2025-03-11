@@ -13,6 +13,7 @@ class Game:
         self.disconnected = False
         self.db = None
         self.comm = None
+        self.players_ready = [False, False]
 
     def reset(self):
         self.ball = Ball(0.5 - 0.01, 0.5 - 0.01)
