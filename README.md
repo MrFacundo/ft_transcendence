@@ -61,14 +61,14 @@ Stops the game monitoring process, preventing new games from being automatically
 Lists all games that have been recorded in the blockchain.
 
 4. Manually Register New Games
-#### make getallnewgames
+#### make saveallnewgames
 Retrieves and registers all new completed or interrupted games in the blockchain without requiring the startmonitor process to be active.
+
 5. Retrieve Games by Player
-make gamesbyplayers <player_id>
+#### make gamesbyplayers <player_id>
 Retrieves all games in which a specific player has participated, using their player ID.
 
 6. Retrieve Games by Tournament
-
 #### make gamesbytournament <tournament_id>
 Retrieves all games associated with a specific tournament, using the tournament ID.
 
