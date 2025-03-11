@@ -62,6 +62,12 @@ export class WebSocketManager {
         };
         ws.onclose = () => {
             console.warn(`WebSocket connection closed: ${path}`);
+            setTimeout(() => {
+                if (this.app.auth?.authenticated) {
+                    console.log("Reconnecting...");
+                    this.ws[path] = this.setupWebSocket(path, messageHandler);
+                }
+            }, 3000);
         };
         return ws;
     }

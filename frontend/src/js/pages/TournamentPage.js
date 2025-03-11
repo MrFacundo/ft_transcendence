@@ -54,6 +54,7 @@ class TournamentPage extends Page {
                 tournamentBracketEl.page = this;
                 tournamentBracketEl.setTournament(tournament);
                 if (tournament.final_game.status === "completed" || tournament.final_game.status === "interrupted") { 
+                    this.app.wsManager.ws.currentTournament.close();
                     if (this.unsubscribe) this.unsubscribe();
                     this.app.stateManager.updateState('currentTournament', null);
                 }
