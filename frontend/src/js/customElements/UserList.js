@@ -43,6 +43,12 @@ class UserList extends BaseElement {
         this.setState({ users: this.state.users.filter(user => user.id !== userId) });
     }
 
+    updateUser(updatedUser) {
+        this.setState({ 
+            users: this.state.users.map(user => user.id === updatedUser.id ? updatedUser : user) 
+        });
+    }
+
     render() {
         const listGroup = this.shadowRoot.querySelector(".list-group");
         listGroup.innerHTML = '';
@@ -60,7 +66,7 @@ class UserList extends BaseElement {
         userCardSm.setState({user});
         userCardSm.setAttribute("data-user-id", user.id);
 
-        const isPending = user.game_invite?.expires_at || user.friendship?.status === "pending";
+        const isPending = user.game_invite?.expires_at || user.friendship?.status === "pending" || user.isPending;
         if (isPending) userCardSm.appendPendingButton(user.game_invite?.expires_at);
 
         userCardSm.addEventListener("click", () => {

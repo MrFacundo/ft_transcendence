@@ -16,10 +16,13 @@ class UserSettingsPage extends Page {
 
     render() {
         this.setupEventListeners();
-        this.setInitial2FASelection();
+        this.setInitialValues();
     }
 
-    setInitial2FASelection() {
+    setInitialValues() {
+        const { username, email } = this.app.auth.user;
+        document.getElementById("new-username").placeholder = username;
+        document.getElementById("new-email").placeholder = email;
         const twoFactorElement = document.getElementById(`2fa-${this.app.auth.user.two_factor_method}`);
         if (twoFactorElement) twoFactorElement.checked = true;
     }

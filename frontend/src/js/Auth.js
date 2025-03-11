@@ -1,5 +1,5 @@
 import Cookies from "js-cookie";
-import { settings } from "./settings.js"; // TODO: handle oauth in Api.js
+import { settings } from "./settings.js";
 
 /**
  * Handles user authentication, including login, registration, token and OAuth2 management.
@@ -50,9 +50,7 @@ export class Auth {
             return false;
         }
         try {
-            const response = await this.app.api.request("post", "/token/refresh/", {
-                refresh: refreshToken
-            });
+            const response = await this.app.api.refreshToken(refreshToken);
             Cookies.set("access_token", response.access);
             this.accessToken = response.access;
             console.log("Access token successfully refreshed");
@@ -108,15 +106,11 @@ export class Auth {
         try {
             const responseData = await this.app.api.login(email, password);
             if (!responseData.two_factor_required) {
-                console.log("Login successful");
                 Cookies.set("access_token", responseData.access);
                 Cookies.set("refresh_token", responseData.refresh);
                 this.accessToken = responseData.access;
-                this.authenticated = true;
                 this.app.navigate("/home");
-                return responseData;
             } else {
-                console.log("2FA required");
                 localStorage.setItem("otp_oken", responseData.otp_token);
                 this.app.navigate("/two-factor-auth");
                 return responseData;
@@ -155,9 +149,6 @@ export class Auth {
             Cookies.set("access_token", responseData.access);
             Cookies.set("refresh_token", responseData.refresh);
             this.accessToken = responseData.access;
-            this.authenticated = true;
-            return responseData;
-
         } catch (error) {
             console.error(error);
             throw error;
@@ -192,15 +183,12 @@ export class Auth {
 
                 const checkForTokenCookie = () => {
                     this.accessToken = Cookies.get("access_token");
-                    console.log("this.accessToken", this.accessToken);
                     if (this.accessToken) return resolve();
                     if (++attempts >= maxAttempts) return reject("Token not received.");
                     setTimeout(checkForTokenCookie, 1000);
                 };
-
                 checkForTokenCookie();
             });
-
             this.oauthPopup.close();
             this.oauthPopup = null;
             this.app.navigate("/home");

@@ -39,13 +39,15 @@ class HomePage extends Page {
 			selectedUserCard,
 			actionButton,
 			actionText: "Invite",
-			actionCallback: async (user, userCardSm) => {
+			actionCallback: async (user) => {
 				try {
 					await api.friendRequest(user.id);
-					userCardSm.appendPendingButton();
+					user.isPending = true;
+					sendList.updateUser(user);
+					actionButton.classList.add("d-none");
 				}
 				catch (error) {
-					this.handleError();
+					this.handleError(error);
 				}
 			}
 		};
@@ -60,17 +62,18 @@ class HomePage extends Page {
 				try {
 					await api.friendAccept(user.id);
 					receiveList.removeUser(user.id);
+					actionButton.classList.add("d-none");
 					showMessage(`${user.username} is now your friend.`);
 				}
 				catch (error) {
-					this.handleError();
+					this.handleError(error);
 				}
 			}
 		};
 		receiveList.setState ({ users: receiveListData });
 	}
 
-	handleError() {
+	handleError(error) {
 		showMessage(error?.response?.data?.message, "error");
         this.close();
         this.open();

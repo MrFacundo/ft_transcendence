@@ -50,7 +50,13 @@ export class Api {
         }
     }
 
-    /* User / Auth */
+    /* Auth */
+
+    async refreshToken(refreshToken) {
+        return this.request("post", "/token/refresh/", { refresh: refreshToken });
+    }
+
+    /* User */
 
     /**
      * Creates a new user.
@@ -166,13 +172,13 @@ export class Api {
     }
 
     /**
-     * Retrieves a list current the user friends, along with their Game Invitation data related to the current user.
+     * Retrieves a list current the user friends, along with their Game Invitation data related to the specified user.
      */
     async getFriends(userId) {
         return this.request("get", `/friends/${userId}/`);
     }
 
-    /* Friends */
+    /* Friendship */
 
     /**
      * Sends a friend request to a user.
