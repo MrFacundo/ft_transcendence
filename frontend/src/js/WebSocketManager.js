@@ -125,7 +125,7 @@ export class WebSocketManager {
                 this.handleTournamentJoinMessage(data, auth, stateManager);
                 break;
             case "start_game":
-                this.handleTournamentStartGameMessage(data, auth, stateManager);
+                this.handleTournamentStartGameMessage(data, auth);
                 break;
             case "game_over":
                 this.handleTournamentGameOverMessage(data, currentPage, stateManager);
@@ -146,7 +146,7 @@ export class WebSocketManager {
         }
     }
 
-    handleTournamentStartGameMessage(data, auth, stateManager) {
+    handleTournamentStartGameMessage(data, auth) {
         if (auth.user.id === data.participant_id) {
             this.app.navigate(data.game_url);
         }
