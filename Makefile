@@ -43,9 +43,21 @@ blockchain:
 waf:
 	$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) up -d waf
 
-# Scripts
+# Commands
 create_users:
 	docker exec -it $(transcendence_back) bash -c "python manage.py create_users"
+
+frontend-build:
+	docker exec transcendence_front npm run build
+
+frontend-stop:
+	docker stop transcendence_front
+
+frontend-dev: frontend-stop
+	$(DOCKER_COMPOSE) up -d frontend
+
+frontend-prod: frontend-stop
+	NODE_ENV=production $(DOCKER_COMPOSE) up -d frontend 
 
 blockchain_startmonitor:
 	docker exec $(blockchain) python /usr/src/app/scripts/push_to_blockchain.py --startMonitor &
