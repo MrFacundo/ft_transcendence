@@ -3,6 +3,9 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from app.users.models import UserOnlineStatus
 from channels.db import database_sync_to_async
 from django.utils import timezone
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 """
 
@@ -105,7 +108,8 @@ class UserOnlineStatusConsumer(AsyncWebsocketConsumer):
 
     @database_sync_to_async
     def set_user_offline(self):
-        UserOnlineStatus.objects.update_or_create(
-            user=self.user,
-            defaults={"is_online": False, "last_seen": timezone.now()}
-        )
+        if User.objects.filter(id=self.user.id).exists():
+            UserOnlineStatus.objects.update_or_create(
+                user=self.user,
+                defaults={"is_online": False, "last_seen": timezone.now()}
+            )
