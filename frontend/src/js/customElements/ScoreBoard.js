@@ -1,6 +1,8 @@
 import { settings } from "../settings.js";
 import { getAvatarSrc } from "../utils.js";
 
+
+
 class ScoreBoard extends HTMLElement {
     constructor() {
         super().attachShadow({ mode: "open" });
@@ -97,6 +99,7 @@ class ScoreBoard extends HTMLElement {
             </div>
         </div>`;
     }
+    
 }
 
 customElements.define("score-board", ScoreBoard);
