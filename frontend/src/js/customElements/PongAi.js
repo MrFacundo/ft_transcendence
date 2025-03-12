@@ -204,7 +204,7 @@ class PongAi extends HTMLElement {
     // Check win conditions: update score and either reset ball or end game at 3 points.
     if (this.ball.x <= 0) {
       this.aiScore++;
-      if (this.aiScore >= 1) {
+      if (this.aiScore >= 3) {
         this.endGame("Loooooser!!!");
       } else {
         this.resetBall();
