@@ -5,25 +5,26 @@ from rest_framework_simplejwt.views import TokenRefreshView
 from app.auth.views.auth_views import (
     LoginView,
     VerifyEmailView,
+    CustomTokenRefreshView
 )
 
 
 from app.auth.views.oauth_views import (
     OAuth42View,
-    OAuth42CallbackView,
+    OAuth42CallbackView
 )
 
 from app.auth.views.two_factor_auth_views import (
     VerifyOTPView,
     AuthenticatorSetupView,
-    VerifyAuthenticatorSetupView,
+    VerifyAuthenticatorSetupView
 )
 
 
 urlpatterns = [
     # Auth
     path('token/', LoginView.as_view(), name='token_obtain_pair'),
-    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('token/refresh/', CustomTokenRefreshView.as_view(), name='token_refresh'),
     path('verify-email/<str:token>/', VerifyEmailView.as_view(), name='verify-email'),
 
     # OAuth
