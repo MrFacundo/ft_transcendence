@@ -13,6 +13,8 @@ from django.db import models
 from app.users.models import Friendship
 from django.db.models import Q
 from django.utils import timezone
+from django_ratelimit.decorators import ratelimit
+from django.utils.decorators import method_decorator
 
 User = get_user_model()
 
@@ -20,6 +22,7 @@ class CreateGameInvitationView(APIView):
     """
     Sends a game request to the user with the given ID. Checks if the user is not sending a request to themselves, and if a request already exists.
     """
+    @method_decorator(ratelimit(key='user', rate='1/10s', block=True))
     def post(self, request, user_id):
         with transaction.atomic():
             receiver = get_object_or_404(User, id=user_id)
