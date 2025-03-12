@@ -131,19 +131,3 @@ class MatchHistoryListView(ListAPIView):
             (Q(player1_id=user_id) | Q(player2_id=user_id)) & 
             (Q(status="completed") | Q(status="interrupted"))
         )
-
-
-class CreateAIGameView(APIView):
-    def post(self, request):
-        try:
-            game = PongGame.objects.create(
-                player1=request.user, player2=None, status="not_started"
-            )
-            return Response(
-                {"id": game.id, "status": game.status}, status=status.HTTP_201_CREATED
-            )
-        except Exception as e:
-            return Response(
-                {"message": "Failed to create AI game", "error": str(e)},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
