@@ -57,7 +57,7 @@ module.exports = (env, argv) => {
     module: {
       rules: [
         {
-          test: /\.(png|jpe?g|gif|svg|webp)$/,
+          test: /\.(png|jpe?g|gif|ico|svg|webp)$/,
           type: "asset/resource",
           generator: {
             filename: "static/images/[name]" + (isProduction ? ".[contenthash]" : "") + "[ext]",
