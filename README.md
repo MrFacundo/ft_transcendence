@@ -1,10 +1,10 @@
 
-****<h1 align="center">
+<h1 align="center">
 	📖 42_Transcendence
 </h1>
 
 <h2 align="center">
-	42 Lisbon Cursus - Final Project
+	42 Lisbon Cursus - 🎉 Final Project 🎉
 </h2>
 
 <p align="center">
@@ -16,35 +16,17 @@
 
 ## Summary
 
-A full-stack web application that allows users to play a multiplayer game of Pong, and participate in tournaments.
+A full-stack web application that allows users to play games of Pong remotely, locally and against AI, as well as participating in tournaments.
 
 ## Tools
 
-### Containerization
-- Docker, Docker Compose
-
-### Backend
-- Django
-- PostgreSQL
-- Redis
-
-### Frontend
-- Webpack
-- JavaScript
-- HTML
-- CSS
-- Bootstrap
-
-### Profiling and Documentation
-- Silk Profiling
-- Redoc
-- Swagger
-  
-### Blockchain
-- Truffle
-- Ganache
-- Solidity
-
+|                      |                                                                  |
+|------------------------------|-----------------------------------------------------------------------|
+| **Containerization**         | Docker, Docker Compose                                                |
+| **Backend**                  | Django, PostgreSQL, Redis                                             |
+| **Frontend**                 | Webpack, JavaScript, HTML, CSS, SCSS, Bootstrap                       |
+| **Profiling and Documentation** | Silk Profiling, Redoc, Swagger                                      |
+| **Blockchain**               | Truffle, Ganache, Solidity                                            |
 ## Subject
 [📗️](en.subject.pdf) 
 
@@ -52,14 +34,14 @@ A full-stack web application that allows users to play a multiplayer game of Pon
 - Django as backend Framework.
 - Standard user management, authentication, users across tournaments.
 - Remote authentication using 42's OAuth2.
-- Two-Factor Authentication (2FA) and JWT
-- Remote (Online) players
-- AI opponents
+- Two-Factor Authentication (2FA) and JWT.
+- Remote (Online) players.
+- AI opponents.
 - Blockchain - The score of each game is recorded in a blockchain.
 - PostgreSQL as database.
-- Bootstrap as a front-end tooltik
-- Browser Compatibility: Chrome, Firefox
-- 
+- Bootstrap as a front-end tooltik.
+- Browser Compatibility: Chrome, Firefox.
+  
 ## Our implementation
 
 #### Frontend:
@@ -84,9 +66,6 @@ A full-stack web application that allows users to play a multiplayer game of Pon
   
 Copy the example environment from `.env.example` to `.env`. If needed, update credentials such as email client and 42's OAuth2.
 
-## Running the Application
-
-The following commands are available in the Makefile:
 
 ## Running the Application
 
@@ -95,9 +74,9 @@ The following commands are available in the Makefile:
 | Command                          | Description                                                                 |
 |----------------------------------|-----------------------------------------------------------------------------|
 | `up`, `down`, `build`, `clean`   | Perform the respective Docker Compose commands.                             |
-| `backend`, `frontend`, `db`, `cache`, `blockchain`, `waf` | Runs the respective service in interactive mode. |
-| `create_users`                   | Creates a set of users on the database, using the Django management command. |
-| `frontend-build`                 | Builds the frontend using Webpack.                                              |
+| `backend`, `frontend`, `db`, `cache`, `blockchain`, `waf` | Starts the respective service. |
+| `create_users`                   | Creates a set of users on the backend app and database.  |
+| `frontend-build`                 | Compiles and bundles the frontend files for the browser using Webpack.                                              |
 | `frontend-stop`                  | Stops the frontend container.                                               |
 | `frontend-dev`                   | Stops the frontend container and starts it in development mode.             |
 | `frontend-prod`                  | Stops the frontend container and starts it in production mode.              |
@@ -112,8 +91,4 @@ The following commands are available in the Makefile:
 - Frontend: http://localhost:8080
 - Django Admin: http://localhost:8000/admin/
 - Silk Profiling: http://localhost:8000/silk/
-### Accessing the Application
 
-- Frontend: http://localhost:8080
-- Django Admin: http://localhost:8000/admin/
-- Silk Profiling: http://localhost:8000/silk/
