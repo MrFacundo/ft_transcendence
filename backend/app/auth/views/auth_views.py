@@ -5,7 +5,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from rest_framework import status
-
+from rest_framework_simplejwt.views import TokenRefreshView
+from rest_framework.exceptions import NotFound
 from ..services import generate_jwt_response
 
 from app.auth.serializers import LoginSerializer
@@ -62,3 +63,17 @@ class VerifyEmailView(APIView):
                 return Response({'message': 'Email already verified.'}, status=status.HTTP_200_OK)
         except (BadSignature, User.DoesNotExist):
             return Response({'error': 'Invalid or expired token'}, status=status.HTTP_401_UNAUTHORIZED)
+
+class CustomTokenRefreshView(TokenRefreshView):
+    """"
+    Checks if the user exists before refreshing the token.
+    This avoids the error when the user is deleted and the token is still valid. 
+    """
+    def post(self, request, *args, **kwargs):
+        try:
+            return super().post(request, *args, **kwargs)
+        except User.DoesNotExist:
+            return Response(
+                {"detail": "User not found. Token refresh failed."},
+                status=status.HTTP_404_NOT_FOUND
+            )
