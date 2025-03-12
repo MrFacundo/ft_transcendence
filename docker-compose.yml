@@ -13,6 +13,8 @@ services:
       - backend
     env_file:
       - .env
+    environment:
+      - NODE_ENV=${NODE_ENV}
   backend:
     container_name: transcendence_back
     build:

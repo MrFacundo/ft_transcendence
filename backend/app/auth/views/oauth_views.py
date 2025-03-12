@@ -4,10 +4,9 @@ import secrets
 
 from django.conf import settings
 from django.shortcuts import redirect
-from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
-from ..services import get_or_create_user_from_oauth
+from ..services import get_or_create_user_from_oauth, DuplicateUserDataError
 
 logger = logging.getLogger(__name__)
 
@@ -61,7 +60,11 @@ class OAuth42CallbackView(APIView):
             response.set_cookie(
                 'refresh_token', str(tokens), httponly=False)
             return response
+
+        except DuplicateUserDataError as e:
+            logger.error(f"OAuth Error: {e}")
+            return redirect(f"{settings.FRONTEND_URL}/oauth-result?error=duplicate_data")   
         
         except Exception as e:
             logger.error(f"OAuth Error: {e}")
-            return redirect(f"{settings.FRONTEND_URL}/oauth-result?error=true")
+            return redirect(f"{settings.FRONTEND_URL}/oauth-result?error=unknown")

@@ -7,21 +7,34 @@ from django.core.mail import send_mail
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.response import Response
+from django.db import IntegrityError
 
 logger = logging.getLogger(__name__)
 User = get_user_model()
 signer = Signer()
 
+
+class DuplicateUserDataError(Exception):
+    pass
+
 def get_or_create_user_from_oauth(user_info):
-    user, created = User.objects.get_or_create(
-        oauth_uid=str(user_info['id']),
-        defaults={
-            'username': user_info['login'],
-            'email': user_info['email'].lower(),
-            'avatar_oauth': user_info['image']['versions']['medium'],
-            'email_is_verified': True,
-        }
-    )
+    try:
+        user, created = User.objects.get_or_create(
+            oauth_uid=str(user_info['id']),
+            defaults={
+                'username': user_info['login'],
+                'email': user_info['email'].lower(),
+                'avatar_oauth': user_info['image']['versions']['medium'],
+                'email_is_verified': True,
+            }
+        )
+    except IntegrityError as e:
+        if ('duplicate key value violates unique constraint "users_customuser_email_key"' in str(e) or
+            'duplicate key value violates unique constraint "users_customuser_new_email_key"' in str(e) or
+            'duplicate key value violates unique constraint "users_customuser_username_key"' in str(e)):
+            raise DuplicateUserDataError("Duplicate user data")
+        else:
+            raise e
     
     if not created:
         user.avatar_oauth = user_info['image']['versions']['medium']
