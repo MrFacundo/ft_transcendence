@@ -5,33 +5,48 @@
 - Ensure ports 8080 and 8000 are free on your machine.
 - Docker and Docker Compose should be installed.
 
-## Setup
+### Setup
 
-1. Copy the example environment variables file:
-```sh
-   cp .env.example .env
-```
-2. If needed, update the email and 42's OAuth2 credentials in the `.env` file.
+Copy the example environment from `.env.example` to `.env`. If needed, update credentials such as email client and 42's OAuth2.
 
+### Available Commands
 
-## Running the Project
-To start the project, run:
+The following commands are available in the Makefile:
 
-```sh
-	docker-compose up --build
-```
-Check the Makefile for more commands.
+`up`, `down`, `build`, `clean`
 
-## Accessing the Application
+Perform the respective Docker Compose commands.
+
+`backend`, `frontend`, `db`, `cache`, `blockchain`, `waf`
+
+Runs the respective service in interactive mode.
+
+`create_users`
+
+Creates a set of users on the database, using the Django management command.
+
+`blockchain_startmonitor`
+
+Starts monitoring games that have been completed or interrupted in the PostgreSQL database and saves them to the blockchain.
+
+`blockchain_stopmonitor`
+
+Stops the game monitoring process, preventing new games from being automatically recorded in the blockchain.
+
+`blockchain_listallgames`
+
+Lists all games that have been recorded in the blockchain.
+
+`blockchain_gamesbyplayers <player_id>`
+
+Retrieves all games in which a specific player has participated, using their player ID.
+
+`blockchain_gamesbytournament <tournament_id>`
+
+Retrieves all games associated with a specific tournament, using the tournament ID.
+
+### Accessing the Application
 
 - Frontend: http://localhost:8080
 - Django Admin: http://localhost:8000/admin/
 - Silk Profiling: http://localhost:8000/silk/
-
-## User creation
-
-- Users can be created using the `python manage.py create_users` management command in the backend container.
-- Users can also be created manually through the Django Admin interface. Superuser needs to be created first with the `createsuperuser` management command.
-- Users can also be created through the frontend interface.
-	- Using an email and password. (requires the email credentials to be set in the `.env` file).
-	- Using the 42 OAuth2 login (requires the 42 OAuth2 credentials to be setin the `.env` file).
