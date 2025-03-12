@@ -27,7 +27,6 @@ class Page {
      * Renders the page's content.
      */
     async open() {
-        const { app } = this;
         document.querySelectorAll("section").forEach((section) => { section.remove() });
         const tempElement = document.createElement(this.pageElement.tagName);
         tempElement.innerHTML = this.pageElement.innerHTML;
@@ -37,11 +36,11 @@ class Page {
         });
         document.title = this.name;
         this.renderNavbar(this);
-        this.render(app);
+        this.render(this.app);
     }
 
     /**
-     * Closes the page and removes event listeners.
+     * Closes the page and removes event listeners and state subscriptions.
      */
     close() {
         this.mainElement.querySelectorAll("[data-href]").forEach((element) => {
@@ -55,7 +54,6 @@ class Page {
 
     /**
      * Handles click events for navigation.
-     * @param {Event} event - The click event
      */
     handleClick(event) {
         event.preventDefault();

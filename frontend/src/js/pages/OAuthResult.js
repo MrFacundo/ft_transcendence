@@ -20,8 +20,11 @@ class OAuthResultPage extends Page {
         const error = urlParams.get("error");
 
         const messageEl = document.getElementById("oauth-message");
-        if (error) {
+        if (error === "unknown") {
             messageEl.textContent = "An error occurred while logging in. Please close this window and try again.";
+            messageEl.classList.add("error-message", "alert", "alert-danger");
+        } else if (error === "duplicate_data") {
+            messageEl.textContent = "An account with this credentials already exists. Please try with a different account.";
             messageEl.classList.add("error-message", "alert", "alert-danger");
         } else {
             messageEl.textContent = "Login successful! You can close this window.";
