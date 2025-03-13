@@ -35,6 +35,8 @@ class ScoreBoard extends HTMLElement {
                 this.shadowRoot.getElementById(`${key}-${winner}`).style.cssText =
                     key === "avatar" ? "border: 2px solid yellow;" : "color: gold;";
             });
+            const winnerUsername = winner === 1 ? match.player1.username : match.player2.username;
+            setElement("game-winner", `${winnerUsername} wins!`);
         }
     }
 
@@ -56,6 +58,7 @@ class ScoreBoard extends HTMLElement {
                 display: flex; 
                 justify-content: space-between; 
                 align-items: center; 
+                justify-content: center;
                 margin-bottom: 1rem; 
             }
             
@@ -78,8 +81,15 @@ class ScoreBoard extends HTMLElement {
             .text-danger { 
                 color: #dc3545; 
             }
+            #game-winner {
+                font-family: "CustomFont", sans-serif;
+	            text-transform: uppercase;
+            }
         </style>
         <div id="scoreboard">
+            <div class="row">
+                <h2 id="game-winner"></h2>
+            </div>
             <div class="row">
                 <div class="col-avatar"><img id="avatar-1" src="${settings.EMPTY_AVATAR_URL}" alt="Avatar" width="100" height="100"></div>
                 <div class="score">

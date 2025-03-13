@@ -14,37 +14,40 @@ class AIPage extends Page {
   }
 
   async render() {
-    const difficultySelect = document.querySelector("#difficulty");
-    const startGameBtn = document.querySelector("#startGame");
-    const resultModal = document.querySelector("#resultModal");
-    const settingsEl = document.querySelector("#ai-game-settings");
+    const difficultyCards = document.querySelectorAll("#ai-game-settings .card");
 
-    startGameBtn.onclick = () => {
-      this.app.stateManager.updateState("currentGame", true);
+    difficultyCards.forEach(card => {
+      card.onclick = () => {
+        const difficulty = card.dataset.difficulty;
+        this.startGame(difficulty);
+      };
+    });
 
-      resultModal.classList.add("d-none");
-      settingsEl.classList.add("d-none");
-      const gameEl = document.createElement("div");
-      gameEl.id = "Game";
-      gameEl.style.cssText = `display:flex;justify-content:center;align-items:center;height:100vh;`;
-
-      const pongAi = document.createElement("pong-ai");
-      pongAi.setApp(this.app);
-      pongAi.setAttribute("difficulty", difficultySelect.value);
-
-      this.mainElement.appendChild(gameEl);
-      gameEl.appendChild(pongAi);
-    };
-    
     this.mainElement.addEventListener("gameEnd", this.handleGameEnd);
+  }
+
+  startGame(difficulty) {
+    this.app.stateManager.updateState("currentGame", true);
+
+    const settingsEl = document.querySelector("#ai-game-settings");
+    settingsEl.classList.add("d-none");
+
+    const gameEl = document.createElement("div");
+    gameEl.id = "Game";
+    gameEl.style.cssText = `display:flex;justify-content:center;align-items:start;height:100vh;`;
+
+    const pongAi = document.createElement("pong-ai");
+    pongAi.setApp(this.app);
+    pongAi.setAttribute("difficulty", difficulty);
+
+    this.mainElement.appendChild(gameEl);
+    gameEl.appendChild(pongAi);
   }
 
   handleGameEnd(e) {
     const gameEl = document.querySelector("#Game");
     gameEl && gameEl.remove();
-    const resultModal = document.querySelector("#resultModal");
     const settingsEl = document.querySelector("#ai-game-settings");
-    resultModal.classList.remove("d-none");
     settingsEl.classList.remove("d-none");
     this.app.stateManager.updateState("currentGame", false);
   }

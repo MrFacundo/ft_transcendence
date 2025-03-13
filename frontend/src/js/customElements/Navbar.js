@@ -35,7 +35,7 @@ class Navbar extends BaseElement {
             this.setDisplay([loginEl, registerEl], "flex");
             this.setDisplay([profileEl, settingsEl, logoutEl], "none");
             this.setDisplay([pagesNavEl], "none");
-            navbarEl.style.backgroundColor = "#0c6dfd";
+            navbarEl.style.backgroundColor = "#383e45";
         }
 
         pagesNavEl.querySelectorAll(".nav-link").forEach(link => {

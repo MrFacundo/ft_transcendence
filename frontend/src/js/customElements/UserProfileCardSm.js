@@ -30,6 +30,8 @@ class UserProfileCardSm extends BaseElement {
         if (!profileContainer.querySelector(".btn-warning")) {
             const pendingButton = document.createElement("button");
             pendingButton.className = "btn-warning";
+            pendingButton.style.position = "absolute";
+            pendingButton.style.right = "16px";
             pendingButton.innerText = expiresAt;
             profileContainer.appendChild(pendingButton);
         }

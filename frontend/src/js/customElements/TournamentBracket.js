@@ -145,7 +145,7 @@ class TournamentBracket extends BaseElement {
         const winnerUsername = final_game.winner === final_game.player1.id ? 
             final_game.player1.username : 
             final_game.player2.username;
-        headerEl.textContent = `Winner: ${winnerUsername}`;
+        headerEl.textContent = `${winnerUsername} wins`;
     }
 
     handleStartButtonClick = () => {
@@ -189,12 +189,14 @@ class TournamentBracket extends BaseElement {
                 text-align: center;
                 margin-bottom: 40px;
                 color: white;
+                font-family: 'Roboto', sans-serif;
             }
 
             .header h3 {
                 font-size: 2.5em;
                 margin: 0;
-                color: #ffd700;
+                font-family: "CustomFont", sans-serif;
+	            text-transform: uppercase;
             }
 
             .start-button-container {
@@ -206,11 +208,11 @@ class TournamentBracket extends BaseElement {
 
             .start-button-container button {
                 font-size: 2.5em;
-                margin: 0;
-                color: #ffd700;
-                padding: 17px;
+                margin-top: 5rem;
+                color: white;
+                padding: 15px;
             	background: #202428;
-                border-radius: 15px;
+                border-radius: 0.5rem;
                 transition: all 0.3s;
                 cursor: pointer;
             }
@@ -378,7 +380,7 @@ class TournamentBracket extends BaseElement {
         </style>
 
         <div class="tournament-container">
-            <div class="header">
+            <div class="header title">
                 <h3></h3>
             </div>
             
