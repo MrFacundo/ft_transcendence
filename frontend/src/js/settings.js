@@ -7,7 +7,7 @@ const DEBUG = process.env.NODE_ENV !== 'production';
 
 export const settings = {
     "EMPTY_AVATAR_URL": EMPTY_AVATAR_URL,
-    "API_URL": API_WAF_URL,
+    "API_URL": API_URL,
     "MEDIA_URL": MEDIA_URL,
     "WS_URL": WS_URL,
     "DEBUG": DEBUG,
