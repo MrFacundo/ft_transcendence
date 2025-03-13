@@ -17,7 +17,7 @@
 </head>
 
 <body class="loading">
-    <div class="d-none" id="background"></div>
+    <div id="background"></div>
     <p id="noScript">
         this website requires javascript to be enabled
     </p>
@@ -26,7 +26,7 @@
         <!-- code will be injected by app -->
     </div>
     <section id="Login">
-        <div class="container col-xl-10 col-xxl-8 px-4 py-5">
+        <div class="container col-xl-10 col-xxl-8 px-4 py-5 text-black">
             <div class="row align-items-center g-lg-5 py-5">
                 <div class="col-lg-7 text-center text-lg-start">
                     <h2 class="display-4 fw-bold lh-1 mb-3">Welcome to Pong</h2>
@@ -67,7 +67,8 @@
                     <custom-form>
                         <h1 class="title h3 mb-3 fw-normal text-black">Let's get you registered :)</h1>
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="Username" placeholder="Username" autocomplete="off" />
+                            <input type="text" class="form-control" id="Username" placeholder="Username"
+                                autocomplete="off" />
                             <label for="Username">Username</label>
                         </div>
                         <div class="form-floating mb-3">
@@ -181,7 +182,8 @@
                         <h3>Change Email</h3>
                         <div class="mb-3">
                             <label for="new-email" class="form-label">New Email</label>
-                            <input type="email" class="form-control" id="new-email" placeholder="example@email.com" autocomplete="off" readonly onfocus="this.removeAttribute('readonly');">
+                            <input type="email" class="form-control" id="new-email" placeholder="example@email.com"
+                                autocomplete="off" readonly onfocus="this.removeAttribute('readonly');">
                         </div>
                         <button class="btn btn-primary">Change Email</button>
                     </div>
@@ -244,14 +246,12 @@
                     </div>
 
                     <!-- Two-Factor Authentication Modal -->
-                    <div class="modal fade" id="authenticatorModal" tabindex="-1"
+                    <div class="modal fade align-content-center text-black" id="authenticatorModal" tabindex="-1"
                         aria-labelledby="authenticatorModalLabel" aria-hidden="true">
                         <div class="modal-dialog">
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <h5 class="modal-title" id="authenticatorModalLabel">Authenticator Setup</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                        aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
                                     <p>Scan the QR code below with your authenticator app. Once scanned, enter the OTP
@@ -339,11 +339,11 @@
                 </div>
             </div>
             <div class="col-md-3">
-                <div class="card my-4 shadow-sm" style="min-height: 250px; cursor: pointer;"
-                    data-href="/pvp_offline">
+                <div class="card my-4 shadow-sm" style="min-height: 250px; cursor: pointer;" data-href="/pvp_offline">
                     <div class="d-flex flex-column card-body text-center align-items-center">
                         <h5 class="card-title">Local 1vs1</h5>
-                        <img src="/static/images/offline-pvp.svg" class="margin-0" alt="Offline Icon" width="130" height="130">
+                        <img src="/static/images/offline-pvp.svg" class="margin-0" alt="Offline Icon" width="130"
+                            height="130">
                     </div>
                 </div>
             </div>
@@ -399,7 +399,6 @@
                     <div class="d-flex flex-column card-body text-center align-items-center">
                         <h5 class="card-title">Create</h5>
                         <img src="/static/images/pencil-square.svg" alt="Pencil Icon" width="130" height="130">
-                        <p class="card-text mt-4">Create a new tournament.</p>
                     </div>
                 </div>
             </div>
@@ -408,7 +407,6 @@
                     <div class="d-flex flex-column card-body text-center align-items-center">
                         <h5 class="card-title">Join</h5>
                         <img src="/static/images/person-plus-fill.svg" alt="Person Icon" width="130" height="130">
-                        <p class="card-text mt-4">Join an existing tournament.</p>
                     </div>
                 </div>
             </div>
@@ -484,30 +482,27 @@
 
     <section id="AI" class="container mt-5">
         <h1 class="title mb-4">AI Game</h1>
-        <div id="resultModal" class="result-modal d-none">
         </div>
-        <div class="row" id="ai-game-settings">
-            <div class="col-md-8">
-                <div class="card shadow">
+        <div class="row" id="ai-game-settings" style="text-align: -webkit-center;">
+            <div class="col-md-4">
+                <div class="card shadow" data-difficulty="easy">
                     <div class="card-body">
-                        <h2 class="text-center mb-4">Game Settings</h2>
-                        <div class="form-group mb-4">
-                            <label for="difficulty">Select Difficulty</label>
-                            <select class="form-select" id="difficulty">
-                                <option value="easy">Easy</option>
-                                <option value="medium">Medium</option>
-                                <option value="hard">Hard</option>
-                            </select>
-                        </div>
-                        <button id="startGame" class="btn btn-primary w-100">Start Game</button>
+                        <h2 class="text-center mb-4 title">Novice</h2>
                     </div>
                 </div>
             </div>
-            <div class="col-md-4 d-flex flex-column align-items-center text-center">
-                <user-profile bot="true"></user-profile>
-                <div class="mt-3">
-                    <h4>AI Opponent</h4>
-                    <p>Challenge our AI bot to improve your skills!</p>
+            <div class="col-md-4">
+                <div class="card shadow" data-difficulty="medium">
+                    <div class="card-body">
+                        <h2 class="text-center mb-4 title">Warrior</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card shadow" data-difficulty="hard">
+                    <div class="card-body">
+                        <h2 class="text-center mb-4 title">Master</h2>
+                    </div>
                 </div>
             </div>
         </div>
