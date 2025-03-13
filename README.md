@@ -18,15 +18,24 @@
 
 A full-stack web application that allows users to play games of Pong remotely, locally and against AI, as well as participating in tournaments.
 
+<p align="center">
+    <img src="./showcase/login.png" alt="Login page" style="width: 500px; margin-bottom: 20px;"/> 
+    <img src="./showcase/home.png" alt="home page" style="width: 500px; margin-bottom: 20px;"/> 
+    <img src="./showcase/ai.png" alt="AI page" style="width: 500px; margin-bottom: 20px;"/> 
+    <img src="./showcase/tournament.png" alt="Tournament page" style="width: 500px; margin-bottom: 20px;"/> 
+    <img src="./showcase/settings.png" alt="Settings page" style="width: 500px; margin-bottom: 20px;"/> 
+</p>
+
+
 ## Tools
 
-|                      |                                                                  |
-|------------------------------|-----------------------------------------------------------------------|
-| **Containerization**         | Docker, Docker Compose                                                |
-| **Backend**                  | Django, PostgreSQL, Redis                                             |
-| **Frontend**                 | Webpack, JavaScript, HTML, CSS, SCSS, Bootstrap                       |
-| **Profiling and Documentation** | Silk Profiling, Redoc, Swagger                                      |
-| **Blockchain**               | Truffle, Ganache, Solidity                                            |
+|                                 |                                                         |
+| ------------------------------- | ------------------------------------------------------- |
+| **Containerization**            | Docker, Docker Compose                                  |
+| **Backend**                     | Django, PostgreSQL, Redis                               |
+| **Frontend**                    | NodeJs, Webpack, JavaScript, HTML, CSS, SCSS, Bootstrap |
+| **Profiling and Documentation** | Silk Profiling, Redoc, Swagger                          |
+| **Blockchain**                  | Truffle, Ganache, Solidity                              |
 ## Subject
 [📗️](en.subject.pdf) 
 
@@ -46,7 +55,7 @@ A full-stack web application that allows users to play games of Pong remotely, l
 
 #### Frontend:
 
-- Features a Single Page Application (SPA) that uses a class-based system to manage navigation and rendering of pages and components.
+- A Single Page Application (SPA) utilizing a class-based system for managing navigation and rendering of pages and components.
 - It communicates with the backend using RESTful APIs and WebSockets, allowing for real-time updates.
 - App, pages and components have their own state management. State is updated on WebSocket events, API calls, and user interactions.
 - Using the Observer pattern, pages and components can subscribe to state changes and re-render when necessary.
@@ -71,20 +80,20 @@ Copy the example environment from `.env.example` to `.env`. If needed, update cr
 
 The following commands are available in the Makefile:
 
-| Command                          | Description                                                                 |
-|----------------------------------|-----------------------------------------------------------------------------|
-| `up`, `down`, `build`, `clean`   | Perform the respective Docker Compose commands.                             |
-| `backend`, `frontend`, `db`, `cache`, `blockchain`, `waf` | Starts the respective service. |
-| `create_users`                   | Creates a set of users on the backend app and database.  |
-| `frontend-build`                 | Compiles and bundles the frontend files for the browser using Webpack.                                              |
-| `frontend-stop`                  | Stops the frontend container.                                               |
-| `frontend-dev`                   | Stops the frontend container and starts it in development mode.             |
-| `frontend-prod`                  | Stops the frontend container and starts it in production mode.              |
-| `blockchain_startmonitor`        | Starts monitoring games that have been completed or interrupted in the PostgreSQL database and saves them to the blockchain. |
-| `blockchain_stopmonitor`         | Stops the game monitoring process, preventing new games from being automatically recorded in the blockchain. |
-| `blockchain_listallgames`        | Lists all games that have been recorded in the blockchain.                  |
-| `blockchain_gamesbyplayers <player_id>` | Retrieves all games in which a specific player has participated, using their player ID. |
-| `blockchain_gamesbytournament <tournament_id>` | Retrieves all games associated with a specific tournament, using the tournament ID. |
+| Command                                                   | Description                                                                                                                  |
+| --------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `up`, `down`, `build`, `clean`                            | Perform the respective Docker Compose commands.                                                                              |
+| `backend`, `frontend`, `db`, `cache`, `blockchain`, `waf` | Starts the respective service.                                                                                               |
+| `create_users`                                            | Creates a set of users on the backend app and database.                                                                      |
+| `frontend-build`                                          | Compiles and bundles the frontend files for the browser using Webpack.                                                       |
+| `frontend-stop`                                           | Stops the frontend container.                                                                                                |
+| `frontend-dev`                                            | Stops the frontend container and starts it in development mode.                                                              |
+| `frontend-prod`                                           | Stops the frontend container and starts it in production mode.                                                               |
+| `blockchain_startmonitor`                                 | Starts monitoring games that have been completed or interrupted in the PostgreSQL database and saves them to the blockchain. |
+| `blockchain_stopmonitor`                                  | Stops the game monitoring process, preventing new games from being automatically recorded in the blockchain.                 |
+| `blockchain_listallgames`                                 | Lists all games that have been recorded in the blockchain.                                                                   |
+| `blockchain_gamesbyplayers <player_id>`                   | Retrieves all games in which a specific player has participated, using their player ID.                                      |
+| `blockchain_gamesbytournament <tournament_id>`            | Retrieves all games associated with a specific tournament, using the tournament ID.                                          |
 
 ### Accessing the Application
 

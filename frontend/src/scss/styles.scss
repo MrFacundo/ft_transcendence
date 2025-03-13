@@ -1,6 +1,13 @@
 @import "bootstrap/scss/bootstrap";
 @import "./pong.scss";
 
+@font-face {
+    font-family: 'CustomFont';
+    src: url('../fonts/mk3.ttf') format('truetype');
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Titillium+Web:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700&display=swap');
+
 html {
     overflow-y: scroll;
 }
@@ -20,10 +27,10 @@ html {
 
 #main {
     padding: 3rem;
-
     @media (min-width: 1200px) {
         padding: 3rem 10rem;
     }
+    font-family: "Titillium Web", sans-serif;
 }
 
 .card {
@@ -80,4 +87,9 @@ html {
 
 .transition-opacity {
     transition: opacity 0.5s ease-in-out;
+}
+
+.title {
+    font-family: 'CustomFont', sans-serif;
+    text-transform: uppercase;
 }
