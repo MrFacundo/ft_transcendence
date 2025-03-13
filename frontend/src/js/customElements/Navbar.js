@@ -16,6 +16,7 @@ class Navbar extends BaseElement {
     render() {
         const pagesNavEl = this.shadowRoot.querySelector(".navbar-center > .navbar-nav");
         const loginEl = this.shadowRoot.querySelector(".login");
+        const navbarEl = this.shadowRoot.querySelector(".navbar");
         const registerEl = this.shadowRoot.querySelector(".register");
         const profileEl = this.shadowRoot.querySelector(".profile");
         const settingsEl = this.shadowRoot.querySelector(".settings");
@@ -29,10 +30,12 @@ class Navbar extends BaseElement {
             this.setDisplay([settingsEl, logoutEl], "flex");
             this.setDisplay([profileEl], "flex");
             this.setDisplay([pagesNavEl], "flex");
+            navbarEl.style.backgroundColor = "#1e1e1e7f";
         } else {
             this.setDisplay([loginEl, registerEl], "flex");
             this.setDisplay([profileEl, settingsEl, logoutEl], "none");
             this.setDisplay([pagesNavEl], "none");
+            navbarEl.style.backgroundColor = "#0c6dfd";
         }
 
         pagesNavEl.querySelectorAll(".nav-link").forEach(link => {
@@ -40,7 +43,7 @@ class Navbar extends BaseElement {
             if (link.dataset.href === this.page.url) {
                 link.style.fontWeight = "bold";
                 if (parentLi) {
-                    parentLi.style.borderBottom = "2px solid white";
+                    parentLi.style.borderBottom = "2px solid #fec006";
                 }
             } else {
                 link.style.fontWeight = "normal";
@@ -91,7 +94,7 @@ class Navbar extends BaseElement {
                     justify-content: space-between;
                     align-items: center;
                     padding: 0.5rem 1rem;
-                    background-color: #0d6efd;
+                    background-color: #1e1e1e7f;
                     height: 40px;
                 }
                 .navbar a, .nav-link {
@@ -99,7 +102,7 @@ class Navbar extends BaseElement {
                     text-decoration: none;
                 }
                 .navbar-center a:hover {
-                    color: yellow;
+                    color: #fec006;
                 }
                 a:hover, .profile {
                     cursor: pointer;

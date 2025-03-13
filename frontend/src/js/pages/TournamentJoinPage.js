@@ -41,7 +41,8 @@ class TournamentPage extends Page {
         openTournaments.forEach(({ id, name, participants, participants_amount }) => {
             const tournamentItem = document.createElement("li");
             tournamentItem.id = `tournament-${id}`;
-            tournamentItem.className = "list-group-item d-flex justify-content-between align-items-center shadow-lg p-4 my-3 rounded cursor-pointer";
+            tournamentItem.className = "text-white list-group-item d-flex justify-content-between align-items-center shadow-lg p-4 my-3 rounded cursor-pointer";
+            tournamentItem.style.backgroundColor = "#202428";
             tournamentItem.innerHTML = `<span>${name}</span><span class="badge bg-light text-dark">${participants.length} / ${participants_amount}</span>`;
             tournamentListElement.appendChild(tournamentItem);
 

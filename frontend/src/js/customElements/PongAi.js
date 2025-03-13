@@ -6,6 +6,8 @@ class PongAi extends HTMLElement {
     this.canvas.width = 900;
     this.canvas.height = 500;
     this.canvas.style.border = "2px solid red";
+    this.canvas.style.position = "relative";
+    this.canvas.style.top = "50%";
     this.shadowRoot.appendChild(this.canvas);
     this.ctx = this.canvas.getContext("2d");
 
@@ -286,9 +288,8 @@ class PongAi extends HTMLElement {
       display:flex;
       justify-content:center;
       align-items:center;
-      background:white;
       font-size:48px;
-      color:black;
+      color:#000;
       z-index:1000;
     `;
     overlay.textContent = message;
