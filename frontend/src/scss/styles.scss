@@ -31,6 +31,8 @@ body {
 	background-position: center;
 	filter: brightness(70%) blur(2px);
 	z-index: -1;
+	opacity: 0; 
+	transition: opacity 0.5s ease-in-out;
 }
 
 [data-href],
@@ -39,8 +41,10 @@ body {
 	cursor: pointer;
 }
 
-[data-page="login"] {
-	color: #000;
+[data-page="ai"] {
+	.card-body {
+		align-content: center;
+	}
 }
 
 .form-signin {
@@ -73,7 +77,7 @@ body {
 
 .card:hover {
 	transform: translateY(-10px);
-	box-shadow: 0 10px 20px rgba(0, 0, 0, 0.6);
+	box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6) !important;
 }
 
 .card-body {
@@ -109,9 +113,13 @@ body {
 .title {
 	font-family: "CustomFont", sans-serif;
 	text-transform: uppercase;
-	color: #fff;
 }
 
 #settings-container {
 	background: #202428;
+}
+
+button {
+	background: #383e45 !important;
+	border: 1px solid grey !important;
 }

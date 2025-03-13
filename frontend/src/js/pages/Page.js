@@ -85,10 +85,12 @@ class Page {
 
     toggleBackground(active) {
         const backgroundEl = document.querySelector("#background");
-        const noBackgroundPages = ["login", "register", "404", "auth-result", "two-factor-auth", "verify-email"];
-       console.log("TEST: Toggling background", active, this.name, backgroundEl);
-        if (active  && !noBackgroundPages.includes(this.name)) backgroundEl.classList.remove("d-none");
-        else backgroundEl.classList.add("d-none");
+        const noBackgroundPages = ["login", "register", "404", "auth-result", "two-factor-auth", "verify-email", "oauth-result"];
+        if (active && !noBackgroundPages.includes(this.name)) {
+            backgroundEl.style.opacity = "1";
+        } else {
+            backgroundEl.style.opacity = "0";
+        }
     }
 }
 
