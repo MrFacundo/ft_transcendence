@@ -14,6 +14,7 @@ class Navbar extends BaseElement {
     }
 
     render() {
+        const pagesNavEl = this.shadowRoot.querySelector(".navbar-center > .navbar-nav");
         const loginEl = this.shadowRoot.querySelector(".login");
         const registerEl = this.shadowRoot.querySelector(".register");
         const profileEl = this.shadowRoot.querySelector(".profile");
@@ -23,15 +24,32 @@ class Navbar extends BaseElement {
         if (this.state.authenticated) {
             const { user } = this.state;
             profileEl.querySelector("img").src = user.avatarUrl || settings.EMPTY_AVATAR_URL;
-            profileEl.querySelector(".username").textContent = user.username;
             profileEl.setAttribute("data-href", `/profile/${user.id}`);
             this.setDisplay([loginEl, registerEl], "none");
-            this.setDisplay([settingsEl, logoutEl], "block");
+            this.setDisplay([settingsEl, logoutEl], "flex");
             this.setDisplay([profileEl], "flex");
+            this.setDisplay([pagesNavEl], "flex");
         } else {
-            this.setDisplay([loginEl, registerEl], "block");
+            this.setDisplay([loginEl, registerEl], "flex");
             this.setDisplay([profileEl, settingsEl, logoutEl], "none");
+            this.setDisplay([pagesNavEl], "none");
         }
+
+        pagesNavEl.querySelectorAll(".nav-link").forEach(link => {
+            const parentLi = link.closest("li");
+            if (link.dataset.href === this.page.url) {
+                link.style.fontWeight = "bold";
+                if (parentLi) {
+                    parentLi.style.borderBottom = "2px solid white";
+                }
+            } else {
+                link.style.fontWeight = "normal";
+                if (parentLi) {
+                    parentLi.style.borderBottom = "none";
+                }
+            }
+        });
+
 
         if (!this.listenersAdded) {
             this.shadowRoot.querySelectorAll("[data-href]").forEach(element => {
@@ -79,54 +97,58 @@ class Navbar extends BaseElement {
                 .navbar a, .nav-link {
                     color: white;
                     text-decoration: none;
-                    margin-right: 1rem;
-                    font-weight: 500;
                 }
-                .navbar a:hover, .nav-link:hover {
-                    color: lightgray;
+                .navbar-center a:hover {
+                    color: yellow;
+                }
+                a:hover, .profile {
                     cursor: pointer;
                 }
                 .navbar-brand {
                     font-size: 1.25rem;
                     font-weight: bold;
+                    font-family: 'CustomFont', sans-serif;
                 }
                 .navbar-center {
                     align-items: center;
                     gap: 0.5rem;
+                    font-family: 'CustomFont', sans-serif;
+                    text-transform: uppercase;
+                    font-size: 14px;
                 }
                 .navbar-nav {
                     display: flex;
-                    gap: 1rem;
+                    align-items: center;
                     list-style: none;
-                    padding: 0;
-                    margin: 0;
                 }
-                .profile {
-                    cursor: pointer;
+                .nav-item {
+                     padding: 3px 10px;
                 }
                 img.avatar {
                     border-radius: 50%;
                     margin-right: 0.5rem;
                     border: 1px solid white;
+                    object-fit: cover;
                 }
-                .username {
-                    color: white;
-                    font-weight: 500;
-                    width: 100px;
-                }
-
             </style>
             <nav class="navbar">
                 <a class="navbar-brand" data-href="/home">PONG</a>
-                <div class="profile navbar-center" data-href="/profile">
-                    <img src="${settings.EMPTY_AVATAR_URL}" width="40" height="40" alt="Avatar" class="avatar" />
-                    <span class="username"></span>
+                <div class="navbar-center" >
+                    <ul class="navbar-nav">
+                        <li class="nav-item"><a class="nav-link title" data-href="/onlinepvp">Online 1v1</a></li>
+                        <li class="nav-item"><a class="nav-link" data-href="/tournament">Tournamens</a></li>
+                        <li class="nav-item"><a class="nav-link" data-href="/pvp_offline">Local 1v1</a></li>
+                        <li class="nav-item"><a class="nav-link" data-href="/ai">AI Game</a></li>
+                    </ul>
                 </div>
                 <ul class="navbar-nav">
                     <li class="login nav-item"><a class="nav-link" data-href="/login">Login</a></li>
                     <li class="register nav-item"><a class="nav-link" data-href="/register">Register</a></li>
                     <li class="settings nav-item"><a class="nav-link" data-href="/settings">Settings</a></li>
                     <li class="logout nav-item"><a class="nav-link">Logout</a></li>
+                    <li class="profile nav-item" data-href="/profile">
+                        <img src="${settings.EMPTY_AVATAR_URL}" width="40" height="40" alt="Avatar" class="avatar" />
+                    </li>
                 </ul>
             </nav>
         `;

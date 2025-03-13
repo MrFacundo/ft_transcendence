@@ -28,13 +28,13 @@
         <div class="container col-xl-10 col-xxl-8 px-4 py-5">
             <div class="row align-items-center g-lg-5 py-5">
                 <div class="col-lg-7 text-center text-lg-start">
-                    <h1 class="display-4 fw-bold lh-1 text-body-emphasis mb-3">Welcome to Pong</h1>
+                    <h2 class="display-4 fw-bold lh-1 text-body-emphasis mb-3">Welcome to Pong</h2>
                     <p class="col-lg-10 fs-4">Join us for PvP, AI, and tournaments. Sign in or register to get started.
                     </p>
                 </div>
                 <div class="col-md-10 mx-auto col-lg-5 bg-body-tertiary p-5">
                     <custom-form id="login-form">
-                        <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
+                        <h2 class="h3 mb-3 fw-normal">Please sign in</h2>
                         <div class="form-floating mb-3">
                             <input type="email" class="form-control" id="login-email" />
                             <label for="login-email">Username or email</label>
@@ -64,7 +64,7 @@
             <div class="bg-body-tertiary p-5">
                 <main id="register-form-container" class="form-signin w-100 m-auto">
                     <custom-form>
-                        <h1 class="h3 mb-3 fw-normal">Let's get you registered :)</h1>
+                        <h1 class="title h3 mb-3 fw-normal">Let's get you registered :)</h1>
                         <div class="form-floating mb-3">
                             <input type="text" class="form-control" id="Username" placeholder="Username" autocomplete="off" />
                             <label for="Username">Username</label>
@@ -136,7 +136,7 @@
     </section>
 
     <section id="UserSettings" class="container mt-5">
-        <h1 class="mb-4">User settings</h1>
+        <h1 class="title mb-4">User settings</h1>
         <div class="row justify-content-center min-vh-100 bg-white">
             <div class="bg-light rounded p-4 d-flex flex-column" style="height: 400px;">
                 <ul class="nav nav-tabs mb-3" id="pills-tab" role="tablist">
@@ -300,7 +300,7 @@
         </div>
     </section>
     <section id="Home" class="container mt-5">
-        <h1 class="mb-4 text-center display-4">CHOOSE YOUR DESTINY</h1>
+        <h1 class="title mb-4 text-center display-4 title">CHOOSE YOUR DESTINY</h1>
         <div class="row">
             <div class="col-md-3">
                 <div class="card bg-light my-4 shadow-sm" style="min-height: 250px; cursor: pointer;">
@@ -336,7 +336,7 @@
                 </div>
             </div>
         </div>
-        <h2 class="my-5 text-center display-6">Add friends</h2>
+        <h2 class="title my-5 text-center display-6">Add friends</h2>
         <div class="row">
             <div class="col-md-4">
                 <p>Invitations Received</p>
@@ -354,7 +354,7 @@
     </section>
 
     <section id="OnlinePvp" class="container mt-5">
-        <h1 class="mb-4">Online Pong</h1>
+        <h1 class="title mb-4">Online Pong</h1>
         <div class="row">
             <div class="col-md-4">
                 <p>Invitations Received</p>
@@ -376,7 +376,7 @@
     </section>
 
     <section id="Tournament" class="container mt-5">
-        <h1 class="mb-4">Tournament</h1>
+        <h1 class="title mb-4">Tournament</h1>
         <div id="cards-container" class="row justify-content-around d-none">
             <div class="col-md-4" data-href="/tournament-create">
                 <div class="card bg-light my-4 shadow-sm" style="min-height: 250px; cursor: pointer;">
@@ -415,10 +415,10 @@
     </section>
 
     <section id="TournamentCreate" class="container mt-5">
-        <h1 class="mb-4">Create Tournament</h1>
+        <h1 class="title mb-4">Create Tournament</h1>
         <div class="row justify-content-around">
             <custom-form class="col-md-8">
-                <h1 class="h3 mb-3 fw-normal">Enter your tournament settings</h1>
+                <h1 class="title h3 mb-3 fw-normal">Enter your tournament settings</h1>
                 <div class="form-check mb-3">
                     <label for="tournament-name">Tournament Name</label>
                     <input type="text" class="form-control" id="tournament-name" />
@@ -437,7 +437,7 @@
     </section>
 
     <section id="TournamentJoin" class="container mt-5">
-        <h1 class="mb-4">Join a Tournament</h1>
+        <h1 class="title mb-4">Join a Tournament</h1>
         <div class="row justify-content-around">
             <ol class="list-group col-md-6 mx-auto" id="tournament-list">
             </ol>
@@ -445,7 +445,7 @@
     </section>
 
     <section id="Profile" class="container mt-5">
-        <h1 class="mb-4"></h1>
+        <h1 class="title mb-4"></h1>
         <div class="row">
             <user-profile class="col-md-4"></user-profile>
             <div class="col-md-8">
@@ -455,7 +455,7 @@
                 </ul>
             </div>
         </div>
-        <h2 id="friend-list-title" class="my-5 text-center display-6"></h2>
+        <h2 id="friend-list-title" class="title my-5 text-center display-6"></h2>
         <div class="row justify-content-center">
             <div class="col-md-4">
                 <user-list id="friend-list"></user-list>
@@ -467,7 +467,7 @@
     </section>
 
     <section id="AI" class="container mt-5">
-        <h1 class="mb-4">AI Game</h1>
+        <h1 class="title mb-4">AI Game</h1>
         <div id="resultModal" class="result-modal d-none">
         </div>
         <div class="row" id="ai-game-settings">
@@ -498,7 +498,7 @@
     </section>
 
     <section id="Game">
-        <h1>NOW YOU PONG</h1>
+        <h1 class="title">NOW YOU PONG</h1>
         <pong-game></pong-game>
         <score-board class="d-none"></score-board>
     </section>
