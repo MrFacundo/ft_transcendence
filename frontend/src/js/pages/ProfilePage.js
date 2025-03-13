@@ -15,6 +15,12 @@ class ProfilePage extends Page {
     createMatchItem(match) {
         const matchItem = document.createElement("li");
         matchItem.className = "list-group-item";
+        Object.assign(matchItem.style, {
+            width: "300px",
+            textAlign: "center",
+            backgroundColor: "#202428",
+            color: "white"
+        });
         const formattedDate = formatDate(match.date_played);
         matchItem.textContent = `${match.opponent.username} - ${match.result} - ${formattedDate}`;
         matchItem.setAttribute("data-href", `/profile/${match.opponent.id}`);

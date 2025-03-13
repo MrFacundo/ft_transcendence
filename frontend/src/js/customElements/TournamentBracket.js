@@ -75,7 +75,7 @@ class TournamentBracket extends BaseElement {
         participantEl.setAttribute("data-player-id", player.id);
         
         if (player.id === this.page.app.auth.user?.id) {
-            participantEl.style.backgroundColor = "#0d6efd";
+            participantEl.style.backgroundColor = "#383e45";
         }
 
         avatarImg.src = await avatarSrcPromise;
@@ -209,7 +209,7 @@ class TournamentBracket extends BaseElement {
                 margin: 0;
                 color: #ffd700;
                 padding: 17px;
-                background: white;
+            	background: #202428;
                 border-radius: 15px;
                 transition: all 0.3s;
                 cursor: pointer;
@@ -235,7 +235,7 @@ class TournamentBracket extends BaseElement {
             .participant {
                 width: 250px;
                 height: 50px;
-                background: #2a4189;
+            	background: #202428;
                 border-radius: 25px;
                 display: flex;
                 align-items: center;
@@ -243,7 +243,7 @@ class TournamentBracket extends BaseElement {
                 position: relative;
                 overflow: hidden;
                 transition: all 0.3s;
-                box-shadow: 0 1rem 1rem rgba(0, 0, 0, .2);
+                box-shadow: 0 1rem 1rem rgba(0, 0, 0, 0.2);
             }
 
             .avatar {

@@ -37,6 +37,7 @@ class Page {
         document.title = this.name;
         this.renderNavbar(this);
         this.render(this.app);
+        this.toggleBackground(true);
     }
 
     /**
@@ -50,6 +51,7 @@ class Page {
         });
         if (this.unsubscribe) this.unsubscribe();
         this.mainElement.innerHTML = "";
+        this.toggleBackground(false);
     }
 
     /**
@@ -79,6 +81,14 @@ class Page {
      */
     render() {
         console.warn(`TEST: Rendering ${this.name} page`);
+    }
+
+    toggleBackground(active) {
+        const backgroundEl = document.querySelector("#background");
+        const noBackgroundPages = ["login", "register", "404", "auth-result", "two-factor-auth", "verify-email"];
+       console.log("TEST: Toggling background", active, this.name, backgroundEl);
+        if (active  && !noBackgroundPages.includes(this.name)) backgroundEl.classList.remove("d-none");
+        else backgroundEl.classList.add("d-none");
     }
 }
 

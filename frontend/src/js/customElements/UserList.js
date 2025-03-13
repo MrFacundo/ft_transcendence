@@ -99,13 +99,11 @@ class UserList extends BaseElement {
                 flex-direction: column;
                 padding-left: 0;
                 margin-bottom: 0;
-                border-radius: 0.25rem;
             }
             .list-group-item {
                 position: relative;
                 display: block;
-                padding: 0;
-                background-color: #fff;
+                margin: 0.5rem 1rem;
             }
             .list-group-item:first-child { border-top-left-radius: inherit; border-top-right-radius: inherit; }
             .list-group-item:last-child { border-bottom-right-radius: inherit; border-bottom-left-radius: inherit; }

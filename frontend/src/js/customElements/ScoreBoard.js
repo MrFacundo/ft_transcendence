@@ -19,8 +19,8 @@ class ScoreBoard extends HTMLElement {
             this.shadowRoot.getElementById(id).src = avatarSrc;
         };
         
-        setElement("scoreboard-title", match.status === "completed" ? "WELL PONGED" : "User disconnected. Pong interrupted");
-        
+        const pageTitleEl = document.querySelector("h1.title");
+        pageTitleEl.textContent = match.status === "completed" ? "Well ponged" : "Pong interrupted";
         await setAvatar("avatar-1", match.player1);
         setElement("username-1", match.player1.username);
         setElement("score-1", match.score_player1);
@@ -45,16 +45,11 @@ class ScoreBoard extends HTMLElement {
                 max-width: 800px;
                 margin: 2rem auto;
                 text-align: center;
-                background: #007bff;
+            	background: #202428;
                 border-radius: 8px;
                 padding: 1.5rem;
                 color: #fff;
                 font-family: Arial, sans-serif;
-            }
-            #scoreboard-title { 
-                margin-bottom: 1rem; 
-                font-size: 1.5rem; 
-                font-weight: bold; 
             }
             
             .row { 
@@ -85,7 +80,6 @@ class ScoreBoard extends HTMLElement {
             }
         </style>
         <div id="scoreboard">
-            <div id="scoreboard-title">WELL PONGED</div>
             <div class="row">
                 <div class="col-avatar"><img id="avatar-1" src="${settings.EMPTY_AVATAR_URL}" alt="Avatar" width="100" height="100"></div>
                 <div class="score">
