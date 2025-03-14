@@ -28,16 +28,12 @@ class Page {
      */
     async open() {
         document.querySelectorAll("section").forEach((section) => { section.remove() });
-        const tempElement = document.createElement(this.pageElement.tagName);
-        tempElement.innerHTML = this.pageElement.innerHTML;
-        this.mainElement.innerHTML = tempElement.innerHTML;
-        this.mainElement.querySelectorAll("[data-href]").forEach((element) => {
-            element.addEventListener("click", (event) => this.handleClick(event));
-        });
-        document.title = this.name;
+        this.mainElement.innerHTML = this.pageElement.innerHTML;
+        this.addEventListeners();
+        document.title = "Ultimate Pong - " + this.name.replace(/[_-]/g, ' ').charAt(0).toUpperCase() + this.name.replace(/[_-]/g, ' ').slice(1);
         this.renderNavbar(this);
         this.render(this.app);
-        this.toggleBackground(true);
+        this.toggleBackground();
         document.body.classList.remove("loading");
     }
 
@@ -52,7 +48,15 @@ class Page {
         });
         if (this.unsubscribe) this.unsubscribe();
         this.mainElement.innerHTML = "";
-        this.toggleBackground(false);
+    }
+
+    /**
+     * Adds event listeners to the elements with the data-href attribute.
+     */
+    addEventListeners() {
+        this.mainElement.querySelectorAll("[data-href]").forEach((element) => {
+            element.addEventListener("click", (event) => this.handleClick(event));
+        });
     }
 
     /**
@@ -84,10 +88,10 @@ class Page {
         console.warn(`TEST: Rendering ${this.name} page`);
     }
 
-    toggleBackground(active) {
+    toggleBackground() {
         const backgroundEl = document.querySelector("#background");
         const noBackgroundPages = ["login", "register", "404", "auth-result", "two-factor-auth", "verify-email", "oauth-result"];
-        if (active && !noBackgroundPages.includes(this.name)) {
+        if (!noBackgroundPages.includes(this.name)) {
             backgroundEl.style.opacity = "1";
         } else {
             backgroundEl.style.opacity = "0";

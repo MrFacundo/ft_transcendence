@@ -23,14 +23,14 @@ class TournamentPage extends Page {
     async render() {
         const { api, wsManager, stateManager } = this.app;
         const openTournaments = stateManager.state.openTournaments;
-        const tournamentListElement = document.querySelector("#tournament-list");
+        const tournamentListElement = this.mainElement.querySelector("#tournament-list");
 
         this.populateTournamentList(openTournaments, tournamentListElement, api, stateManager, wsManager);
     }
 
     updateTournamentsList(openTournaments) {
         console.log("Updating tournaments list", openTournaments);
-        const tournamentListElement = document.querySelector("#tournament-list");
+        const tournamentListElement = this.mainElement.querySelector("#tournament-list");
         const { api, wsManager, stateManager } = this.app;
         this.populateTournamentList(openTournaments, tournamentListElement, api, stateManager, wsManager);
         console.log("Updating tournaments list", openTournaments);
@@ -50,6 +50,7 @@ class TournamentPage extends Page {
                 try {
                     const response = await api.joinTournament(id);
                     stateManager.updateState('currentTournament', response);
+                    stateManager.setInitialOpenTournaments();
                     wsManager.setupTournamentWebSocket();
                     showMessage(`Joined tournament: ${name}`);
                 } catch (error) {

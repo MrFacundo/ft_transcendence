@@ -8,7 +8,10 @@
     <link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" as="style"
         onload="this.onload=null;this.rel='stylesheet'">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" />
-    <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
+    <link rel="icon" type="image/png" href="/static/icon/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/static/icon/favicon.svg" />
+    <link rel="shortcut icon" href="/static/icon/favicon.ico" />
+    <link rel="manifest" href="/static/icon/site.webmanifest" />
     <style>
         body.loading {
             visibility: hidden;
@@ -23,7 +26,7 @@
     </p>
     <nav-bar></nav-bar>
     <div id="main">
-        <!-- code will be injected by app -->
+        <!-- code will be injected here by app -->
     </div>
     <section id="Login">
         <div class="container col-xl-10 col-xxl-8 px-4 py-5 text-black">
@@ -65,24 +68,24 @@
             <div class="bg-body-tertiary p-5">
                 <main id="register-form-container" class="form-signin w-100 m-auto">
                     <custom-form>
-                        <h1 class="title h3 mb-3 fw-normal text-black">Let's get you registered :)</h1>
+                        <h1 class="h3 mb-3 fw-normal text-black">Let's get you registered:)</h1>
                         <div class="form-floating mb-3">
                             <input type="text" class="form-control" id="Username" placeholder="Username"
                                 autocomplete="off" />
-                            <label for="Username">Username</label>
+                            <label class="text-black-50" for="Username">Username</label>
                         </div>
                         <div class="form-floating mb-3">
                             <input type="email" class="form-control" id="register-email"
                                 placeholder="name@example.com" />
-                            <label for="register-email">Email address</label>
+                            <label class="text-black-50" for="register-email">Email address</label>
                         </div>
                         <div class="form-floating mb-3">
                             <input type="password" class="form-control" id="register-password" placeholder="Password" />
-                            <label for="register-password">Password</label>
+                            <label class="text-black-50" for="register-password">Password</label>
                         </div>
                         <div class="form-floating mb-3">
                             <input type="password" class="form-control" id="ConfirmPassword" placeholder="Password" />
-                            <label for="ConfirmPassword">Confirm Password</label>
+                            <label class="text-black-50" for="ConfirmPassword">Confirm Password</label>
                         </div>
                         <button class="btn btn-primary w-100 py-2" type="submit">
                             Sign in
@@ -300,12 +303,13 @@
             </div>
         </div>
     </section>
+    
     <section id="Home" class="container mt-5">
         <h1 class="title mb-4 text-center display-4 title">CHOOSE YOUR DESTINY</h1>
         <div class="row">
             <div class="col-md-3">
                 <div class="card my-4 shadow-sm" style="min-height: 250px; cursor: pointer;">
-                    <div class="d-flex flex-column card-body text-center align-items-center" data-href="/onlinepvp">
+                    <div class="d-flex flex-column card-body text-center align-items-center" data-href="/online_pvp">
                         <h5 class="card-title title">Online 1vs1</h5>
                     </div>
                 </div>
@@ -386,7 +390,7 @@
             </div>
         </div>
         <div id="tournament-details" class="row justify-content-center d-none">
-            <h2 id="tournament-title" class="mb-4 text-center text-warning display-6"></h2>
+            <h2 id="tournament-title" class="text-center text-warning display-4"></h2>
             <div id="participants-info" class="row d-none">
                 <div class="col-md-4">
                     <p>Participants</p>

@@ -3,7 +3,7 @@ import Page from "./Page";
 class OffinePvpPage extends Page {
     constructor(app) {
         super({
-            name: "pvp_offline",
+            name: "offline_pvp",
             url: "/pvp_offline",
             pageElement: "#Offline",
             isProtected: true,
