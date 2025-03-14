@@ -38,6 +38,7 @@ class Page {
         this.renderNavbar(this);
         this.render(this.app);
         this.toggleBackground(true);
+        document.body.classList.remove("loading");
     }
 
     /**

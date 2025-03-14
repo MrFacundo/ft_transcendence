@@ -17,7 +17,7 @@ class UserProfileCard extends BaseElement {
         const usernameEl = this.shadowRoot.getElementById("profile-username");
         const winsEl = this.shadowRoot.getElementById("profile-wins");
         const lossesEl = this.shadowRoot.getElementById("profile-losses");
-        const profileStats = this.shadowRoot.getElementById("profile-stats");
+        const profileContainer = this.shadowRoot.querySelector(".profile-container");
 
         const { api, stateManager } = this.page.app;
         avatarEl.setAttribute('data-href', `/profile/${user.id}`);
@@ -26,22 +26,17 @@ class UserProfileCard extends BaseElement {
             element.addEventListener("click", this.page.handleClick);
         });
 
-        avatarEl.style.opacity = 0;
-        usernameEl.style.opacity = 0;
-        profileStats.style.opacity = 0;
-        this.updateOnlineStatus(stateManager.state.onlineStatuses?.get(user.id));
-
+        profileContainer.style.opacity = 0;
+        
         setTimeout(async () => {
             avatarEl.src = await getAvatarSrc(user, api.fetchAvatarObjectUrl);
             usernameEl.textContent = user.username;
             winsEl.textContent = user.game_stats.wins;
             lossesEl.textContent = user.game_stats.losses;
-            profileStats.classList.add("visible");
-
-            avatarEl.style.opacity = 1;
-            usernameEl.style.opacity = 1;
-            profileStats.style.opacity = 1;
-        }, 100);
+            this.updateOnlineStatus(stateManager.state.onlineStatuses?.get(user.id));
+            profileContainer.style.opacity = 1;
+            
+        }, 200);
     }
 
     updateOnlineStatus(onlineStatus) {
@@ -70,12 +65,13 @@ class UserProfileCard extends BaseElement {
                 align-items: center;
                 text-align: center;
                 margin-bottom: 1rem;
+                opacity: 0;
+                transition: opacity 0.3s;
             }
             .profile-avatar {
                 border-radius: 50%;
                 object-fit: cover;
                 border: 1px solid #dee2e6;
-                transition: opacity 0.3s;
                 cursor: pointer;
             }
             .profile-info, .profile-stats {
@@ -84,14 +80,6 @@ class UserProfileCard extends BaseElement {
             }
             p {
                 margin: 0;
-            }
-            .profile-stats {
-                visibility: hidden;
-                opacity: 0;
-            }
-            .profile-stats.visible {
-                visibility: visible;
-                opacity: 1;
             }
         </style>
         <div class="profile-container">

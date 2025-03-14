@@ -29,7 +29,7 @@
         <div class="container col-xl-10 col-xxl-8 px-4 py-5 text-black">
             <div class="row align-items-center g-lg-5 py-5">
                 <div class="col-lg-7 text-center text-lg-start">
-                    <h2 class="display-4 fw-bold lh-1 mb-3">Welcome to Pong</h2>
+                    <h2 class="display-4 fw-bold lh-1 mb-3">Welcome to Ultimate Pong</h2>
                     <p class="col-lg-10 fs-4">Join us for PvP, AI, and tournaments. Sign in or register to get started.
                     </p>
                 </div>
@@ -325,33 +325,28 @@
             <div class="col-md-4">
                 <div class="card my-4 shadow-sm" style="min-height: 250px; cursor: pointer;">
                     <div class="d-flex flex-column card-body text-center align-items-center" data-href="/onlinepvp">
-                        <h5 class="card-title">Online 1vs1</h5>
-                        <img src="/static/images/people.svg" class="margin-0" alt="Robot Icon" width="130" height="130">
+                        <h5 class="card-title title">Online 1vs1</h5>
                     </div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="card bg-light my-4 shadow-sm" style="min-height: 250px; cursor: pointer;">
                     <div class="d-flex flex-column card-body text-center align-items-center" data-href="/tournament">
-                        <h5 class="card-title">Tournaments</h5>
-                        <img src="/static/images/trophy.svg" class="margin-0" alt="Robot Icon" width="130" height="130">
+                        <h5 class="card-title title">Tournaments</h5>
                     </div>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="card my-4 shadow-sm" style="min-height: 250px; cursor: pointer;" data-href="/pvp_offline">
                     <div class="d-flex flex-column card-body text-center align-items-center">
-                        <h5 class="card-title">Local 1vs1</h5>
-                        <img src="/static/images/offline-pvp.svg" class="margin-0" alt="Offline Icon" width="130"
-                            height="130">
+                        <h5 class="card-title title">Local 1vs1</h5>
                     </div>
                 </div>
             </div>
             <div class="col-md-3" data-href="/ai">
                 <div class="card my-4 shadow-sm" style="min-height: 250px; cursor: pointer;">
                     <div class="d-flex flex-column card-body text-center align-items-center">
-                        <h5 class="card-title">Play against AI</h5>
-                        <img src="/static/images/robot.svg" alt="Robot Icon" width="130" height="130">
+                        <h5 class="card-title title">AI Game</h5>
                     </div>
                 </div>
             </div>
@@ -359,11 +354,11 @@
         <h2 class="title my-5 text-center display-6">Add friends</h2>
         <div class="row gx-1">
             <div class="col">
-                <p>Invitations Received</p>
+                <p class="h5">Invitations Received</p>
                 <user-list id="receive-list"></user-list>
             </div>
             <div class="col">
-                <p>Send Invitations</p>
+                <p class="h5">Send Invitations</p>
                 <user-list id="send-list"></user-list>
             </div>
             <div class="col d-flex flex-column align-items-center text-center">
@@ -377,11 +372,11 @@
         <h1 class="title mb-4">Online Pong</h1>
         <div class="row">
             <div class="col-md-4">
-                <p>Invitations Received</p>
+                <p class="h5">Invitations Received</p>
                 <user-list id="receive-list"></user-list>
             </div>
             <div class="col-md-4">
-                <p>Send Invitations</p>
+                <p class="h5">Send Invitations</p>
                 <user-list id="send-list"></user-list>
             </div>
             <div class="col-md-4 d-flex flex-column align-items-center text-center">
@@ -397,16 +392,14 @@
             <div class="col-md-4" data-href="/tournament-create">
                 <div class="card my-4 shadow-sm" style="min-height: 250px; cursor: pointer;">
                     <div class="d-flex flex-column card-body text-center align-items-center">
-                        <h5 class="card-title">Create</h5>
-                        <img src="/static/images/pencil-square.svg" alt="Pencil Icon" width="130" height="130">
+                        <h5 class="card-title title">Create</h5>
                     </div>
                 </div>
             </div>
             <div class="col-md-4" data-href="/tournament-join">
                 <div class="card my-4 shadow-sm" style="min-height: 250px; cursor: pointer;">
                     <div class="d-flex flex-column card-body text-center align-items-center">
-                        <h5 class="card-title">Join</h5>
-                        <img src="/static/images/person-plus-fill.svg" alt="Person Icon" width="130" height="130">
+                        <h5 class="card-title title">Join</h5>
                     </div>
                 </div>
             </div>
@@ -487,21 +480,21 @@
             <div class="col-md-4">
                 <div class="card shadow" data-difficulty="easy">
                     <div class="card-body">
-                        <h2 class="text-center mb-4 title">Novice</h2>
+                        <h5 class="text-center mb-4 title">Novice</h5>
                     </div>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="card shadow" data-difficulty="medium">
                     <div class="card-body">
-                        <h2 class="text-center mb-4 title">Warrior</h2>
+                        <h5 class="text-center mb-4 title">Warrior</h5>
                     </div>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="card shadow" data-difficulty="hard">
                     <div class="card-body">
-                        <h2 class="text-center mb-4 title">Master</h2>
+                        <h5 class="text-center mb-4 title">Master</h5>
                     </div>
                 </div>
             </div>
@@ -509,7 +502,7 @@
     </section>
 
     <section id="Game">
-        <h1 class="title">NOW YOU PONG</h1>
+        <h1 class="title">PONG!</h1>
         <pong-game></pong-game>
         <score-board class="d-none"></score-board>
     </section>
