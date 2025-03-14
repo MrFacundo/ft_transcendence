@@ -176,7 +176,7 @@ class TournamentBracket extends BaseElement {
         <style>
             :host {
                 display: block;
-                padding: 40px;
+                padding: 20px 40px;
             }
 
             .tournament-container {
@@ -207,14 +207,22 @@ class TournamentBracket extends BaseElement {
             }
 
             .start-button-container button {
-                font-size: 2.5em;
+                font-size: 1.5em;
                 margin-top: 5rem;
                 color: white;
-                padding: 15px;
+		        padding: 10px 20px;
             	background: #202428;
-                border-radius: 0.5rem;
-                transition: all 0.3s;
+		        border-radius: 4px;
                 cursor: pointer;
+                font-family: 'Titillium Web';
+            }
+
+            .start-button-container button:not(:disabled):hover {
+                box-shadow: inset 0 0 0 5px #202428, inset 0 0 0 10px red;
+            }
+
+            .start-button-container button:disabled {
+                font-size: 1em;
             }
 
             .tournament-bracket {

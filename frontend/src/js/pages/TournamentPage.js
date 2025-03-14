@@ -23,14 +23,14 @@ class TournamentPage extends Page {
     }
 
     render() {
-        const cardsContainerEl = document.querySelector("#cards-container");
-        const tournamentDetailsEl = document.querySelector("#tournament-details");
-        const tournamentNameEl = document.querySelector("#tournament-title");
-        const participantsInfoEl = document.querySelector("#participants-info");
-        const partcipantsListEl = document.querySelector("#tournament-participants");
-        const selectedUserCard = document.querySelector("user-profile#selected-participant");
-        const tournamentBracketContainerEl = document.querySelector("#tournament-bracket-container");
-        const tournamentBracketEl = document.querySelector("tournament-bracket");
+        const cardsContainerEl = this.mainElement.querySelector("#cards-container");
+        const tournamentDetailsEl = this.mainElement.querySelector("#tournament-details");
+        const tournamentNameEl = this.mainElement.querySelector("#tournament-title");
+        const participantsInfoEl = this.mainElement.querySelector("#participants-info");
+        const partcipantsListEl = this.mainElement.querySelector("#tournament-participants");
+        const selectedUserCard = this.mainElement.querySelector("user-profile#selected-participant");
+        const tournamentBracketContainerEl = this.mainElement.querySelector("#tournament-bracket-container");
+        const tournamentBracketEl = this.mainElement.querySelector("tournament-bracket");
         const tournament = this.app.stateManager.state.currentTournament;
 
         if (!tournament) {
@@ -40,7 +40,7 @@ class TournamentPage extends Page {
             const isTournamentFull = participants.length === participants_amount;
 
             tournamentDetailsEl.classList.remove("d-none");
-            tournamentNameEl.textContent = name + " 🏆";
+            tournamentNameEl.textContent = name;
 
             if (!isTournamentFull) {
                 this.updatePartcipantsList(tournament);
@@ -73,8 +73,8 @@ class TournamentPage extends Page {
 
     updatePartcipantsList(currentTournament) {
         if (!currentTournament) return;
-        const partcipantsListEl = document.querySelector("#tournament-participants");
-        const selectedUserCard = document.querySelector("user-profile#selected-participant");
+        const partcipantsListEl = this.mainElement.querySelector("#tournament-participants");
+        const selectedUserCard = this.mainElement.querySelector("user-profile#selected-participant");
         [partcipantsListEl, selectedUserCard].forEach(el => (el.page = this));
 
         partcipantsListEl.config = { selectedUserCard };
