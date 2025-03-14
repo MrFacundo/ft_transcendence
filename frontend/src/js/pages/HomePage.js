@@ -15,10 +15,10 @@ class HomePage extends Page {
 
 	async render() {
 		const { api, auth } = this.app;
-		const sendList = document.querySelector("#send-list");
-		const receiveList = document.querySelector("#receive-list");
-		const actionButton = document.querySelector("#action-friend");
-		const selectedUserCard = document.querySelector("user-profile");
+		const sendList = this.mainElement.querySelector("#send-list");
+		const receiveList = this.mainElement.querySelector("#receive-list");
+		const actionButton = this.mainElement.querySelector("#action-friend");
+		const selectedUserCard = this.mainElement.querySelector("user-profile");
 
 		[sendList, receiveList, selectedUserCard].forEach(el => el.page = this);
 		

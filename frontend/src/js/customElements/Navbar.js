@@ -110,8 +110,7 @@ class Navbar extends BaseElement {
                 .navbar-brand {
                     font-size: 1.25rem;
                     font-weight: bold;
-                    font-family: 'CustomFont', sans-serif;
-                    text-transform: uppercase;
+                    font-family: 'CustomFont2', sans-serif;
                 }
                 .navbar-center {
                     align-items: center;
@@ -136,11 +135,11 @@ class Navbar extends BaseElement {
                 }
             </style>
             <nav class="navbar">
-                <a class="navbar-brand" data-href="/home">Ultimate Pong</a>
+                <a class="navbar-brand" data-href="/home">U L T I M A T E pong</a>
                 <div class="navbar-center" >
                     <ul class="navbar-nav">
-                        <li class="nav-item"><a class="nav-link title" data-href="/onlinepvp">Online 1v1</a></li>
-                        <li class="nav-item"><a class="nav-link" data-href="/tournament">Tournamens</a></li>
+                        <li class="nav-item"><a class="nav-link title" data-href="/online_pvp">Online 1v1</a></li>
+                        <li class="nav-item"><a class="nav-link" data-href="/tournament">Tournaments</a></li>
                         <li class="nav-item"><a class="nav-link" data-href="/pvp_offline">Local 1v1</a></li>
                         <li class="nav-item"><a class="nav-link" data-href="/ai">AI Game</a></li>
                     </ul>

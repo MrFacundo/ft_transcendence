@@ -62,9 +62,10 @@ A full-stack web application that allows users to play games of Pong remotely, l
 
 #### Backend:
 
-- Django REST Framework was used to build a backend API, providing endpoints for the frontend to interact with.
-- Django Channels was used for WebSocket communication, allowing for real-time updates.
-- Simple JWT was used for authentication, and a custom OAuth2 backend was implemented to handle 42's OAuth2.
+- Online Pong games run on the Django application. Consumers connect and send game updates to the players.
+- Consumers also handle updates on friend invitations, game invitations, tournament progress, and online statuses.
+- Django REST Framework powers the backend API, managing tasks that don't require live updates, such as user management, authentication, and game invitations.
+- Simple JWT was used to manage authentication, while a custom OAuth2 backend handles 42's OAuth2 integration.
 
 ## Setup
 
@@ -95,9 +96,10 @@ The following commands are available in the Makefile:
 | `blockchain_gamesbyplayers <player_id>`                   | Retrieves all games in which a specific player has participated, using their player ID.                                      |
 | `blockchain_gamesbytournament <tournament_id>`            | Retrieves all games associated with a specific tournament, using the tournament ID.                                          |
 
-### Accessing the Application
+### Accessing the Applications
 
 - Frontend: http://localhost:8080
 - Django Admin: http://localhost:8000/admin/
 - Silk Profiling: http://localhost:8000/silk/
-
+- Swagger: http://localhost:8000/swagger/
+- Redoc: http://localhost:8000/redoc/

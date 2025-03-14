@@ -4,7 +4,7 @@ import "../customElements/PongAi.js";
 class AIPage extends Page {
   constructor(app) {
     super({
-      name: "ai",
+      name: "ai_game",
       url: "/ai",
       pageElement: "#AI",
       isProtected: true,
@@ -14,7 +14,7 @@ class AIPage extends Page {
   }
 
   async render() {
-    const difficultyCards = document.querySelectorAll("#ai-game-settings .card");
+    const difficultyCards = this.mainElement.querySelectorAll("#ai-game-settings .card");
 
     difficultyCards.forEach(card => {
       card.onclick = () => {
@@ -29,7 +29,7 @@ class AIPage extends Page {
   startGame(difficulty) {
     this.app.stateManager.updateState("currentGame", true);
 
-    const settingsEl = document.querySelector("#ai-game-settings");
+    const settingsEl = this.mainElement.querySelector("#ai-game-settings");
     settingsEl.classList.add("d-none");
 
     const gameEl = document.createElement("div");
@@ -45,9 +45,9 @@ class AIPage extends Page {
   }
 
   handleGameEnd(e) {
-    const gameEl = document.querySelector("#Game");
+    const gameEl = this.mainElement.querySelector("#Game");
     gameEl && gameEl.remove();
-    const settingsEl = document.querySelector("#ai-game-settings");
+    const settingsEl = this.mainElement.querySelector("#ai-game-settings");
     settingsEl.classList.remove("d-none");
     this.app.stateManager.updateState("currentGame", false);
   }
