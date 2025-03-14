@@ -111,6 +111,7 @@ class Navbar extends BaseElement {
                     font-size: 1.25rem;
                     font-weight: bold;
                     font-family: 'CustomFont', sans-serif;
+                    text-transform: uppercase;
                 }
                 .navbar-center {
                     align-items: center;
@@ -135,7 +136,7 @@ class Navbar extends BaseElement {
                 }
             </style>
             <nav class="navbar">
-                <a class="navbar-brand" data-href="/home">PONG</a>
+                <a class="navbar-brand" data-href="/home">Ultimate Pong</a>
                 <div class="navbar-center" >
                     <ul class="navbar-nav">
                         <li class="nav-item"><a class="nav-link title" data-href="/onlinepvp">Online 1v1</a></li>
