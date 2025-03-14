@@ -91,9 +91,6 @@ class App {
             this.navigate(window.location.pathname.toLowerCase(), true);
         });
         this.navigate(window.location.pathname.toLowerCase());
-        window.addEventListener("load", () => {
-            document.body.classList.remove("loading");
-        });
         window.addEventListener("beforeunload", () => {
             this.wsManager.closeConnections();
             this.stateManager.close();
