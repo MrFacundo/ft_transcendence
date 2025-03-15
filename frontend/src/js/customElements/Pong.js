@@ -1,4 +1,5 @@
 import { settings } from "../settings.js";
+import { showMessage } from "../utils.js";
 
 class Pong extends HTMLElement {
     constructor() {
@@ -39,16 +40,21 @@ class Pong extends HTMLElement {
 
     setWebsocket(id) {
         this.addEventListeners();
+        
+        // Reset state before creating a new connection
+        this.playersJoined = [false, false];
+        this.playersReady = [false, false];
+        
         this.ws = new WebSocket(
-            `${settings.WS_URL}/${id}/?token=${this.page.app.auth.accessToken}`
+          `${settings.WS_URL}/${id}/?token=${this.page.app.auth.accessToken}`
         );
         this.ws.onmessage = (event) => this.handleMessage(JSON.parse(event.data));
         this.ws.onclose = () => this.cleanup();
         this.ws.onerror = (error) => {
-            console.error("WebSocket error:", error);
-            this.updateStatus("Connection error. Please try again.");
+          console.error("WebSocket error:", error);
+          this.updateStatus("Connection error. Please try again.");
         };
-    }
+      }
 
     handleMessage(data) {
         console.log("Received message:", data);
@@ -104,7 +110,7 @@ class Pong extends HTMLElement {
                 this.updateScore();
                 break;
             case "endGame":
-                this.updateStatus(`Game over! Final score: ${this.score[0]} - ${this.score[1]}`);
+                if (data.message === "User disconnected") showMessage("Opponent disconnected.", "error");
                 this.ws.close();
                 break;
             case "error":

@@ -47,3 +47,7 @@ class GameDatabase:
     @database_sync_to_async
     def get_tournament_id(self):
         return self.socket.db_game.tournament.id if self.socket.db_game.tournament else None
+
+    @database_sync_to_async
+    def get_status(self):
+        return self.socket.db_game.status
