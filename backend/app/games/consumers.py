@@ -68,6 +68,14 @@ class GameConsumer(AsyncWebsocketConsumer):
         await self.notify_player()
         await self.notify_oponent()
 
+    async def initialize_game(self, game_id):
+        if game_id not in active_games:
+            active_games[game_id] = Game()
+            active_games[game_id].players_ready = [False, False]
+            active_games[game_id].players_connected = [False, False]
+        self.game = active_games[game_id]
+        self.db_game = await database_sync_to_async(PongGame.objects.filter(id=game_id).first)()
+    
     async def check_errors(self, user, game_id):
         if not self.game:
             await self.handle_error("Game not found")
@@ -83,14 +91,6 @@ class GameConsumer(AsyncWebsocketConsumer):
         await self.accept()
         await self.send(text_data=json.dumps({"type": "error", "message": message}))
         await self.close()
-
-    async def initialize_game(self, game_id):
-        if game_id not in active_games:
-            active_games[game_id] = Game()
-            active_games[game_id].players_ready = [False, False]
-            active_games[game_id].players_connected = [False, False]
-        self.game = active_games[game_id]
-        self.db_game = await database_sync_to_async(PongGame.objects.filter(id=game_id).first)()
 
     async def is_valid_player(self, user):
         return (await self.get_player1(self.db_game)) == user or (await self.get_player2(self.db_game)) == user
@@ -154,7 +154,8 @@ class GameConsumer(AsyncWebsocketConsumer):
             await self.game.handle_disconnect()
 
         if hasattr(self, 'db_game') and self.db_game:
-            await self.game.handle_interruption()
+            if self.db_game.status == "in_progress":
+                await self.game.handle_interruption()
 
         if game_id in active_games and self.db_game.status in ["completed", "interrupted"]:
             del active_games[game_id]
@@ -179,7 +180,8 @@ class GameConsumer(AsyncWebsocketConsumer):
             if all(self.game.players_ready):
                 await self.game.startGame(self)
         elif message_type in ["keydown", "keyup"] and text_data_json.get("key") in ["w", "s"]:
-            await self.game.handle_keys(self.side, message_type, text_data_json["key"])
+            if self.db_game.status == "in_progress":
+                await self.game.handle_keys(self.side, message_type, text_data_json["key"])
 
     async def state_update(self, event):
         if self.is_connected:
@@ -191,7 +193,7 @@ class GameConsumer(AsyncWebsocketConsumer):
     async def player_status(self, event):
         if self.is_connected:
             try:
-                await self.send(text_data=json.dumps(event.get("objects", {})))
+                await self.send(text_data=json.dumps(event.get("objects")))
             except Exception:
                 pass
 

@@ -1,7 +1,8 @@
 import { settings } from "../settings.js";
 import { showMessage } from "../utils.js";
+import BaseElement from "./BaseElement.js";
 
-class Pong extends HTMLElement {
+class Pong extends BaseElement {
     constructor() {
         super();
         this.init();
@@ -17,19 +18,21 @@ class Pong extends HTMLElement {
         this.ball = this.createElement("ball");
         this.scoreboard = this.createElement("scoreboard");
         this.statusMessage = this.createElement("statusMessage");
+        this.side1Username = this.createElement("side1Username");
+        this.side2Username = this.createElement("side2Username");
         this.readyButton = document.createElement("button");
         this.readyButton.id = "readyButton";
         this.readyButton.textContent = "Ready to Play";
         this.readyButton.classList.add("ready-button");
         this.readyButton.addEventListener("click", () => this.sendPlayerReady());
-
-        this.append(this.paddels.left, this.paddels.right, this.ball, this.scoreboard, this.statusMessage, this.readyButton);
+        this.append(this.paddels.left, this.paddels.right, this.ball, this.scoreboard, this.statusMessage, this.readyButton, this.side1Username, this.side2Username);
         this.score = [0, 0];
         this.updateScore();
         this.pressedKeys = [];
         this.playersJoined = [false, false];
         this.playersReady = [false, false];
-        this.mySide = null;
+        this.playerSide = null;
+        this.inProgress = false;
     }
 
     createElement(id) {
@@ -38,10 +41,14 @@ class Pong extends HTMLElement {
         return el;
     }
 
+    setSideUsernames(side1Username, side2Username) {
+        this.side1Username.textContent = side1Username;
+        this.side2Username.textContent = side2Username;
+    }
+
     setWebsocket(id) {
         this.addEventListeners();
         
-        // Reset state before creating a new connection
         this.playersJoined = [false, false];
         this.playersReady = [false, false];
         
@@ -57,18 +64,14 @@ class Pong extends HTMLElement {
       }
 
     handleMessage(data) {
-        console.log("Received message:", data);
-
         switch (data.type) {
             case "connection_established":
-                this.mySide = data.side;
-                this.updateStatus(`Connected as Player ${this.mySide + 1}. Waiting for opponent...`);
+                this.playerSide = data.side;
+                this.updateStatus(`Connected as Player ${this.playerSide + 1}. Waiting for opponent...`);
                 break;
             case "player_connected":
                 this.playersJoined[data.side] = true;
-                if (data.side === this.mySide) {
-                    this.updateStatus("You've connected. Waiting for opponent...");
-                } else {
+                if (data.side != this.playerSide) {
                     this.updateStatus("Opponent connected! Click 'Ready to Play' when you're ready.");
                     this.readyButton.style.display = "block";
                 }
@@ -79,13 +82,16 @@ class Pong extends HTMLElement {
             case "player_disconnected":
                 this.playersJoined[data.side] = false;
                 this.playersReady[data.side] = false;
-                if (data.side !== this.mySide) {
+                if (this.inProgress) {
+                    data.side === this.playerSide ? showMessage("Disconnected from game", "error") : showMessage("Opponent disconnected", "error");
+                } else if (data.side !== this.playerSide) {
                     this.updateStatus("Opponent disconnected. Waiting for them to reconnect...");
                 }
                 break;
             case "player_ready":
+                if (!this.inProgress) this.inProgress = true;
                 this.playersReady[data.side] = true;
-                if (data.side === this.mySide) {
+                if (data.side === this.playerSide) {
                     this.updateStatus("You are ready. Waiting for opponent...");
                     this.readyButton.style.display = "none";
                 } else {
@@ -110,7 +116,7 @@ class Pong extends HTMLElement {
                 this.updateScore();
                 break;
             case "endGame":
-                if (data.message === "User disconnected") showMessage("Opponent disconnected.", "error");
+                this.inProgress = false;
                 this.ws.close();
                 break;
             case "error":
@@ -182,6 +188,7 @@ class Pong extends HTMLElement {
     }
 
     cleanup() {
+        if (this.inProgress) showMessage("Disconnected from game", "error");
         this.removeEventListeners();
         this.ws = null;
         this.dispatchEvent(new CustomEvent("gameOver"));
