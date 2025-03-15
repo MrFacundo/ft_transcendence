@@ -22,7 +22,7 @@ export default class GamePage extends Page {
         try {
             const game = await app.api.getGame(gameId);
 
-            if (game.status === "not_started") {
+            if (game.status === "not_started" || game.status === "in_progress") {
                 gameEl.startGame(gameId);
                 gameEl.addEventListener("gameOver", async () => this.showScoreBoard(gameId));
             } else if (game.status === "completed" || game.status === "interrupted") {
@@ -44,7 +44,7 @@ export default class GamePage extends Page {
             return;
         scoreBoardEl.page = this;
         scoreBoardEl.displayMatch(await this.app.api.getGame(gameId));
-        gameEl.remove();
+        gameEl && gameEl.remove();
         scoreBoardEl.classList.remove("d-none");
     }
 }

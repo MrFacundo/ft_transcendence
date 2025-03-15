@@ -29,7 +29,7 @@ class ScoreBoard extends HTMLElement {
         setElement("username-2", match.player2.username);
         setElement("score-2", match.score_player2);
 
-        if (match.winner) {
+        if (match.winner && match.status === "completed") {
             const winner = match.player1.id === match.winner ? 1 : 2;
             ["avatar", "username", "score"].forEach((key) => {
                 this.shadowRoot.getElementById(`${key}-${winner}`).style.cssText =
