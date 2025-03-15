@@ -21,6 +21,7 @@ export default class GamePage extends Page {
 
         try {
             const game = await app.api.getGame(gameId);
+            gameEl.setSideUsernames(game.player1.username, game.player2.username);
 
             if (game.status === "not_started" || game.status === "in_progress") {
                 gameEl.startGame(gameId);

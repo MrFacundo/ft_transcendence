@@ -34,9 +34,6 @@ class Game:
         await self.db.set_game_status("in_progress")
 
     async def handle_interruption(self):
-        status = await self.db.get_status()
-        if status != "in_progress":
-            return
         await self.db.set_score()
         winner = 0 if self.score[0] > self.score[1] else 1
         await self.db.update_stats(winner)
@@ -78,7 +75,7 @@ class Game:
             await self.comm.send_game_state()
             await asyncio.sleep(0.1)
 
-        await self.comm.send_disconnect_message()
+        await self.comm.send_game_over()
 
     def _update_game_state(self):
         self.ball.update()

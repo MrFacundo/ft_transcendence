@@ -54,18 +54,6 @@ class GameCommunication:
                 }
             )
 
-    async def send_disconnect_message(self):
-        await self.socket.channel_layer.group_send(
-            self.socket.db_game.channel_group_name,
-            {
-                "type": "state_update",
-                "objects": {
-                    "type": "endGame",
-                    "message": "User disconnected"
-                }
-            }
-        )
-
     def _get_ball_state(self):
         return {
             "x": truncate(self.game.ball.x, 2),
