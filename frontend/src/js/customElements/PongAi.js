@@ -18,12 +18,10 @@ class PongAi extends BaseElement {
     this.side1Username = this.createElement("side1Username");
     this.side2Username = this.createElement("side2Username");
 
-    // Set default text content
     this.side1Username.textContent = "Player";
     this.side2Username.textContent = "AI";
     this.scoreboard.textContent = "0 - 0";
 
-    // Add all elements to the component
     this.append(this.canvas, this.statusMessage, this.scoreboard, this.side1Username, this.side2Username);
 
     this.ctx = this.canvas.getContext("2d");
