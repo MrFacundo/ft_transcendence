@@ -2,7 +2,7 @@ pong-game {
 	width: 1000px;
 	display: inline-block;
 	height: 700px;
-	background: #31313a;
+	background: #202428;
 	position: relative;
 
 	#statusMessage {
@@ -34,13 +34,24 @@ pong-game {
 		cursor: not-allowed;
 	}
 
-	#scoreboard {
+	#scoreboard , #side1Username, #side2Username {
 		color: #f1f1f1;
 		font-size: 24px;
 		position: absolute;
 		top: 60px;
+	}
+
+	#scoreboard{
 		left: 50%;
 		transform: translateX(-50%);
+	}
+
+	#side1Username {
+		left: 40px;
+	}
+
+	#side2Username {
+		right: 40px;
 	}
 
 	#leftPaddle,

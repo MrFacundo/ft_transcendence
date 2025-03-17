@@ -21,7 +21,6 @@ class PongGame(models.Model):
     date_played = models.DateTimeField(auto_now_add=True)
     score_player1 = models.IntegerField(default=0)
     score_player2 = models.IntegerField(default=0)
-    match_date = models.DateTimeField(null=True, blank=True)
     registered_on_blockchain = models.BooleanField(default=False) 
     status = models.CharField(
         max_length=20, 
