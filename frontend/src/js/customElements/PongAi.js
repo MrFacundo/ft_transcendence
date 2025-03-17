@@ -1,29 +1,48 @@
-class PongAi extends HTMLElement {
+import BaseElement from "./BaseElement.js";
+
+class PongAi extends BaseElement {
   constructor() {
     super();
-    this.attachShadow({ mode: "open" });
+    this.init();
+  }
+
+  init() {
+    this.innerHTML = "";
     this.canvas = document.createElement("canvas");
-    this.canvas.width = 900;
-    this.canvas.height = 500;
-    this.canvas.style.border = "2px solid red";
-    this.canvas.style.position = "relative";
-    this.canvas.style.top = "50%";
-    this.shadowRoot.appendChild(this.canvas);
+    this.canvas.width = 1000;
+    this.canvas.height = 700;
+
+    // Create UI elements to match the Pong component
+    this.statusMessage = this.createElement("statusMessage");
+    this.scoreboard = this.createElement("scoreboard");
+    this.side1Username = this.createElement("side1Username");
+    this.side2Username = this.createElement("side2Username");
+
+    // Set default text content
+    this.side1Username.textContent = "Player";
+    this.side2Username.textContent = "AI";
+    this.scoreboard.textContent = "0 - 0";
+
+    // Add all elements to the component
+    this.append(this.canvas, this.statusMessage, this.scoreboard, this.side1Username, this.side2Username);
+
     this.ctx = this.canvas.getContext("2d");
 
-    // Reduce player speed for smoother movement (adjust as needed)
-    this.playerPaddle = { x: 10, y: 210, width: 10, height: 80, speed: 3 };
-    // You can tune the AI paddle speed per difficulty:
-    this.aiPaddle = { x: 870, y: 210, width: 10, height: 80, speed: 5 };
+    // Game state
+    const paddleHeight = this.canvas.height * 0.25;
+    const paddleWidth = this.canvas.width * 0.02;
+    const paddleInitialY = (this.canvas.height - paddleHeight) / 2;
+    const playerPaddleX = 0;
+    const aiPaddleX = this.canvas.width - paddleWidth;
+    this.playerPaddle = { x: playerPaddleX, y: paddleInitialY, width: paddleWidth, height: paddleHeight, speed: 5 };
+    this.aiPaddle = { x: aiPaddleX, y: paddleInitialY, width: paddleWidth, height: paddleHeight, speed: 7 };
     this.ball = { x: 450, y: 250, size: 10, vx: 3, vy: 3 };
 
     this.playerScore = 0;
     this.aiScore = 0;
     this.gameOver = false;
-    this.difficulty = "easy";
 
     this.keys = {};
-    // Use an object to simulate AI key presses.
     this.aiKeys = { ArrowUp: false, ArrowDown: false };
 
     this.aiInterval = null;
@@ -34,19 +53,17 @@ class PongAi extends HTMLElement {
     this.gameLoop = this.gameLoop.bind(this);
   }
 
-  setApp(app) {
-    this.app = app;
+  createElement(id) {
+    const el = document.createElement("span");
+    el.id = id;
+    return el;
   }
 
   connectedCallback() {
     window.addEventListener("keydown", this.handleKeyDown);
     window.addEventListener("keyup", this.handleKeyUp);
 
-    const diff = this.getAttribute("difficulty");
-    if (diff) {
-      this.difficulty = diff;
-    }
-    this.startGame();
+    // Set initial status message
   }
 
   disconnectedCallback() {
@@ -57,11 +74,25 @@ class PongAi extends HTMLElement {
     this.gameOver = true;
   }
 
-  startGame() {
-    this.resetBall();
-    this.gameOver = false;
+  setPositions({
+    leftPaddle = { top: "calc(50% - 50px)" },
+    rightPaddle = { top: "calc(50% - 50px)" },
+    ball = { top: "calc(50% - 5px)", left: "calc(50% - 5px)" },
+  }) {
+    Object.assign(this.paddels.left.style, leftPaddle);
+    Object.assign(this.paddels.right.style, rightPaddle);
+    Object.assign(this.ball.style, ball);
+  }
 
-    const diff = this.difficulty ? this.difficulty.toLowerCase() : "easy";
+  startGame(difficulty) {
+    this.resetBall();
+    this.playerScore = this.aiScore = 0;
+    this.updateScoreDisplay();
+    this.gameOver = false;
+    
+    const diff = difficulty ? difficulty.toLowerCase() : "easy";
+    this.statusMessage.textContent = `Difficulty: ${diff}`;
+    
     let reactionTime;
     if (diff === "hard") {
       reactionTime = 600;
@@ -75,14 +106,13 @@ class PongAi extends HTMLElement {
     }
 
     if (this.aiInterval) clearInterval(this.aiInterval);
-    this.aiInterval = setInterval(() => this.simulateAIInput(), reactionTime);
+    this.aiInterval = setInterval(() => this.simulateAIInput(diff), reactionTime);
 
     this.gameLoop();
   }
 
-  simulateAIInput() {
-    const diff = this.difficulty ? this.difficulty.toLowerCase() : "easy";
-    console.log("simulateAIInput: difficulty =", diff);
+  simulateAIInput(difficulty) {
+    const diff = difficulty ? difficulty.toLowerCase() : "easy";
 
     if (this.ball.vx > 0) {
       // Wait for the ball to pass 30% of canvas for first prediction.
@@ -163,7 +193,7 @@ class PongAi extends HTMLElement {
       this.canvas.height - this.playerPaddle.height
     );
 
-    // AI movement: use simulated key flags (simulate keyboard input)
+    // AI movement: use simulated key flags
     if (this.aiKeys["ArrowUp"]) this.aiPaddle.y -= this.aiPaddle.speed;
     if (this.aiKeys["ArrowDown"]) this.aiPaddle.y += this.aiPaddle.speed;
     this.aiPaddle.y = Math.min(
@@ -203,38 +233,43 @@ class PongAi extends HTMLElement {
       this.ball.x = this.aiPaddle.x - this.ball.size;
     }
 
-    // Check win conditions: update score and either reset ball or end game at 3 points.
+    // Check win conditions
     if (this.ball.x <= 0) {
       this.aiScore++;
+      this.updateScoreDisplay();
       if (this.aiScore >= 3) {
-        this.endGame("Loooooser!!!");
+        this.endGame();
       } else {
         this.resetBall();
       }
     } else if (this.ball.x + this.ball.size >= this.canvas.width) {
       this.playerScore++;
+      this.updateScoreDisplay();
       if (this.playerScore >= 3) {
-        this.endGame("Congrats!");
+        this.endGame();
       } else {
         this.resetBall();
       }
     }
   }
 
+  updateScoreDisplay() {
+    this.scoreboard.textContent = `${this.playerScore} - ${this.aiScore}`;
+  }
+
   draw() {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    this.ctx.fillStyle = "#f0f0f0";
+    this.ctx.fillStyle = "#202428"; // Match the background color
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
     // Draw paddles
-    this.ctx.fillStyle = "blue";
+    this.ctx.fillStyle = "#f1f1f1";
     this.ctx.fillRect(
       this.playerPaddle.x,
       this.playerPaddle.y,
       this.playerPaddle.width,
       this.playerPaddle.height
     );
-    this.ctx.fillStyle = "red";
     this.ctx.fillRect(
       this.aiPaddle.x,
       this.aiPaddle.y,
@@ -243,24 +278,16 @@ class PongAi extends HTMLElement {
     );
 
     // Draw ball
-    this.ctx.fillStyle = "black";
+    this.ctx.fillStyle = "#f1f1f1";
     this.ctx.fillRect(this.ball.x, this.ball.y, this.ball.size, this.ball.size);
-
-    // Draw score (optional)
-    this.ctx.font = "24px Arial";
-    this.ctx.textAlign = "center";
-    this.ctx.fillText(
-      `${this.playerScore} - ${this.aiScore}`,
-      this.canvas.width / 2,
-      30
-    );
   }
 
   resetBall() {
     this.ball.x = this.canvas.width / 2;
     this.ball.y = this.canvas.height / 2;
-    this.ball.vx = 3 * (Math.random() > 0.5 ? 1 : -1);
-    this.ball.vy = 3 * (Math.random() > 0.5 ? 1 : -1);
+    this.ball.vx = 5 * (Math.random() > 0.5 ? 1 : -1);
+    this.ball.vy = 5 * (Math.random() > 0.5 ? 1 : -1);
+    this.firstPrediction = false;
   }
 
   handleKeyDown(e) {
@@ -275,36 +302,20 @@ class PongAi extends HTMLElement {
     this.gameOver = true;
     if (this.aiInterval) clearInterval(this.aiInterval);
     cancelAnimationFrame(this.animationFrameId);
-    window.removeEventListener("keydown", this.handleKeyDown);
-    window.removeEventListener("keyup", this.handleKeyUp);
 
-    const overlay = document.createElement("div");
-    overlay.style = `
-      position:absolute;
-      top:0;
-      left:0;
-      width:100%;
-      height:100%;
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      font-size:48px;
-      color:#000;
-      z-index:1000;
-    `;
-    overlay.textContent = message;
-    this.shadowRoot.appendChild(overlay);
+    const gameScore = {
+      playerScore: this.playerScore,
+      aiScore: this.aiScore,
+    };
 
-    setTimeout(() => {
-      this.dispatchEvent(
-        new CustomEvent("gameEnd", {
-          detail: message,
-          bubbles: true,
-          composed: true,
-        })
-      );
-      if (this.parentElement) this.parentElement.removeChild(this);
-    }, 1500);
+    // Dispatch game end event
+    this.dispatchEvent(
+      new CustomEvent("gameEnd", {
+        detail: gameScore,
+        bubbles: true,
+        composed: true,
+      })
+    );
   }
 }
 
