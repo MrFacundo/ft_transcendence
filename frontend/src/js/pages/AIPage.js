@@ -19,7 +19,7 @@ class AIPage extends Page {
     difficultyCards.forEach(card => {
       card.onclick = () => {
         const difficulty = card.dataset.difficulty;
-        this.startGame(difficulty);
+        if (!this.app.stateManager.state.currentGame) this.startGame(difficulty);
       };
     });
 
@@ -29,9 +29,24 @@ class AIPage extends Page {
   createGameObject(gameData) {
       const player1 = this.app.auth.user;
       const winner = gameData.playerScore > gameData.aiScore ? player1.id : "ai";
+      const defaultStats = { total_matches: "", wins: "", losses: "" };
+      const defaultPlayer = {
+          id: "",
+          username: "",
+          email: "",
+          avatar_oauth: "",
+          avatar_upload: "",
+          two_factor_method: "",
+          new_email: "",
+          date_joined: "",
+          game_stats: defaultStats,
+          friendship_status: ""
+      };
+  
       return {
           id: "",
           player1: {
+              ...defaultPlayer,
               id: player1.id,
               username: player1.username,
               email: player1.email,
@@ -40,29 +55,10 @@ class AIPage extends Page {
               two_factor_method: player1.two_factor_method,
               new_email: player1.new_email,
               date_joined: player1.date_joined,
-              game_stats: player1.game_stats || {
-                  total_matches: "",
-                  wins: "",
-                  losses: ""
-              },
+              game_stats: player1.game_stats || defaultStats,
               friendship_status: player1.friendship_status || ""
           },
-          player2: {
-              id: "ai",
-              username: "AI",
-              email: "",
-              avatar_oauth: "",
-              avatar_upload: "",
-              two_factor_method: "",
-              new_email: "",
-              date_joined: "",
-              game_stats: {
-                  total_matches: "",
-                  wins: "",
-                  losses: ""
-              },
-              friendship_status: ""
-          },
+          player2: { ...defaultPlayer, id: "ai", username: "AI" },
           channel_group_name: "",
           date_played: "",
           score_player1: gameData.playerScore,
@@ -78,6 +74,7 @@ class AIPage extends Page {
     this.app.stateManager.updateState("currentGame", true);
     const settingsEl = this.mainElement.querySelector("#ai-game-settings");
     const pongAiEl = this.mainElement.querySelector("pong-ai");
+    pongAiEl.page = this;
     const scoreBoardEl = this.mainElement.querySelector("score-board");
     settingsEl.classList.add("d-none");
     scoreBoardEl.classList.add("d-none");
