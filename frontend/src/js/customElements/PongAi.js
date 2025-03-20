@@ -88,6 +88,7 @@ class PongAi extends BaseElement {
     if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId);
     if (this.aiInterval) clearInterval(this.aiInterval);
     this.gameOver = true;
+    this.page?.app.stateManager.updateState("currentGame", false);
   }
 
   setPositions({
@@ -101,8 +102,8 @@ class PongAi extends BaseElement {
   }
 
   startGame(difficulty) {
+    this.page.app.stateManager.updateState("currentGame", true);
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
     this.resetBall();
     this.playerScore = this.aiScore = 0;
     this.updateScoreDisplay();
