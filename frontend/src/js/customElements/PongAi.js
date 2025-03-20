@@ -342,6 +342,7 @@ class PongAi extends BaseElement {
   }
 
   endGame(message) {
+    this.page?.app.stateManager.updateState("currentGame", false);
     this.gameOver = true;
     if (this.aiInterval) clearInterval(this.aiInterval);
     cancelAnimationFrame(this.animationFrameId);
