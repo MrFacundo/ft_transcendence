@@ -71,7 +71,6 @@ class AIPage extends Page {
   }
 
   startGame(difficulty) {
-    this.app.stateManager.updateState("currentGame", true);
     const settingsEl = this.mainElement.querySelector("#ai-game-settings");
     const pongAiEl = this.mainElement.querySelector("pong-ai");
     pongAiEl.page = this;
@@ -87,7 +86,6 @@ class AIPage extends Page {
     pongAiEl && pongAiEl.classList.add("d-none");
     const settingsEl = this.mainElement.querySelector("#ai-game-settings");
     settingsEl.classList.remove("d-none");
-    this.app.stateManager.updateState("currentGame", false);
     const scoreBoardEl = this.mainElement.querySelector("score-board");
     if (!scoreBoardEl)
         return;
