@@ -73,6 +73,7 @@ class UserProfileCard extends BaseElement {
                 object-fit: cover;
                 border: 1px solid #dee2e6;
                 cursor: pointer;
+                box-shadow: 0 3px 6px rgba(0, 0, 0, 0.40), 0 3px 6px rgba(0, 0, 0, 0.50);
             }
             .profile-info, .profile-stats {
                 margin-bottom: 1rem;

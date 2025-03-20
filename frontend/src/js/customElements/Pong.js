@@ -23,7 +23,6 @@ class Pong extends BaseElement {
         this.readyButton = document.createElement("button");
         this.readyButton.id = "readyButton";
         this.readyButton.textContent = "Ready to Play";
-        this.readyButton.classList.add("ready-button");
         this.readyButton.addEventListener("click", () => this.sendPlayerReady());
         this.append(this.paddels.left, this.paddels.right, this.ball, this.scoreboard, this.statusMessage, this.readyButton, this.side1Username, this.side2Username);
         this.score = [0, 0];

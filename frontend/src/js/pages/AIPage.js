@@ -74,7 +74,6 @@ class AIPage extends Page {
       };
   }
 
-
   startGame(difficulty) {
     this.app.stateManager.updateState("currentGame", true);
     const settingsEl = this.mainElement.querySelector("#ai-game-settings");
@@ -96,8 +95,7 @@ class AIPage extends Page {
     if (!scoreBoardEl)
         return;
     scoreBoardEl.page = this;
-    const game = this.createGameObject(e.detail);
-    scoreBoardEl.displayMatch(game);
+    scoreBoardEl.displayMatch(this.createGameObject(e.detail));
     scoreBoardEl.classList.remove("d-none");
   }
 

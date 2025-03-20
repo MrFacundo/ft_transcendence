@@ -1,9 +1,11 @@
 pong-game, pong-ai {
 	width: 1000px;
-	display: inline-block;
+	display: flex;
 	height: 700px;
 	background: #202428;
 	position: relative;
+	justify-self: center;
+	margin-top: 10rem;
 
 	#statusMessage {
 		position: absolute;
