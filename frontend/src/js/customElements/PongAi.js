@@ -15,17 +15,23 @@ class PongAi extends BaseElement {
     this.scoreboard = this.createElement("scoreboard");
     this.side1Username = this.createElement("side1Username");
     this.side2Username = this.createElement("side2Username");
-
     this.side1Username.textContent = "Player";
     this.side2Username.textContent = "AI";
     this.scoreboard.textContent = "0 - 0";
+    this.readyButton = document.createElement("button");
+    this.readyButton.id = "readyButton";
+    this.readyButton.textContent = "Ready to Play";
+    this.readyButton.addEventListener("click", () =>  {
+      this.gameLoop(); this.readyButton.style.display = "none";
+    });
 
     this.append(
       this.canvas,
       this.statusMessage,
       this.scoreboard,
       this.side1Username,
-      this.side2Username
+      this.side2Username,
+      this.readyButton
     );
 
     this.ctx = this.canvas.getContext("2d");
@@ -97,6 +103,8 @@ class PongAi extends BaseElement {
   }
 
   startGame(difficulty) {
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
     this.resetBall();
     this.playerScore = this.aiScore = 0;
     this.updateScoreDisplay();
@@ -124,8 +132,7 @@ class PongAi extends BaseElement {
       () => this.simulateAIInput(diff),
       this.aiReactionDelay
     );
-
-    this.gameLoop();
+    this.readyButton.style.display = "block";
   }
 
   simulateAIInput(difficulty) {
@@ -273,17 +280,17 @@ class PongAi extends BaseElement {
     }
 
     if (this.ball.x <= 0) {
-      this.aiScore++;
+      this.playerScore++;
       this.updateScoreDisplay();
-      if (this.aiScore >= 3) {
+      if (this.playerScore >= 3) {
         this.endGame();
       } else {
         this.resetBall();
       }
     } else if (this.ball.x + this.ball.size >= this.canvas.width) {
-      this.playerScore++;
+      this.aiScore++;
       this.updateScoreDisplay();
-      if (this.playerScore >= 3) {
+      if (this.aiScore >= 3) {
         this.endGame();
       } else {
         this.resetBall();
