@@ -18,6 +18,8 @@ export default class GamePage extends Page {
         const gameId = params["id"];
         const gameEl = mainElement.querySelector("pong-game");
         gameEl.page = this;
+        
+        if (this.app.stateManager.state.currentGame) return;
 
         try {
             const game = await app.api.getGame(gameId);

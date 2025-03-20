@@ -11,7 +11,6 @@ class PongAi extends BaseElement {
     this.canvas = document.createElement("canvas");
     this.canvas.width = 1000;
     this.canvas.height = 700;
-    this.statusMessage = this.createElement("statusMessage");
     this.scoreboard = this.createElement("scoreboard");
     this.side1Username = this.createElement("side1Username");
     this.side2Username = this.createElement("side2Username");
@@ -27,7 +26,6 @@ class PongAi extends BaseElement {
 
     this.append(
       this.canvas,
-      this.statusMessage,
       this.scoreboard,
       this.side1Username,
       this.side2Username,
@@ -109,9 +107,10 @@ class PongAi extends BaseElement {
     this.playerScore = this.aiScore = 0;
     this.updateScoreDisplay();
     this.gameOver = false;
+    this.side1Username.textContent = this.page.app.auth.user.username;
+    this.side2Username.textContent = "AI" + (difficulty ? ` (${difficulty})` : "");
 
     const diff = difficulty ? difficulty.toLowerCase() : "easy";
-    this.statusMessage.textContent = `Difficulty: ${diff}`;
 
     if (diff === "hard") {
       this.aiPaddle.speed = 7;
