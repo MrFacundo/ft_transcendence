@@ -27,7 +27,6 @@ CONTRACT_ABI = [
             {"name": "_datePlayed", "type": "uint256"},
             {"name": "_scorePlayer1", "type": "uint256"},
             {"name": "_scorePlayer2", "type": "uint256"},
-            {"name": "_matchDate", "type": "uint256"},
             {"name": "_status", "type": "string"},
             {"name": "_player1Id", "type": "uint256"},
             {"name": "_player2Id", "type": "uint256"},
@@ -86,7 +85,7 @@ def monitor_game(last_checked_id):
             cur = conn.cursor()
 
             cur.execute(f"""
-                SELECT id, channel_group_name, date_played, score_player1, score_player2, match_date, status, player1_id, player2_id, winner_id, tournament_id
+                SELECT id, channel_group_name, date_played, score_player1, score_player2, status, player1_id, player2_id, winner_id, tournament_id
                 FROM games_ponggame
                 WHERE (status = 'interrupted' OR status = 'completed') 
                 AND registered_on_blockchain = FALSE
@@ -102,7 +101,7 @@ def monitor_game(last_checked_id):
             cur.close()
             conn.close()
             
-            return [{"id": j[0], "channel_group_name": j[1], "date_played": j[2], "score_player1": j[3], "score_player2": j[4], "match_date": j[5], "status": j[6], "player1_id": j[7], "player2_id": j[8], "winner_id": j[9], "tournament_id": j[10]} for j in games]
+            return [{"id": j[0], "channel_group_name": j[1], "date_played": j[2], "score_player1": j[3], "score_player2": j[4], "status": j[5], "player1_id": j[6], "player2_id": j[7], "winner_id": j[8], "tournament_id": j[9]} for j in games]
         except psycopg2.OperationalError:
             print("Database is not available. Retrying in 5 seconds...")
             time.sleep(3)
@@ -116,7 +115,7 @@ def get_all_new_games():
             cur = conn.cursor()
 
             cur.execute(f"""
-                SELECT id, channel_group_name, date_played, score_player1, score_player2, match_date, status, player1_id, player2_id, winner_id, tournament_id
+                SELECT id, channel_group_name, date_played, score_player1, score_player2, status, player1_id, player2_id, winner_id, tournament_id
                 FROM games_ponggame
                 WHERE (status = 'interrupted' OR status = 'completed') 
                 AND registered_on_blockchain = FALSE
@@ -129,7 +128,7 @@ def get_all_new_games():
             cur.close()
             conn.close()
             
-            return [{"id": j[0], "channel_group_name": j[1], "date_played": j[2], "score_player1": j[3], "score_player2": j[4], "match_date": j[5], "status": j[6], "player1_id": j[7], "player2_id": j[8], "winner_id": j[9], "tournament_id": j[10]} for j in games]
+            return [{"id": j[0], "channel_group_name": j[1], "date_played": j[2], "score_player1": j[3], "score_player2": j[4], "status": j[5], "player1_id": j[6], "player2_id": j[7], "winner_id": j[8], "tournament_id": j[9]} for j in games]
         except psycopg2.OperationalError:
             print("Database is not available. Retrying in 5 seconds...")
             time.sleep(3)
@@ -160,7 +159,6 @@ def register_game_on_blockchain(game):
         int(game['date_played'].timestamp()),
         game['score_player1'],
         game['score_player2'],
-        int(game['match_date'].timestamp()) if game['match_date'] else 0,
         game['status'],
         game['player1_id'],
         game['player2_id'],
