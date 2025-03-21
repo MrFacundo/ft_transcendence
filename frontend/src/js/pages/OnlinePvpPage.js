@@ -2,12 +2,13 @@ import Page from "./Page.js";
 import "../customElements/UserProfileCard.js";
 import "../customElements/UserProfileCardSm.js";
 import "../customElements/UserList.js";
+import { showMessage } from "../utils.js";
 
 class OnlinePvpPage extends Page {
     constructor(app) {
         super({
-            name: "onlinepvp",
-            url: "/onlinepvp",
+            name: "online_pvp",
+            url: "/online_pvp",
             pageElement: "#OnlinePvp",
             isProtected: true,
             app: app,
@@ -16,10 +17,10 @@ class OnlinePvpPage extends Page {
 
     async render() {
         const { api, auth, stateManager } = this.app;
-        const sendList = document.querySelector("#send-list");
-        const receiveList = document.querySelector("#receive-list");
-        const actionButton = document.querySelector("#action-friend");
-        const selectedUserCard = document.querySelector("user-profile");
+        const sendList = this.mainElement.querySelector("#send-list");
+        const receiveList = this.mainElement.querySelector("#receive-list");
+        const actionButton = this.mainElement.querySelector("#action-friend");
+        const selectedUserCard = this.mainElement.querySelector("user-profile");
 
         [sendList, receiveList, selectedUserCard].forEach(el => (el.page = this));
 
@@ -34,34 +35,48 @@ class OnlinePvpPage extends Page {
         );
 
         sendList.config = {
-			selectedUserCard,
-			actionButton,
-			actionText: "Invite",
-            actionCallback: async (user, userCardSm) => {
-                const response = await api.gameRequest(user.id);
-                userCardSm.appendPendingButton(Date.now() + 10 * 60 * 1000);
-                console.log(`Game invite sent to: ${user.username}`);
-                return response;
+            selectedUserCard,
+            actionButton,
+            actionText: "Invite",
+            actionCallback: async (user) => {
+                try {
+                    await api.gameRequest(user.id);
+					user.isPending = true;
+					sendList.updateUser(user);
+					actionButton.classList.add("d-none");
+                } catch (error) {
+                    this.handleError(error);
+                }
             },
-		};
-		sendList.setState ({ users: sendListData });
+        };
+        sendList.setState({ users: sendListData });
 
         receiveList.config = {
-			selectedUserCard,
-			actionButton,
-			actionText: "Accept",
+            selectedUserCard,
+            actionButton,
+            actionText: "Accept",
             actionCallback: async (user) => {
-                if (!stateManager.state.onlineStatuses?.get(user.id)?.is_online) {
-                    alert(`${user.username} is offline, try again later.`);
-                    return;
+                try {
+                    if (!stateManager.state.onlineStatuses?.get(user.id)?.is_online) {
+                        alert(`${user.username} is offline, try again later.`);
+                        return;
+                    }
+                    const response = await api.gameAccept(user.game_invite.id);
+                    console.log(`Game invite accepted from: ${user.username}`);
+                    this.app.navigate(response.game_url);
+                    return response;
+                } catch (error) {
+                    this.handleError(error);
                 }
-                const response = await api.gameAccept(user.game_invite.id);
-                console.log(`Game invite accepted from: ${user.username}`);
-                this.app.navigate(response.game_url);
-                return response;
             },
-		};
-		receiveList.setState ({ users: receiveListData });
+        };
+        receiveList.setState({ users: receiveListData });
+    }
+
+    handleError(error) {
+        showMessage(error?.response?.data?.message, "error");
+        this.close();
+        this.open();
     }
 }
 

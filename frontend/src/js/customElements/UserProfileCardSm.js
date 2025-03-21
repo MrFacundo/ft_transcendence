@@ -30,6 +30,8 @@ class UserProfileCardSm extends BaseElement {
         if (!profileContainer.querySelector(".btn-warning")) {
             const pendingButton = document.createElement("button");
             pendingButton.className = "btn-warning";
+            pendingButton.style.position = "absolute";
+            pendingButton.style.right = "16px";
             pendingButton.innerText = expiresAt;
             profileContainer.appendChild(pendingButton);
         }
@@ -49,15 +51,15 @@ class UserProfileCardSm extends BaseElement {
                 display: flex;
                 align-items: center;
                 text-align: left;
-                margin-bottom: 0.5rem;
                 cursor: pointer;
                 padding: 0.5rem;
                 border-radius: 0.5rem;
                 transition: background-color 0.3s, box-shadow 0.3s;
+            	background: #202428;
             }
             .profile-container:hover {
-                background-color: #f8f9fa;
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            	background: #383e45;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
             }
             .profile-avatar {
                 border-radius: 50%;
@@ -72,7 +74,7 @@ class UserProfileCardSm extends BaseElement {
             .profile-username {
                 font-size: 1rem;
                 font-weight: bold;
-                color: #343a40;
+                color: #fff;
             }
             .status-indicator {
                 width: 10px;
@@ -84,7 +86,7 @@ class UserProfileCardSm extends BaseElement {
                 margin-left: 10px;
                 background-color: #ffc107;
                 border: none;
-                color: white;
+                color: #fff;
                 padding: 0.25rem 0.5rem;
                 text-align: center;
                 text-decoration: none;
@@ -95,8 +97,8 @@ class UserProfileCardSm extends BaseElement {
                 background-color: #e0a800;
             }
             .selected {
-                background-color: #f8f9fa;
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            	background: #383e45;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
             }
         </style>
         <div class="profile-container">

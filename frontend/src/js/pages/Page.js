@@ -27,21 +27,18 @@ class Page {
      * Renders the page's content.
      */
     async open() {
-        const { app } = this;
         document.querySelectorAll("section").forEach((section) => { section.remove() });
-        const tempElement = document.createElement(this.pageElement.tagName);
-        tempElement.innerHTML = this.pageElement.innerHTML;
-        this.mainElement.innerHTML = tempElement.innerHTML;
-        this.mainElement.querySelectorAll("[data-href]").forEach((element) => {
-            element.addEventListener("click", (event) => this.handleClick(event));
-        });
-        document.title = this.name;
+        this.mainElement.innerHTML = this.pageElement.innerHTML;
+        this.addEventListeners();
+        document.title = "Ultimate Pong - " + this.name.replace(/[_-]/g, ' ').charAt(0).toUpperCase() + this.name.replace(/[_-]/g, ' ').slice(1);
         this.renderNavbar(this);
-        this.render(app);
+        this.render(this.app);
+        this.toggleBackground();
+        document.body.classList.remove("loading");
     }
 
     /**
-     * Closes the page and removes event listeners.
+     * Closes the page and removes event listeners and state subscriptions.
      */
     close() {
         this.mainElement.querySelectorAll("[data-href]").forEach((element) => {
@@ -54,8 +51,16 @@ class Page {
     }
 
     /**
+     * Adds event listeners to the elements with the data-href attribute.
+     */
+    addEventListeners() {
+        this.mainElement.querySelectorAll("[data-href]").forEach((element) => {
+            element.addEventListener("click", (event) => this.handleClick(event));
+        });
+    }
+
+    /**
      * Handles click events for navigation.
-     * @param {Event} event - The click event
      */
     handleClick(event) {
         event.preventDefault();
@@ -81,6 +86,16 @@ class Page {
      */
     render() {
         console.warn(`TEST: Rendering ${this.name} page`);
+    }
+
+    toggleBackground() {
+        const backgroundEl = document.querySelector("#background");
+        const noBackgroundPages = ["login", "register", "404", "auth-result", "two-factor-auth", "verify-email", "oauth-result"];
+        if (!noBackgroundPages.includes(this.name)) {
+            backgroundEl.style.opacity = "1";
+        } else {
+            backgroundEl.style.opacity = "0";
+        }
     }
 }
 

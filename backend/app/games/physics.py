@@ -56,7 +56,6 @@ class Ball(Hitbox):
         self.speed_y = speed * math.sin(angle)
 
     def update(self):
-        # Update position
         self.x = truncate(self.x + self.speed_x, 2)
         self.y = truncate(self.y + self.speed_y, 2)
         

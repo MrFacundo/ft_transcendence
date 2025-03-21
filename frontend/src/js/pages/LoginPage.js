@@ -19,11 +19,10 @@ class LoginPage extends Page {
         const form = this.mainElement.querySelector("custom-form");
         form.submitForm = async (formData) => {
             try {
-                const response = await auth.login(
+                await auth.login(
                     formData['login-email'],
                     formData['login-password']
                 );
-                return response;
             } catch (error) {
                 if (error.response) {
                     if (error.response.status === 401) {

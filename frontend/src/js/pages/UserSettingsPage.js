@@ -16,10 +16,13 @@ class UserSettingsPage extends Page {
 
     render() {
         this.setupEventListeners();
-        this.setInitial2FASelection();
+        this.setInitialValues();
     }
 
-    setInitial2FASelection() {
+    setInitialValues() {
+        const { username, email } = this.app.auth.user;
+        document.getElementById("new-username").placeholder = username;
+        document.getElementById("new-email").placeholder = email;
         const twoFactorElement = document.getElementById(`2fa-${this.app.auth.user.two_factor_method}`);
         if (twoFactorElement) twoFactorElement.checked = true;
     }
@@ -33,21 +36,21 @@ class UserSettingsPage extends Page {
         ];
 
         elements.forEach(({ button, input, field, message, confirmInput }) => {
-            const btn = document.querySelector(button);
-            const inp = document.querySelector(input);
-            const confirmInp = confirmInput ? document.querySelector(confirmInput) : null;
+            const btn = this.mainElement.querySelector(button);
+            const inp = this.mainElement.querySelector(input);
+            const confirmInp = confirmInput ? this.mainElement.querySelector(confirmInput) : null;
             if (btn) btn.addEventListener("click", () => this.handleChange(field, inp.value, message, confirmInp?.value));
         });
 
-        const update2FAButton = document.querySelector("#two-factor .btn");
+        const update2FAButton = this.mainElement.querySelector("#two-factor .btn");
         if (update2FAButton) {
             update2FAButton.addEventListener("click", this.handle2FAButtonClick.bind(this));
         }
 
-        const form = document.querySelector("#authenticatorModal custom-form");
+        const form = this.mainElement.querySelector("#authenticatorModal custom-form");
         form.submitForm = this.submitAuthenticatorForm.bind(this, form);
 
-        const deleteAccountButton = document.querySelector("#confirmDeleteAccount");
+        const deleteAccountButton = this.mainElement.querySelector("#confirmDeleteAccount");
         if (deleteAccountButton) {
             deleteAccountButton.addEventListener("click", this.deleteAccount.bind(this));
         }
@@ -55,7 +58,7 @@ class UserSettingsPage extends Page {
 
     /* 2FA */
     async handle2FAButtonClick() {
-        const selected2FAMethod = document.querySelector("input[name='2fa-method']:checked").id.split("-")[1];
+        const selected2FAMethod = this.mainElement.querySelector("input[name='2fa-method']:checked").id.split("-")[1];
         if (selected2FAMethod == 'authenticator') {
             if (this.app.auth.user.two_factor_method === 'authenticator') return;
             try {
@@ -119,7 +122,7 @@ class UserSettingsPage extends Page {
             }
     
             if (field === "avatar") {
-                const fileInput = document.querySelector("#new-avatar");
+                const fileInput = this.mainElement.querySelector("#new-avatar");
                 if (fileInput.files.length === 0) {
                     showMessage("Please select an image to upload.", "error");
                     return;

@@ -46,24 +46,28 @@ export class WebSocketManager {
     setupTournamentWebSocket() {
         const tournamentId = this.app.stateManager.state.currentTournament?.id;
         if (!tournamentId) return;
-        this.ws.currentTournament = this.setupWebSocket(`tournament/${tournamentId}`, this.handleTournamentMessage.bind(this));
+        this.ws.currentTournament = this.setupWebSocket(`tournament/${tournamentId}`, this.handleTournamentMessage.bind(this), false);
     }
 
     setupOpenTournamentsWebSocket() {
         this.ws.currentTournament = this.setupWebSocket('open-tournaments', this.handleOpenTournamentsMessage.bind(this));
     }
 
-    setupWebSocket(path, messageHandler) {
+    setupWebSocket(path, messageHandler, reconnect = true) {
         const ws = new WebSocket(`${settings.WS_URL}/${path}/?token=${this.app.auth.accessToken}`);
         ws.onopen = () => console.log(`WebSocket connection established: ${path}`);
         ws.onmessage = messageHandler;
         ws.onerror = (error) => {
             console.error(`${path} WebSocket error:`, error);
-            this[`${path.split('/')[0]}Ws`] = null;
         };
         ws.onclose = () => {
             console.warn(`WebSocket connection closed: ${path}`);
-            this[`${path.split('/')[0]}Ws`] = null;
+            setTimeout(() => {
+                if (this.app.auth?.authenticated && reconnect) {
+                    console.log("Reconnecting...");
+                    this.ws[path] = this.setupWebSocket(path, messageHandler);
+                }
+            }, 3000);
         };
         return ws;
     }
@@ -121,7 +125,7 @@ export class WebSocketManager {
                 this.handleTournamentJoinMessage(data, auth, stateManager);
                 break;
             case "start_game":
-                this.handleTournamentStartGameMessage(data, auth, stateManager);
+                this.handleTournamentStartGameMessage(data, auth);
                 break;
             case "game_over":
                 this.handleTournamentGameOverMessage(data, currentPage, stateManager);
@@ -142,7 +146,7 @@ export class WebSocketManager {
         }
     }
 
-    handleTournamentStartGameMessage(data, auth, stateManager) {
+    handleTournamentStartGameMessage(data, auth) {
         if (auth.user.id === data.participant_id) {
             this.app.navigate(data.game_url);
         }

@@ -13,6 +13,8 @@ services:
       - backend
     env_file:
       - .env
+    environment:
+      - NODE_ENV=${NODE_ENV}
   backend:
     container_name: transcendence_back
     build:
@@ -30,33 +32,6 @@ services:
       cache:
         condition: service_healthy
     restart: unless-stopped
-    env_file:
-      - .env
-  blockchain:
-    container_name: blockchain
-    environment:
-      - DB_NAME=${POSTGRES_DB}
-      - DB_USER=${POSTGRES_USER}
-      - DB_PASSWORD=${POSTGRES_PASSWORD}
-      - DB_HOST=${POSTGRES_HOST}
-    restart: unless-stopped
-    build:
-      context: ./blockchain
-      args:
-        GANACHE_ENV: ${GANACHE_COD}
-        GANACHE_URL: ${GANACHE_URL}
-        GANACHE_PORT: ${GANACHE_PORT}
-      dockerfile: Dockerfile
-    image: blockchain:local
-    ports:
-      - "8545:8545"
-    volumes:
-      - ./blockchain:/usr/src/app:delegated
-    networks:
-      - backend-network
-    depends_on:
-      backend:
-        condition: service_started
     env_file:
       - .env
   db:
@@ -93,7 +68,6 @@ services:
     volumes:
       - cache_data:/data
     restart: unless-stopped
-
   waf:
     container_name: modecurity_waf
     build:
@@ -106,6 +80,33 @@ services:
       - backend
     networks:
       - backend-network
+  blockchain:
+    container_name: blockchain
+    environment:
+      - DB_NAME=${POSTGRES_DB}
+      - DB_USER=${POSTGRES_USER}
+      - DB_PASSWORD=${POSTGRES_PASSWORD}
+      - DB_HOST=${POSTGRES_HOST}
+    restart: unless-stopped
+    build:
+      context: ./blockchain
+      args:
+        GANACHE_ENV: ${GANACHE_COD}
+        GANACHE_URL: ${GANACHE_URL}
+        GANACHE_PORT: ${GANACHE_PORT}
+      dockerfile: Dockerfile
+    image: blockchain:local
+    ports:
+      - "8545:8545"
+    volumes:
+      - ./blockchain:/usr/src/app:delegated
+    networks:
+      - backend-network
+    depends_on:
+      backend:
+        condition: service_started
+    env_file:
+      - .env
 
 networks:
   backend-network:

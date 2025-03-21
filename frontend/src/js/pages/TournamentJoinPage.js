@@ -23,14 +23,14 @@ class TournamentPage extends Page {
     async render() {
         const { api, wsManager, stateManager } = this.app;
         const openTournaments = stateManager.state.openTournaments;
-        const tournamentListElement = document.querySelector("#tournament-list");
+        const tournamentListElement = this.mainElement.querySelector("#tournament-list");
 
         this.populateTournamentList(openTournaments, tournamentListElement, api, stateManager, wsManager);
     }
 
     updateTournamentsList(openTournaments) {
         console.log("Updating tournaments list", openTournaments);
-        const tournamentListElement = document.querySelector("#tournament-list");
+        const tournamentListElement = this.mainElement.querySelector("#tournament-list");
         const { api, wsManager, stateManager } = this.app;
         this.populateTournamentList(openTournaments, tournamentListElement, api, stateManager, wsManager);
         console.log("Updating tournaments list", openTournaments);
@@ -41,7 +41,8 @@ class TournamentPage extends Page {
         openTournaments.forEach(({ id, name, participants, participants_amount }) => {
             const tournamentItem = document.createElement("li");
             tournamentItem.id = `tournament-${id}`;
-            tournamentItem.className = "list-group-item d-flex justify-content-between align-items-center shadow-lg p-4 my-3 rounded cursor-pointer";
+            tournamentItem.className = "text-white list-group-item d-flex justify-content-between align-items-center shadow-lg p-4 my-3 rounded cursor-pointer";
+            tournamentItem.style.backgroundColor = "#202428";
             tournamentItem.innerHTML = `<span>${name}</span><span class="badge bg-light text-dark">${participants.length} / ${participants_amount}</span>`;
             tournamentListElement.appendChild(tournamentItem);
 
@@ -49,6 +50,7 @@ class TournamentPage extends Page {
                 try {
                     const response = await api.joinTournament(id);
                     stateManager.updateState('currentTournament', response);
+                    stateManager.setInitialOpenTournaments();
                     wsManager.setupTournamentWebSocket();
                     showMessage(`Joined tournament: ${name}`);
                 } catch (error) {
