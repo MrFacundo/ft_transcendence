@@ -38,7 +38,7 @@ class HomePage extends Page {
 		sendList.config = {
 			selectedUserCard,
 			actionButton,
-			actionText: "Invite",
+			actionText: "Send friend request",
 			actionCallback: async (user) => {
 				try {
 					await api.friendRequest(user.id);

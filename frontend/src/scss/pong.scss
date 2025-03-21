@@ -1,9 +1,12 @@
-pong-game {
+pong-game, pong-ai {
 	width: 1000px;
-	display: inline-block;
+	display: flex;
 	height: 700px;
 	background: #202428;
 	position: relative;
+	justify-self: center;
+	margin: 0 auto; // Firefox
+	margin-top: 8rem;
 
 	#statusMessage {
 		position: absolute;

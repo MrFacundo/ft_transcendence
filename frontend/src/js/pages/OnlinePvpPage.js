@@ -37,7 +37,7 @@ class OnlinePvpPage extends Page {
         sendList.config = {
             selectedUserCard,
             actionButton,
-            actionText: "Invite",
+            actionText: "Challenge to PvP",
             actionCallback: async (user) => {
                 try {
                     await api.gameRequest(user.id);
