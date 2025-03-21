@@ -11,7 +11,6 @@ contract PongGameHistory {
         uint256 datePlayed;
         uint256 scorePlayer1;
         uint256 scorePlayer2;
-        uint256 matchDate;
         string status;
         uint256 player1Id;
         uint256 player2Id;
@@ -43,7 +42,6 @@ contract PongGameHistory {
         uint256 _datePlayed,
         uint256 _scorePlayer1,
         uint256 _scorePlayer2,
-        uint256 _matchDate,
         string memory _status,
         uint256 _player1Id,
         uint256 _player2Id,
@@ -59,7 +57,6 @@ contract PongGameHistory {
             _datePlayed,
             _scorePlayer1,
             _scorePlayer2,
-            _matchDate,
             _status,
             _player1Id,
             _player2Id,
@@ -98,7 +95,6 @@ contract PongGameHistory {
         uint256 datePlayed,
         uint256 scorePlayer1,
         uint256 scorePlayer2,
-        uint256 matchDate,
         string memory status,
         uint256 player1Id,
         uint256 player2Id,
@@ -113,7 +109,6 @@ contract PongGameHistory {
             game.datePlayed,
             game.scorePlayer1,
             game.scorePlayer2,
-            game.matchDate,
             game.status,
             game.player1Id,
             game.player2Id,
