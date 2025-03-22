@@ -11,51 +11,74 @@ class TournamentPage extends Page {
             app: app,
         });
         this.handleStartButtonClick = this.handleStartButtonClick.bind(this);
+        this.elements = null;
+    }
+
+    async open() {
+        super.open();
+        this.unsubscribe = this.app.stateManager.subscribe(
+            'currentTournament',
+            (currentTournament) => this.render()
+        );
     }
 
     render() {
-        const { stateManager } = this.app;
-        const tournament = stateManager.state.currentTournament;
-        const cardsContainerEl = document.querySelector("#cards-container");
-        const tournamentDetailsEl = document.querySelector("#tournament-details");
-        const tournamentNameEl = document.querySelector("#tournament-name");
-        const participantsInfoEl = document.querySelector("#participants-info");
-        const partcipantsListEl = document.querySelector("#tournament-participants");
-        const selectedUserCard = document.querySelector("user-profile#selected-participant");
-        const tournamentBracketContainerEl = document.querySelector("#tournament-bracket-container");
-        const tournamentBracketEl = document.querySelector("tournament-bracket");
+        const cardsContainerEl = this.mainElement.querySelector("#cards-container");
+        const tournamentDetailsEl = this.mainElement.querySelector("#tournament-details");
+        const tournamentNameEl = this.mainElement.querySelector("#tournament-title");
+        const participantsInfoEl = this.mainElement.querySelector("#participants-info");
+        const partcipantsListEl = this.mainElement.querySelector("#tournament-participants");
+        const selectedUserCard = this.mainElement.querySelector("user-profile#selected-participant");
+        const tournamentBracketContainerEl = this.mainElement.querySelector("#tournament-bracket-container");
+        const tournamentBracketEl = this.mainElement.querySelector("tournament-bracket");
+        const tournament = this.app.stateManager.state.currentTournament;
 
         if (!tournament) {
-            // Show Join/create cards 
             cardsContainerEl.classList.remove("d-none");
         } else {
+            const { name, participants, participants_amount } = tournament;
+            const isTournamentFull = participants.length === participants_amount;
+
             tournamentDetailsEl.classList.remove("d-none");
-            tournamentNameEl.textContent = tournament.name + " 🏆";
+            tournamentNameEl.textContent = name;
 
-            const isTournamentFull = tournament.participants.length === tournament.participants_amount;
             if (!isTournamentFull) {
-                // Show participants list
+                this.updatePartcipantsList(tournament);
                 participantsInfoEl.classList.remove("d-none");
-                [partcipantsListEl, selectedUserCard].forEach(el => (el.page = this));
-
-                partcipantsListEl.config = { selectedUserCard };
-                partcipantsListEl.setState ({ users: tournament.participants });
             } else {
-                // Show tournament bracket
+                partcipantsListEl.classList.add("d-none");
+                selectedUserCard.classList.add("d-none");
+                participantsInfoEl.classList.add("d-none");
+
                 tournamentBracketContainerEl.classList.remove("d-none");
                 tournamentBracketEl.page = this;
                 tournamentBracketEl.setTournament(tournament);
+                if (tournament.final_game.status === "completed" || tournament.final_game.status === "interrupted") { 
+                    this.app.wsManager.ws.currentTournament.close();
+                    if (this.unsubscribe) this.unsubscribe();
+                    this.app.stateManager.updateState('currentTournament', null);
+                }
             }
         }
     }
 
     handleStartButtonClick() {
         const { wsManager } = this.app;
-        if (wsManager.tournamentWs) {
-            wsManager.tournamentWs.send(JSON.stringify({
+        if (wsManager.ws.currentTournament) {
+            wsManager.ws.currentTournament.send(JSON.stringify({
                 type: "start",
             }));
         }
+    }
+
+    updatePartcipantsList(currentTournament) {
+        if (!currentTournament) return;
+        const partcipantsListEl = this.mainElement.querySelector("#tournament-participants");
+        const selectedUserCard = this.mainElement.querySelector("user-profile#selected-participant");
+        [partcipantsListEl, selectedUserCard].forEach(el => (el.page = this));
+
+        partcipantsListEl.config = { selectedUserCard };
+        partcipantsListEl.setState({ users: currentTournament.participants });
     }
 }
 

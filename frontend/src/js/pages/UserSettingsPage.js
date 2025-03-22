@@ -16,10 +16,13 @@ class UserSettingsPage extends Page {
 
     render() {
         this.setupEventListeners();
-        this.setInitial2FASelection();
+        this.setInitialValues();
     }
 
-    setInitial2FASelection() {
+    setInitialValues() {
+        const { username, email } = this.app.auth.user;
+        document.getElementById("new-username").placeholder = username;
+        document.getElementById("new-email").placeholder = email;
         const twoFactorElement = document.getElementById(`2fa-${this.app.auth.user.two_factor_method}`);
         if (twoFactorElement) twoFactorElement.checked = true;
     }
@@ -33,21 +36,21 @@ class UserSettingsPage extends Page {
         ];
 
         elements.forEach(({ button, input, field, message, confirmInput }) => {
-            const btn = document.querySelector(button);
-            const inp = document.querySelector(input);
-            const confirmInp = confirmInput ? document.querySelector(confirmInput) : null;
+            const btn = this.mainElement.querySelector(button);
+            const inp = this.mainElement.querySelector(input);
+            const confirmInp = confirmInput ? this.mainElement.querySelector(confirmInput) : null;
             if (btn) btn.addEventListener("click", () => this.handleChange(field, inp.value, message, confirmInp?.value));
         });
 
-        const update2FAButton = document.querySelector("#two-factor .btn");
+        const update2FAButton = this.mainElement.querySelector("#two-factor .btn");
         if (update2FAButton) {
             update2FAButton.addEventListener("click", this.handle2FAButtonClick.bind(this));
         }
 
-        const form = document.querySelector("#authenticatorModal custom-form");
+        const form = this.mainElement.querySelector("#authenticatorModal custom-form");
         form.submitForm = this.submitAuthenticatorForm.bind(this, form);
 
-        const deleteAccountButton = document.querySelector("#confirmDeleteAccount");
+        const deleteAccountButton = this.mainElement.querySelector("#confirmDeleteAccount");
         if (deleteAccountButton) {
             deleteAccountButton.addEventListener("click", this.deleteAccount.bind(this));
         }
@@ -55,7 +58,7 @@ class UserSettingsPage extends Page {
 
     /* 2FA */
     async handle2FAButtonClick() {
-        const selected2FAMethod = document.querySelector("input[name='2fa-method']:checked").id.split("-")[1];
+        const selected2FAMethod = this.mainElement.querySelector("input[name='2fa-method']:checked").id.split("-")[1];
         if (selected2FAMethod == 'authenticator') {
             if (this.app.auth.user.two_factor_method === 'authenticator') return;
             try {
@@ -63,6 +66,7 @@ class UserSettingsPage extends Page {
                 const QrCodeImgEl = document.getElementById('QRCode');
                 QrCodeImgEl.src = `data:image/png;base64,${response.qr_code}`;
                 const authenticatorModal = new Modal(document.getElementById('authenticatorModal'));
+                console.log("authenticatorModal", authenticatorModal);
                 authenticatorModal.show();
             } catch (error) {
                 console.error("Error setting up authenticator app:", error);
@@ -73,9 +77,20 @@ class UserSettingsPage extends Page {
     }
 
     async submitAuthenticatorForm(form, formData) {
+        const otp = formData["otp-input"];
+        if (!otp) {
+            form.showFormError("Please enter the OTP code.");
+            return;
+        }
+        if (!/^\d{6}$/.test(otp)) {
+            form.showFormError("Invalid one-time password.");
+            return;
+        }
         try {
-            await this.app.api.verifyAuthenticatorSetup(formData["otp-input"].trim());
-            form.showFormSuccess("Authenticator setup successfully");
+            await this.app.api.verifyAuthenticatorSetup(otp.trim());
+            const authenticatorModal = Modal.getInstance(document.getElementById('authenticatorModal'));
+            authenticatorModal.hide();
+            showMessage("Authenticator setup successfully");
         } catch (error) {
             console.error(error);
             form.showFormError(error.response.data.error);
@@ -97,45 +112,53 @@ class UserSettingsPage extends Page {
     }
 
     /* Update password, username, email, avatar */
-    handleChange(field, newValue, successMessage, confirmPasswordValue = null) {
-        newValue = newValue.trim();
-        if (field === "new_password" && newValue !== confirmPasswordValue) {
-            showMessage("Passwords do not match.", "error");
-            return;
-        }
-        if (field === "avatar") {
-            const fileInput = document.querySelector("#new-avatar");
-            if (fileInput.files.length === 0) {
-                showMessage("Please select an image to upload.", "error");
+    async handleChange(field, newValue, successMessage, confirmPasswordValue = null) {
+        try {
+            if (field === "new_password") {
+                if (newValue !== confirmPasswordValue) {
+                    showMessage("Passwords do not match.", "error");
+                    return;
+                }
+            }
+    
+            if (field === "avatar") {
+                const fileInput = this.mainElement.querySelector("#new-avatar");
+                if (fileInput.files.length === 0) {
+                    showMessage("Please select an image to upload.", "error");
+                    return;
+                }
+                const file = fileInput.files[0];
+                const updatedUser = await this.app.api.uploadAvatar(file);
+                this.updateUserAndRefresh(updatedUser, successMessage);
                 return;
             }
-            const file = fileInput.files[0];
-            this.app.api.uploadAvatar(file)
-                .then(() => {
-                    showMessage(successMessage);
-                    setTimeout(() => this.app.navigate(this.url), 3000);
-                })
-                .catch(error => {
-                    showMessage("An error occurred while updating the avatar.", "error");
-                });
-            return;
+    
+            newValue = newValue.trim();
+            if (!newValue || newValue === this.app.auth.user[field]) {
+                return;
+            }
+    
+            const updatedUser = await this.app.api.updateUser({ [field]: newValue });
+            this.updateUserAndRefresh(updatedUser, successMessage);
+        } catch (error) {
+            this.handleUpdateError(error);
         }
-        if (!newValue || newValue === this.app.auth.user[field]) {
-            return;
-        }
-        this.app.api.updateUser({ [field]: newValue })
-            .then(() => {
-                showMessage(successMessage);
-                setTimeout(() => this.app.navigate(this.url), 3000);
-            })
-            .catch(error => {
-                const errors = error.response.data;
-                const firstErrorKey = Object.keys(errors)[0];
-                if (firstErrorKey && errors[firstErrorKey][0]) {
-                    return showMessage(capitalizeFirstLetter(errors[firstErrorKey][0]), "error");
-                }
-                showMessage("An error occurred while updating the settings.", "error");
-            });
+    }
+    
+    handleUpdateError(error) {
+        const errorMessage = error.response?.data?.[Object.keys(error.response.data)[0]]?.[0];
+        showMessage(
+            capitalizeFirstLetter(errorMessage) || 
+            "An error occurred while updating the settings.", 
+            "error"
+        );
+    }
+    
+    updateUserAndRefresh(updatedUser, successMessage) {
+        this.app.auth.user = updatedUser;
+        showMessage(successMessage);
+        this.close();
+        this.open();
     }
 }
 

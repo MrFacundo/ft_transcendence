@@ -1,6 +1,8 @@
 import { settings } from "../settings.js";
 import { getAvatarSrc } from "../utils.js";
 
+
+
 class ScoreBoard extends HTMLElement {
     constructor() {
         super().attachShadow({ mode: "open" });
@@ -17,8 +19,8 @@ class ScoreBoard extends HTMLElement {
             this.shadowRoot.getElementById(id).src = avatarSrc;
         };
         
-        setElement("scoreboard-title", match.status === "completed" ? "WELL PONGED" : "PONG INTERRUPTED");
-        
+        const pageTitleEl = document.querySelector("h1.title");
+        pageTitleEl.textContent = match.status === "completed" ? "Well ponged" : "Pong interrupted";
         await setAvatar("avatar-1", match.player1);
         setElement("username-1", match.player1.username);
         setElement("score-1", match.score_player1);
@@ -27,12 +29,14 @@ class ScoreBoard extends HTMLElement {
         setElement("username-2", match.player2.username);
         setElement("score-2", match.score_player2);
 
-        if (match.winner) {
+        if (match.winner && match.status === "completed") {
             const winner = match.player1.id === match.winner ? 1 : 2;
             ["avatar", "username", "score"].forEach((key) => {
                 this.shadowRoot.getElementById(`${key}-${winner}`).style.cssText =
                     key === "avatar" ? "border: 2px solid yellow;" : "color: gold;";
             });
+            const winnerUsername = winner === 1 ? match.player1.username : match.player2.username;
+            setElement("game-winner", `${winnerUsername} wins!`);
         }
     }
 
@@ -43,22 +47,18 @@ class ScoreBoard extends HTMLElement {
                 max-width: 800px;
                 margin: 2rem auto;
                 text-align: center;
-                background: #007bff;
+            	background: #202428;
                 border-radius: 8px;
                 padding: 1.5rem;
                 color: #fff;
                 font-family: Arial, sans-serif;
-            }
-            #scoreboard-title { 
-                margin-bottom: 1rem; 
-                font-size: 1.5rem; 
-                font-weight: bold; 
             }
             
             .row { 
                 display: flex; 
                 justify-content: space-between; 
                 align-items: center; 
+                justify-content: center;
                 margin-bottom: 1rem; 
             }
             
@@ -81,9 +81,15 @@ class ScoreBoard extends HTMLElement {
             .text-danger { 
                 color: #dc3545; 
             }
+            #game-winner {
+                font-family: "CustomFont", sans-serif;
+	            text-transform: uppercase;
+            }
         </style>
         <div id="scoreboard">
-            <div id="scoreboard-title">WELL PONGED</div>
+            <div class="row">
+                <h2 id="game-winner"></h2>
+            </div>
             <div class="row">
                 <div class="col-avatar"><img id="avatar-1" src="${settings.EMPTY_AVATAR_URL}" alt="Avatar" width="100" height="100"></div>
                 <div class="score">
@@ -97,6 +103,7 @@ class ScoreBoard extends HTMLElement {
             </div>
         </div>`;
     }
+    
 }
 
 customElements.define("score-board", ScoreBoard);

@@ -9,24 +9,42 @@ export class StateManager {
         this.state = {
             onlineStatuses: null,
             currentTournament: null,
-            currentGame: null
+            currentGame: null,
+            openTournaments: null,
         };
         this.init();
     }
     
+    /**
+     * Subscribes a callback function to a specific key in the state manager.
+     * The callback will be invoked whenever the state associated with the key changes.
+     *
+     * @param {string} key - The key to subscribe to.
+     * @param {function} callback - The callback function to invoke when the state changes.
+     * @returns {function} - A function to unsubscribe the callback from the key.
+     */
     subscribe(key, callback) {
         if (!this.subscribers.has(key)) {
-            this.subscribers.set(key, new Set());
+          this.subscribers.set(key, new Set());
         }
+        console.log("Subscribing callback " + callback + " to " + key);
         this.subscribers.get(key).add(callback);
+        
         return () => {
-            if (this.subscribers.has(key)) {
-                const unsubscribed = this.subscribers.get(key).delete(callback);
-                console.log(`Unsubscribing from ${key}: ${unsubscribed ? 'Success' : 'Failed'}`);
-            }
+          if (this.subscribers.has(key)) {
+            const unsubscribed = this.subscribers.get(key).delete(callback);
+            console.log(`Unsubscribing from ${key}: ${unsubscribed ? 'Success' : 'Failed'}`);
+          }
         };
-    }
+      }
     
+    /**
+     * Updates the state associated with a specific key and notifies all subscribers.
+     *
+     * @param {string} key - The key of the state to update.
+     * @param {*} newValue - The new value to set for the state.
+     * @param {*} [additionalData] - Optional additional data to pass to the subscribers.
+     */
     updateState(key, newValue, additionalData) {
         console.log("Updating state:", key, newValue);
         this.state[key] = newValue;
@@ -38,18 +56,20 @@ export class StateManager {
     }
 
     async init() {
-        if (!this.app.auth.authenticated) {
+        if (!this.app.auth.authenticated || this.initialized) {
             return;
         }
-
+        
         const promises = [
             this.state.onlineStatuses === null ? this.setInitialOnlineStatuses() : null,
-            this.state.currentTournament === null ? this.setInitialCurrentTournament() : null
+            this.state.currentTournament === null ? this.setInitialCurrentTournament() : null,
+            this.state.openTournaments === null ? this.setInitialOpenTournaments() : null,
         ].filter(Boolean);
-
+        
         await Promise.all(promises);
+        this.initialized = true;
     }
-
+    
     async setInitialOnlineStatuses() {
         try {
             const response = await this.app.api.getOnlineStatuses();
@@ -78,6 +98,25 @@ export class StateManager {
         }
     }
 
+    async setInitialOpenTournaments() {
+        try {
+            const openTournaments = await this.app.api.getTournaments();
+            this.updateState('openTournaments', openTournaments);
+        } catch (error) {
+            console.error("Error fetching open tournaments data:", error);
+        }
+    }
+
+    updateOpenTournaments(tournament) {
+        const openTournaments = this.state.openTournaments;
+        if (!openTournaments) return;
+
+        if (!openTournaments.some(t => t.id === tournament.id)) {
+            const updatedTournaments = [...openTournaments, tournament];
+            this.updateState("openTournaments", updatedTournaments);
+        }
+    }
+
     close() {
         this.subscribers.clear();
         Object.keys(this.state).forEach(key => {
@@ -85,5 +124,6 @@ export class StateManager {
                 this.updateState(key, null);
             }
         });
+        this.initialized = false;
     }
 }

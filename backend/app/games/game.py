@@ -13,6 +13,8 @@ class Game:
         self.disconnected = False
         self.db = None
         self.comm = None
+        self.players_ready = [False, False]
+        self.players_connected = [False, False]
 
     def reset(self):
         self.ball = Ball(0.5 - 0.01, 0.5 - 0.01)
@@ -20,7 +22,32 @@ class Game:
         self.paddles[1].y = 0.5 - 0.075
 
     async def handle_disconnect(self):
-        self.disconnected = True
+        if hasattr(self.socket, 'side'):
+            side = self.socket.side
+            self.players_connected[side] = False
+            self.disconnected = True
+
+    async def handle_ready(self, socket: AsyncWebsocketConsumer):
+        self.socket = socket
+        self.comm = GameCommunication(self)
+        self.db = GameDatabase(self)
+        await self.db.set_game_status("in_progress")
+
+    async def handle_interruption(self):
+        await self.db.set_score()
+        winner = 0 if self.score[0] > self.score[1] else 1
+        await self.db.update_stats(winner)
+        await self.db.set_winner(winner)
+        await self.db.set_game_status("interrupted")
+        await self.comm.send_game_over()
+        self.players_ready = [False, False]
+
+    async def handle_keys(self, side, message_type, key):
+        async with self.socket.update_lock:
+            if message_type == "keydown":
+                self.paddles[side].moving = -0.02 if key == "w" else 0.02
+            elif message_type == "keyup":
+                self.paddles[side].moving = 0
 
     async def game_loop(self):
         if not self.socket:
@@ -35,8 +62,10 @@ class Game:
 
             if self.score[0] >= 3 or self.score[1] >= 3:
                 winner = 0 if self.score[0] >= 3 else 1
+                await self.db.set_score()
                 await self.db.update_stats(winner)
                 await self.db.set_winner(winner)
+                await self.db.set_game_status("completed")
                 await self.comm.send_game_over()
                 return
 
@@ -46,7 +75,7 @@ class Game:
             await self.comm.send_game_state()
             await asyncio.sleep(0.1)
 
-        await self.comm.send_disconnect_message()
+        await self.comm.send_game_over()
 
     def _update_game_state(self):
         self.ball.update()
@@ -59,7 +88,6 @@ class Game:
                 self.ball.calculate_angle(paddle)
 
     async def _check_scoring(self):
-        # Left paddle miss
         if self.ball.x < self.paddles[0].x:
             self.reset()
             self.score[1] += 1
@@ -71,10 +99,6 @@ class Game:
             await self.comm.send_score_update()
 
     async def startGame(self, socket: AsyncWebsocketConsumer):
-        self.socket = socket
-        self.db = GameDatabase(self)
-        self.comm = GameCommunication(self)
-        
-        await self.db.set_game_active()
+        await self.db.set_game_status("in_progress")
         await self.comm.send_game_state()
         asyncio.create_task(self.game_loop())

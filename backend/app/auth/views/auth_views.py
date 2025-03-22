@@ -5,7 +5,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from rest_framework import status
-
+from rest_framework_simplejwt.views import TokenRefreshView
+from rest_framework.exceptions import NotFound
 from ..services import generate_jwt_response
 
 from app.auth.serializers import LoginSerializer
@@ -48,17 +49,31 @@ class VerifyEmailView(APIView):
             user = User.objects.get(pk=user_id)
             
             if user.new_email: # User is updating email
-                user.email = user.new_email
+                user.email = user.new_email.lower()
                 user.email_is_verified = True
                 user.new_email = None
-                user.new_email_is_verified = False
                 user.save()
                 return Response({'message': 'Email verified and updated successfully.'}, status=status.HTTP_200_OK)
             elif not user.email_is_verified: # User is verifying email for the first time
                 user.email_is_verified = True
+                user.email = user.email.lower()
                 user.save()
                 return Response({'message': 'Email verified successfully.'}, status=status.HTTP_200_OK)
             else:
                 return Response({'message': 'Email already verified.'}, status=status.HTTP_200_OK)
         except (BadSignature, User.DoesNotExist):
             return Response({'error': 'Invalid or expired token'}, status=status.HTTP_401_UNAUTHORIZED)
+
+class CustomTokenRefreshView(TokenRefreshView):
+    """"
+    Checks if the user exists before refreshing the token.
+    This avoids the error when the user is deleted and the token is still valid. 
+    """
+    def post(self, request, *args, **kwargs):
+        try:
+            return super().post(request, *args, **kwargs)
+        except User.DoesNotExist:
+            return Response(
+                {"detail": "User not found. Token refresh failed."},
+                status=status.HTTP_404_NOT_FOUND
+            )

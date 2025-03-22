@@ -11,10 +11,6 @@ class UserList extends BaseElement {
                 'onlineStatuses',
                 (statuses, updatedUserId) => this.handleOnlineStatusUpdate(statuses, updatedUserId)
             );
-            this.unsubscribe = this.page.app.stateManager.subscribe(
-                'currentTournament',
-                (currentTournament) => this.handleTournamentUpdate(currentTournament)
-            );
         };
     }
 
@@ -27,12 +23,6 @@ class UserList extends BaseElement {
         const selectedUser = this.selectedUserCard?.state?.user?.id === updatedUserId;
         if (selectedUser) {
             this.selectedUserCard.updateOnlineStatus(statuses.get(updatedUserId));
-        }
-    }
-
-    handleTournamentUpdate(currentTournament) { //TODO: this should be done by the page, not the component
-        if (this.page.name === "tournament") {
-            this.setState({ users: currentTournament.participants });
         }
     }
 
@@ -53,6 +43,12 @@ class UserList extends BaseElement {
         this.setState({ users: this.state.users.filter(user => user.id !== userId) });
     }
 
+    updateUser(updatedUser) {
+        this.setState({ 
+            users: this.state.users.map(user => user.id === updatedUser.id ? updatedUser : user) 
+        });
+    }
+
     render() {
         const listGroup = this.shadowRoot.querySelector(".list-group");
         listGroup.innerHTML = '';
@@ -70,7 +66,7 @@ class UserList extends BaseElement {
         userCardSm.setState({user});
         userCardSm.setAttribute("data-user-id", user.id);
 
-        const isPending = user.game_invite?.expires_at || user.friendship?.status === "pending";
+        const isPending = user.game_invite?.expires_at || user.friendship?.status === "pending" || user.isPending;
         if (isPending) userCardSm.appendPendingButton(user.game_invite?.expires_at);
 
         userCardSm.addEventListener("click", () => {
@@ -103,13 +99,11 @@ class UserList extends BaseElement {
                 flex-direction: column;
                 padding-left: 0;
                 margin-bottom: 0;
-                border-radius: 0.25rem;
             }
             .list-group-item {
                 position: relative;
                 display: block;
-                padding: 0;
-                background-color: #fff;
+                margin: 0.5rem 1rem;
             }
             .list-group-item:first-child { border-top-left-radius: inherit; border-top-right-radius: inherit; }
             .list-group-item:last-child { border-bottom-right-radius: inherit; border-bottom-left-radius: inherit; }

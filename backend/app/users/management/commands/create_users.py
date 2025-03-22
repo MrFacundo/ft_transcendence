@@ -1,12 +1,12 @@
 from django.core.management.base import BaseCommand
-from app.users.models import CustomUser, GameStats
+from app.users.models import CustomUser
 from faker import Faker
 import random
 import requests
 from django.core.files.base import ContentFile
 from io import BytesIO
 class Command(BaseCommand):
-    help = "Create a group of users with associated game stats"
+    help = "Create 10 users"
 
     def handle(self, *args, **kwargs):
         if CustomUser.objects.count() >=10:
@@ -29,7 +29,8 @@ class Command(BaseCommand):
             user = CustomUser.objects.create_user(
                 email=email,
                 username=username,
-                password="pass"
+                password="pass",
+                email_is_verified=True
             )
 
             self.stdout.write(self.style.NOTICE(f"User {username} created. Downloading avatar..."))
@@ -42,17 +43,6 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.NOTICE(f"Avatar for {username} saved as {image_name}"))
             else:
                 self.stdout.write(self.style.WARNING(f"Failed to download avatar for {username}"))
-
-            game_stats = user.game_stats
-
-            total_matches = random.randint(30, 60)
-            wins = random.randint(0, total_matches)
-            losses = total_matches - wins
-
-            game_stats.total_matches = total_matches
-            game_stats.wins = wins
-            game_stats.losses = losses
-            game_stats.save()
 
             self.stdout.write(self.style.SUCCESS(f"Successfully created user: {username}, Password: pass"))
 

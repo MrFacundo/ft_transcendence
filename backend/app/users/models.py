@@ -2,7 +2,6 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import RegexValidator, MinLengthValidator, EmailValidator, FileExtensionValidator
-import pyotp
 
 class CustomUser(AbstractUser):
     TWO_FACTOR_CHOICES = [
@@ -16,7 +15,7 @@ class CustomUser(AbstractUser):
         validators=[
             MinLengthValidator(4, message='Username must be at least 4 characters long.'),
             RegexValidator(
-                regex=r'^[\w.@+-]+$', 
+                regex=r'^[\w._]+$', 
                 message=_('Enter a valid username.')
             )
         ]
@@ -27,7 +26,7 @@ class CustomUser(AbstractUser):
         unique=True, 
         validators=[EmailValidator]
     )
-    email_is_verified = models.BooleanField(default=True)
+    email_is_verified = models.BooleanField(default=False)
     new_email = models.EmailField(
         _('pending email address'), 
         max_length=255, 
@@ -35,7 +34,6 @@ class CustomUser(AbstractUser):
         null=True, 
         validators=[EmailValidator]
     )
-    new_email_is_verified = models.BooleanField(default=False)
     oauth_uid = models.CharField(max_length=255, blank=True, null=True)
     avatar_oauth = models.URLField(blank=True, null=True)
     avatar_upload = models.ImageField(
@@ -52,23 +50,10 @@ class CustomUser(AbstractUser):
     def __str__(self):
         return self.username
 
-    def save(self, *args, **kwargs):
-        if self.email_is_verified:
-            self.email = self.email.lower()
-        super().save(*args, **kwargs)
-
-    def generate_totp(self):
-        """Generate a Time-Based One-Time Password object using the validation secret"""
-        if not self.validation_secret:
-            self.validation_secret = pyotp.random_base32()
-            self.save()
-        return pyotp.TOTP(self.validation_secret, interval=300)
-
     def get_current_tournament(self):
         return self.tournaments.filter(end_date__isnull=True).first()
         
 class GameStats(models.Model):
-    id = models.BigAutoField(primary_key=True)
     user = models.OneToOneField(
         CustomUser, 
         on_delete=models.CASCADE, 
@@ -88,11 +73,10 @@ class Friendship(models.Model):
         ('rejected', 'Rejected')
     ]
     
-    id = models.BigAutoField(primary_key=True)
     sender = models.ForeignKey(
         CustomUser, 
         on_delete=models.CASCADE, 
-        related_name='friendships_initiated'
+        related_name='friendships_sent'
     )
     receiver = models.ForeignKey(
         CustomUser, 

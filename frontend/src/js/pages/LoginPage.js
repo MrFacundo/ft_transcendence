@@ -19,31 +19,25 @@ class LoginPage extends Page {
         const form = this.mainElement.querySelector("custom-form");
         form.submitForm = async (formData) => {
             try {
-                console.log("Login form submitted", formData);
-                const response = await auth.login(
+                await auth.login(
                     formData['login-email'],
                     formData['login-password']
                 );
-                return response;
             } catch (error) {
                 if (error.response) {
                     if (error.response.status === 401) {
                         form.showFormError("Invalid email or password");
-                    }
-                    else {
+                    } else {
                         form.showFormError("An error ocurred, please try again later.");
                     }
-                }
-                else {
+                } else {
                     form.showFormError(error.message);
                 }
-                throw error;
             }
         };
 
         const oAuthButton = this.mainElement.querySelector("#oauth");
-        oAuthButton.addEventListener("click",  async () => {
-            console.log("OAuth login");
+        oAuthButton.addEventListener("click", async () => {
             await auth.oAuthLogin().catch((error) => {
                 form.showFormError(error.message);
             });

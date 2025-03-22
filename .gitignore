@@ -14,7 +14,7 @@ Thumbs.db
 
 # Ignore build artifacts
 build/
-dist/
+*dist/
 node_modules/
 
 # Ignore log files
@@ -26,7 +26,7 @@ node_modules/
 *.bak
 
 # Ignore environment-specific files
-.env
+/.env
 .env.local
 .env.*.local
 
@@ -84,3 +84,10 @@ backend/media/
 
 #other
 test.sql
+
+#schema generation
+schema.json
+
+#file blockchain
+blockchain/deployedAddress.json
+menu.sh

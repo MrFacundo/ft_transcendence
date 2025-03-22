@@ -50,14 +50,21 @@ export class Api {
         }
     }
 
-    /* User / Auth */
+    /* Auth */
+
+    async refreshToken(refreshToken) {
+        return this.request("post", "/token/refresh/", { refresh: refreshToken });
+    }
+
+    /* User */
 
     /**
      * Creates a new user.
      * @param {Object} data - The user email, password, and username.
      * @returns {Promise<Object>} The created user.
      */
-    async createUser(data) {
+    async createUser(username, email, password) {
+        const data = { username, email, password };
         return this.request("post", "/user", data);
     }
 
@@ -165,13 +172,13 @@ export class Api {
     }
 
     /**
-     * Retrieves a list current the user friends, along with their Game Invitation data related to the current user.
+     * Retrieves a list current the user friends, along with their Game Invitation data related to the specified user.
      */
     async getFriends(userId) {
         return this.request("get", `/friends/${userId}/`);
     }
 
-    /* Friends */
+    /* Friendship */
 
     /**
      * Sends a friend request to a user.
@@ -298,6 +305,10 @@ export class Api {
             headers: { "Content-Type": "multipart/form-data" },
         });
     }
+
+    async createAIGame(params) {
+    return this.request("post", "/games/ai/", params);
+  }
 
     /**
      * Fetches the avatar image as a blob object URL.

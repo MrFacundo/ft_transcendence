@@ -1,34 +1,36 @@
 {
-  "name": "frontend",
-  "version": "1.0.0",
-  "main": "index.js",
-  "scripts": {
-    "start": "webpack serve",
-    "build": "webpack build --mode=production",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
-  "devDependencies": {
-    "autoprefixer": "^10.4.19",
-    "css-loader": "^7.1.2",
-    "html-webpack-plugin": "^5.6.0",
-    "postcss-loader": "^8.1.1",
-    "sass": "1.32.13",
-    "sass-loader": "^16.0.0",
-    "style-loader": "^4.0.0",
-    "webpack": "^5.93.0",
-    "webpack-cli": "^5.1.4",
-    "webpack-dev-server": "^5.0.4",
-    "source-map-loader": "^4.0.1",
-    "dotenv-webpack": "^7.0.3"
-  },
-  "dependencies": {
-    "@popperjs/core": "^2.11.8",
-    "axios": "^1.7.2",
-    "bootstrap": "^5.3.3",
-    "js-cookie": "^3.0.5"
-  }
+	"name": "frontend",
+	"version": "1.0.0",
+	"main": "index.js",
+	"private": true,
+	"scripts": {
+		"start": "webpack serve",
+		"start:prod": "webpack serve --mode=production --env production",
+		"build": "webpack --mode=production",
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"description": "Frontend for the web application using Webpack, Bootstrap, and custom JavaScript.",
+	"devDependencies": {
+		"autoprefixer": "^10.4.19",
+		"css-loader": "^7.1.2",
+		"html-webpack-plugin": "^5.6.0",
+		"postcss-loader": "^8.1.1",
+		"sass": "1.32.13",
+		"sass-loader": "^16.0.0",
+		"style-loader": "^4.0.0",
+		"webpack": "^5.93.0",
+		"webpack-cli": "^5.1.4",
+		"webpack-dev-server": "^5.0.4",
+		"source-map-loader": "^4.0.1",
+		"dotenv-webpack": "^7.0.3"
+	},
+	"dependencies": {
+		"@popperjs/core": "^2.11.8",
+		"axios": "^1.7.2",
+		"bootstrap": "^5.3.3",
+		"js-cookie": "^3.0.5"
+	}
 }

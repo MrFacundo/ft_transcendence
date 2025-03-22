@@ -21,8 +21,9 @@ export default class GamePage extends Page {
 
         try {
             const game = await app.api.getGame(gameId);
+            gameEl.setSideUsernames(game.player1.username, game.player2.username);
 
-            if (game.status === "not_started") {
+            if (game.status === "not_started" || game.status === "in_progress") {
                 gameEl.startGame(gameId);
                 gameEl.addEventListener("gameOver", async () => this.showScoreBoard(gameId));
             } else if (game.status === "completed" || game.status === "interrupted") {
@@ -40,9 +41,11 @@ export default class GamePage extends Page {
         const { mainElement } = this;
         const gameEl = mainElement.querySelector("pong-game");
         const scoreBoardEl = mainElement.querySelector("score-board");
+        if (!scoreBoardEl)
+            return;
         scoreBoardEl.page = this;
         scoreBoardEl.displayMatch(await this.app.api.getGame(gameId));
-        gameEl.remove();
+        gameEl && gameEl.remove();
         scoreBoardEl.classList.remove("d-none");
     }
 }
