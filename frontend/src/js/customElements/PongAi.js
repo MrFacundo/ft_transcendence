@@ -120,6 +120,9 @@ class PongAi extends BaseElement {
     this.updateScoreDisplay();
     this.gameOver = false;
 
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.statusMessage.textContent = "";
+
     const diff = difficulty ? difficulty.toLowerCase() : "easy";
     this.statusMessage.textContent = `Difficulty: ${diff}`;
 
