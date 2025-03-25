@@ -27,7 +27,11 @@ class PongAi extends BaseElement {
     this.startButton.style.zIndex = "1000";
     this.startButton.style.display = "block";
 
-    this.side1Username.textContent = "Player";
+    const playerName =
+      this.page?.app?.auth?.user?.nickname ||
+      this.page?.app?.auth?.user?.username ||
+      "Guest";
+    this.side1Username.textContent = playerName;
     this.side2Username.textContent = "AI";
     this.scoreboard.textContent = "0 - 0";
 
