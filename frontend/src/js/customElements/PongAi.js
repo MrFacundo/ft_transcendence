@@ -26,12 +26,6 @@ class PongAi extends BaseElement {
     this.startButton.style.transform = "translate(-50%, -50%)";
     this.startButton.style.zIndex = "1000";
     this.startButton.style.display = "block";
-
-    const playerName =
-      this.page?.app?.auth?.user?.nickname ||
-      this.page?.app?.auth?.user?.username ||
-      "Guest";
-    this.side1Username.textContent = playerName;
     this.side2Username.textContent = "AI";
     this.scoreboard.textContent = "0 - 0";
 
@@ -44,6 +38,7 @@ class PongAi extends BaseElement {
       this.startButton
     );
 
+    this.page?.app.stateManager.updateState("currentGame", false);
     this.startButton.addEventListener("click", () => {
       this.startButton.style.display = "none";
       this.lastTime = performance.now();
@@ -119,6 +114,7 @@ class PongAi extends BaseElement {
   }
 
   startGame(difficulty) {
+    this.page.app.stateManager.updateState("currentGame", true);
     this.resetBall();
     this.playerScore = this.aiScore = 0;
     this.updateScoreDisplay();
