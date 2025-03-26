@@ -13,34 +13,26 @@ class PongAi extends BaseElement {
     this.canvas = document.createElement("canvas");
     this.canvas.width = 1000;
     this.canvas.height = 700;
-    this.statusMessage = this.createElement("statusMessage");
     this.scoreboard = this.createElement("scoreboard");
     this.side1Username = this.createElement("side1Username");
     this.side2Username = this.createElement("side2Username");
-
-    this.startButton = document.createElement("button");
-    this.startButton.textContent = "Start Game";
-    this.startButton.className = "btn btn-primary position-absolute";
-    this.startButton.style.left = "50%";
-    this.startButton.style.top = "50%";
-    this.startButton.style.transform = "translate(-50%, -50%)";
-    this.startButton.style.zIndex = "1000";
-    this.startButton.style.display = "block";
+    this.readyButton = document.createElement("button");
+    this.readyButton.id = "readyButton";
+    this.readyButton.textContent = "Ready to Play";
     this.side2Username.textContent = "AI";
     this.scoreboard.textContent = "0 - 0";
 
     this.append(
       this.canvas,
-      this.statusMessage,
       this.scoreboard,
       this.side1Username,
       this.side2Username,
-      this.startButton
+      this.readyButton
     );
 
     this.page?.app.stateManager.updateState("currentGame", false);
-    this.startButton.addEventListener("click", () => {
-      this.startButton.style.display = "none";
+    this.readyButton.addEventListener("click", () => {
+      this.readyButton.style.display = "none";
       this.lastTime = performance.now();
       this.gameLoop(this.lastTime);
     });
@@ -122,10 +114,10 @@ class PongAi extends BaseElement {
     this.gameOver = false;
 
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    this.statusMessage.textContent = "";
 
     const diff = difficulty ? difficulty.toLowerCase() : "easy";
-    this.statusMessage.textContent = `Difficulty: ${diff}`;
+    this.side1Username.textContent = this.page.app.auth.user.username;
+    this.side2Username.textContent = "AI" + (difficulty ? ` (${difficulty})` : "");
 
     if (diff === "hard") {
       this.aiPaddle.speed = 7;
@@ -148,7 +140,7 @@ class PongAi extends BaseElement {
     );
 
     this.selectedDifficulty = diff;
-    this.startButton.style.display = "block";
+    this.readyButton.style.display = "block";
   }
 
   simulateAIInput(difficulty) {
@@ -364,6 +356,7 @@ class PongAi extends BaseElement {
 
   endGame(message) {
     this.gameOver = true;
+    this.page?.app.stateManager.updateState("currentGame", false);
     if (this.aiInterval) clearInterval(this.aiInterval);
     cancelAnimationFrame(this.animationFrameId);
 

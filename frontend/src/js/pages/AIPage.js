@@ -78,10 +78,6 @@ class AIPage extends Page {
     settingsEl.classList.add("d-none");
     scoreBoardEl.classList.add("d-none");
     pongAiEl.classList.remove("d-none");
-    pongAiEl.ctx.clearRect(0, 0, pongAiEl.canvas.width, pongAiEl.canvas.height);
-    pongAiEl.statusMessage.textContent = "";
-    const playerName = this.app?.auth?.user?.username || "Guest";
-    pongAiEl.side1Username.textContent = playerName;
     pongAiEl.startGame(difficulty);
   }
 
