@@ -29,7 +29,7 @@
         <!-- code will be injected here by app -->
     </div>
     <section id="Login">
-        <div class="container col-xl-10 col-xxl-8 px-4 py-5 text-black">
+        <div class="container col-xl-10 py-5 text-black">
             <div class="row align-items-center g-lg-5 py-5">
                 <div class="col-lg-7 text-center text-lg-start">
                     <h2 class="display-4 fw-bold lh-1 mb-3">Welcome to Ultimate Pong</h2>
@@ -64,11 +64,11 @@
     </section>
 
     <section id="Register">
-        <div class="vh-100 d-flex justify-content-center align-items-center">
+        <div class="d-flex justify-content-center align-items-center py-5">
             <div class="bg-body-tertiary p-5">
                 <main id="register-form-container" class="form-signin w-100 m-auto">
                     <custom-form>
-                        <h1 class="h3 mb-3 fw-normal text-black">Let's get you registered:)</h1>
+                        <h1 class="h3 mb-3 fw-normal text-black">Let's get you registered :)</h1>
                         <div class="form-floating mb-3">
                             <input type="text" class="form-control" id="Username" placeholder="Username"
                                 autocomplete="off" />
@@ -461,7 +461,7 @@
     <section id="AI" class="container mt-5">
         <h1 class="title mb-4">AI Game</h1>
         </div>
-        <div class="row" id="ai-game-settings" style="text-align: -webkit-center;">
+        <div class="row my-5" id="ai-game-settings" style="text-align: -webkit-center;">
             <div class="col-md-4">
                 <div class="card shadow" data-difficulty="easy">
                     <div class="card-body">
@@ -484,6 +484,8 @@
                 </div>
             </div>
         </div>
+        <pong-ai class="d-none"></pong-ai>
+        <score-board class="d-none"></score-board>
     </section>
 
     <section id="Game">
