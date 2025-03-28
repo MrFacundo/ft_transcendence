@@ -21,7 +21,6 @@ CONTRACT_ABI = [
             {"name": "_datePlayed", "type": "uint256"},
             {"name": "_scorePlayer1", "type": "uint256"},
             {"name": "_scorePlayer2", "type": "uint256"},
-            {"name": "_matchDate", "type": "uint256"},
             {"name": "_status", "type": "string"},
             {"name": "_player1Id", "type": "uint256"},
             {"name": "_player2Id", "type": "uint256"},
@@ -47,7 +46,6 @@ CONTRACT_ABI = [
             {"name": "datePlayed", "type": "uint256"},
             {"name": "scorePlayer1", "type": "uint256"},
             {"name": "scorePlayer2", "type": "uint256"},
-            {"name": "matchDate", "type": "uint256"},
             {"name": "status", "type": "string"},
             {"name": "player1Id", "type": "uint256"},
             {"name": "player2Id", "type": "uint256"},
@@ -93,12 +91,11 @@ def list_blockchain_games():
             "datePlayed": pd.to_datetime(game[3], unit='s'),
             "scorePlayer1": game[4],
             "scorePlayer2": game[5],
-            "matchDate": pd.to_datetime(game[6], unit='s') if game[6] != 0 else None,
-            "status": game[7],
-            "player1Id": game[8],
-            "player2Id": game[9],
-            "winnerId": game[10],
-            "tournamentId": game[11]
+            "status": game[6],
+            "player1Id": game[7],
+            "player2Id": game[8],
+            "winnerId": game[9],
+            "tournamentId": game[10]
         })
     df = convert_to_dataframe(games)
     return df
