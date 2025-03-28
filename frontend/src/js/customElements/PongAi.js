@@ -19,8 +19,6 @@ class PongAi extends BaseElement {
     this.readyButton = document.createElement("button");
     this.readyButton.id = "readyButton";
     this.readyButton.textContent = "Ready to Play";
-    this.side2Username.textContent = "AI";
-    this.scoreboard.textContent = "0 - 0";
 
     this.append(
       this.canvas,
@@ -30,7 +28,6 @@ class PongAi extends BaseElement {
       this.readyButton
     );
 
-    this.page?.app.stateManager.updateState("currentGame", false);
     this.readyButton.addEventListener("click", () => {
       this.readyButton.style.display = "none";
       this.lastTime = performance.now();
@@ -61,8 +58,6 @@ class PongAi extends BaseElement {
     };
     this.ball = { x: 450, y: 250, size: 10, vx: 3, vy: 3 };
 
-    this.playerScore = 0;
-    this.aiScore = 0;
     this.gameOver = false;
 
     this.keys = {};
@@ -82,20 +77,6 @@ class PongAi extends BaseElement {
     return el;
   }
 
-  connectedCallback() {
-    window.addEventListener("keydown", this.handleKeyDown);
-    window.addEventListener("keyup", this.handleKeyUp);
-  }
-
-  disconnectedCallback() {
-    window.removeEventListener("keydown", this.handleKeyDown);
-    window.removeEventListener("keyup", this.handleKeyUp);
-    if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId);
-    if (this.aiInterval) clearInterval(this.aiInterval);
-    this.gameOver = true;
-    this.page?.app.stateManager.updateState("currentGame", false);
-  }
-
   setPositions({
     leftPaddle = { top: "calc(50% - 50px)" },
     rightPaddle = { top: "calc(50% - 50px)" },
@@ -107,6 +88,7 @@ class PongAi extends BaseElement {
   }
 
   startGame(difficulty) {
+    this.addEventListeners();
     this.page.app.stateManager.updateState("currentGame", true);
     this.resetBall();
     this.playerScore = this.aiScore = 0;
@@ -128,7 +110,7 @@ class PongAi extends BaseElement {
       this.aiReactionDelay = 500;
       this.aiErrorMargin = 70;
     } else {
-      this.aiPaddle.speed = 2;
+      this.aiPaddle.speed = 4;
       this.aiReactionDelay = 800;
       this.aiErrorMargin = 100;
     }
@@ -355,12 +337,7 @@ class PongAi extends BaseElement {
   }
 
   endGame(message) {
-    this.page.app.stateManager.updateState("currentGame", false);
-    this.gameOver = true;
-    this.page?.app.stateManager.updateState("currentGame", false);
-    if (this.aiInterval) clearInterval(this.aiInterval);
-    cancelAnimationFrame(this.animationFrameId);
-
+    this.cleanup();
     const gameScore = {
       playerScore: this.playerScore,
       aiScore: this.aiScore,
@@ -373,6 +350,30 @@ class PongAi extends BaseElement {
         composed: true,
       })
     );
+  }
+
+  addEventListeners() {
+    window.addEventListener("keydown", this.handleKeyDown);
+    window.addEventListener("keyup", this.handleKeyUp);
+  }
+
+  cleanup() {
+    window.removeEventListener("keydown", this.handleKeyDown);
+    window.removeEventListener("keyup", this.handleKeyUp);
+    if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId);
+    if (this.aiInterval) clearInterval(this.aiInterval);
+    this.gameOver = true;
+    if (this.page?.app.stateManager.state.currentGame) {
+      this.page?.app.stateManager.updateState("currentGame", false);
+    }
+  }
+
+  connectedCallback() {
+    this.addEventListeners();
+  }
+
+  disconnectedCallback() {
+    this.cleanup();
   }
 }
 
