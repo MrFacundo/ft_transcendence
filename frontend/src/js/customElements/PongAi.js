@@ -50,7 +50,7 @@ class PongAi extends BaseElement {
       y: paddleInitialY,
       width: paddleWidth,
       height: paddleHeight,
-      speed: 5,
+      speed: 6,
     };
     this.aiPaddle = {
       x: aiPaddleX,
@@ -126,9 +126,9 @@ class PongAi extends BaseElement {
     } else if (diff === "medium") {
       this.aiPaddle.speed = 5;
       this.aiReactionDelay = 500;
-      this.aiErrorMargin = 40;
+      this.aiErrorMargin = 70;
     } else {
-      this.aiPaddle.speed = 3;
+      this.aiPaddle.speed = 2;
       this.aiReactionDelay = 800;
       this.aiErrorMargin = 100;
     }
@@ -166,9 +166,9 @@ class PongAi extends BaseElement {
       }
 
       if (diff === "easy") {
-        predictedY += (Math.random() - 0.5) * 200;
+        predictedY += (Math.random() - 0.9) * 400;
       } else if (diff === "medium") {
-        predictedY += (Math.random() - 0.5) * 80;
+        predictedY += (Math.random() - 0.5) * 200;
       } else if (diff === "hard") {
         predictedY += (Math.random() - 0.5) * 30;
       }
@@ -355,6 +355,7 @@ class PongAi extends BaseElement {
   }
 
   endGame(message) {
+    this.page.app.stateManager.updateState("currentGame", false);
     this.gameOver = true;
     this.page?.app.stateManager.updateState("currentGame", false);
     if (this.aiInterval) clearInterval(this.aiInterval);
