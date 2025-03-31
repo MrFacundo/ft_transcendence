@@ -190,6 +190,11 @@ class PongRemote extends Pong {
         document.removeEventListener("keyup", this.keyUpHandler);
         window.removeEventListener("beforeunload", this.beforeUnloadHandler);
     }
+
+    disconnectedCallback() {
+        this.ws?.close();
+        super.disconnectedCallback();
+    }
 }
 
 customElements.define("pong-remote", PongRemote);
