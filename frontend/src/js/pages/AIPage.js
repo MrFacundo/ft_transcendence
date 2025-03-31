@@ -28,7 +28,7 @@ class AIPage extends Page {
 
   createGameObject(gameData) {
       const player1 = this.app.auth.user;
-      const winner = gameData.playerScore > gameData.aiScore ? player1.id : "ai";
+      const winner = gameData.playerScore > gameData.opponentScore ? player1.id : "ai";
       const defaultStats = { total_matches: "", wins: "", losses: "" };
       const defaultPlayer = {
           id: "",
@@ -62,7 +62,7 @@ class AIPage extends Page {
           channel_group_name: "",
           date_played: "",
           score_player1: gameData.playerScore,
-          score_player2: gameData.aiScore,
+          score_player2: gameData.opponentScore,
           registered_on_blockchain: false,
           status: "completed",
           winner: winner,

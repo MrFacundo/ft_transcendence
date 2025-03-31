@@ -1,4 +1,4 @@
-pong-game, pong-ai {
+pong-remote, pong-ai {
 	width: 1000px;
 	display: flex;
 	height: 700px;
@@ -76,7 +76,7 @@ pong-game, pong-ai {
 		position: absolute;
 		left: calc(50% - 5px);
 		top: calc(50% - 5px);
-		transition: top 0.1s, left 0.1s;
+		transition: top 0.1s linear, left 0.1s linear;
 	}
 	#rightPaddle {
 		left: unset;

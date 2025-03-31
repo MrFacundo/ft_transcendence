@@ -129,6 +129,7 @@ class GameConsumer(AsyncWebsocketConsumer):
         )
 
     async def disconnect(self, close_code):
+        self.db_game = await database_sync_to_async(PongGame.objects.filter(id=game_id).first)()
         self.is_connected = False
         game_id = self.scope["url_route"].get("game_id")
 
@@ -153,9 +154,8 @@ class GameConsumer(AsyncWebsocketConsumer):
         if hasattr(self, 'game') and self.game:
             await self.game.handle_disconnect()
 
-        if hasattr(self, 'db_game') and self.db_game:
-            if self.db_game.status == "in_progress":
-                await self.game.handle_interruption()
+        if self.db_game.status == "in_progress":
+            await self.game.handle_interruption()
 
         if game_id in active_games and self.db_game.status in ["completed", "interrupted"]:
             del active_games[game_id]
