@@ -23,11 +23,9 @@ CONTRACT_ABI = [
         "constant": False,
         "inputs": [
             {"name": "_id", "type": "uint256"},
-            {"name": "_channelGroupName", "type": "string"},
             {"name": "_datePlayed", "type": "uint256"},
             {"name": "_scorePlayer1", "type": "uint256"},
             {"name": "_scorePlayer2", "type": "uint256"},
-            {"name": "_matchDate", "type": "uint256"},
             {"name": "_status", "type": "string"},
             {"name": "_player1Id", "type": "uint256"},
             {"name": "_player2Id", "type": "uint256"},
@@ -102,7 +100,7 @@ def monitor_game(last_checked_id):
             cur.close()
             conn.close()
             
-            return [{"id": j[0], " j[1], "date_played": j[2], "score_player1": j[3], "score_player2": j[4], " j[5], "status": j[6], "player1_id": j[7], "player2_id": j[8], "winner_id": j[9], "tournament_id": j[10]} for j in games]
+            return [{"id": j[0], "date_played": j[1], "score_player1": j[2], "score_player2": j[3], "status": j[4], "player1_id": j[5], "player2_id": j[6], "winner_id": j[7], "tournament_id": j[8]} for j in games]
         except psycopg2.OperationalError:
             print("Database is not available. Retrying in 5 seconds...")
             time.sleep(3)
@@ -129,7 +127,7 @@ def get_all_new_games():
             cur.close()
             conn.close()
             
-            return [{"id": j[0], " j[1], "date_played": j[2], "score_player1": j[3], "score_player2": j[4], " j[5], "status": j[6], "player1_id": j[7], "player2_id": j[8], "winner_id": j[9], "tournament_id": j[10]} for j in games]
+            return [{"id": j[0], "date_played": j[1], "score_player1": j[2], "score_player2": j[3], "status": j[4], "player1_id": j[5], "player2_id": j[6], "winner_id": j[7], "tournament_id": j[8]} for j in games]
         except psycopg2.OperationalError:
             print("Database is not available. Retrying in 5 seconds...")
             time.sleep(3)
@@ -156,11 +154,9 @@ def mark_game_registered(game_id):
 def register_game_on_blockchain(game):
     tx_hash = contract.functions.addGame(
         game['id'],
-        game[',
         int(game['date_played'].timestamp()),
         game['score_player1'],
         game['score_player2'],
-        int(game['.timestamp()) if game[' else 0,
         game['status'],
         game['player1_id'],
         game['player2_id'],

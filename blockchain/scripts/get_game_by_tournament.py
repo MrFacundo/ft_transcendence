@@ -23,11 +23,9 @@ CONTRACT_ABI = [
                 "components": [
                     {"name": "gameId", "type": "uint256"},
                     {"name": "id", "type": "uint256"},
-                    {"name": "channelGroupName", "type": "string"},
                     {"name": "datePlayed", "type": "uint256"},
                     {"name": "scorePlayer1", "type": "uint256"},
                     {"name": "scorePlayer2", "type": "uint256"},
-                    {"name": "matchDate", "type": "uint256"},
                     {"name": "status", "type": "string"},
                     {"name": "player1Id", "type": "uint256"},
                     {"name": "player2Id", "type": "uint256"},
@@ -55,16 +53,14 @@ def get_games_by_tournament(tournament_id):
         games_list = [{
             "gameId": game[0],
             "id": game[1],
-            "channelGroupName": game[2],
-            "datePlayed": pd.to_datetime(game[3], unit='s'),
-            "scorePlayer1": game[4],
-            "scorePlayer2": game[5],
-            "matchDate": pd.to_datetime(game[6], unit='s') if game[6] != 0 else None,
-            "status": game[7],
-            "player1Id": game[8],
-            "player2Id": game[9],
-            "winnerId": game[10],
-            "tournamentId": game[11]
+            "datePlayed": pd.to_datetime(game[2], unit='s'),
+            "scorePlayer1": game[3],
+            "scorePlayer2": game[4],
+            "status": game[5],
+            "player1Id": game[6],
+            "player2Id": game[7],
+            "winnerId": game[8],
+            "tournamentId": game[9]
         } for game in games]
         return pd.DataFrame(games_list)
     except Exception as e:
