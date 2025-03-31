@@ -7,7 +7,6 @@ contract PongGameHistory {
     struct Game {
         uint256 gameId;
         uint256 id;
-        string channelGroupName;
         uint256 datePlayed;
         uint256 scorePlayer1;
         uint256 scorePlayer2;
@@ -38,7 +37,6 @@ contract PongGameHistory {
 
     function addGame(
         uint256 _id,
-        string memory _channelGroupName,
         uint256 _datePlayed,
         uint256 _scorePlayer1,
         uint256 _scorePlayer2,
@@ -53,7 +51,6 @@ contract PongGameHistory {
         games[gameCount] = Game(
             gameCount,
             _id,
-            _channelGroupName,
             _datePlayed,
             _scorePlayer1,
             _scorePlayer2,
@@ -91,7 +88,6 @@ contract PongGameHistory {
     function getGame(uint256 _gameId) public view returns (
         uint256 gameId,
         uint256 id,
-        string memory channelGroupName,
         uint256 datePlayed,
         uint256 scorePlayer1,
         uint256 scorePlayer2,
@@ -105,7 +101,6 @@ contract PongGameHistory {
         return (
             game.gameId,
             game.id,
-            game.channelGroupName,
             game.datePlayed,
             game.scorePlayer1,
             game.scorePlayer2,
