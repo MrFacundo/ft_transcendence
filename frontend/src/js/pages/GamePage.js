@@ -1,6 +1,6 @@
 import Page from "./Page.js";
 import "../customElements/ScoreBoard.js";
-import "../customElements/Pong.js";
+import "../customElements/PongRemote.js";
 
 export default class GamePage extends Page {
     constructor(app) {
@@ -16,7 +16,7 @@ export default class GamePage extends Page {
     async render(app) {
         const { mainElement, params } = this;
         const gameId = params["id"];
-        const gameEl = mainElement.querySelector("pong-game");
+        const gameEl = mainElement.querySelector("pong-remote");
         gameEl.page = this;
         
         if (this.app.stateManager.state.currentGame) return;
@@ -41,7 +41,7 @@ export default class GamePage extends Page {
 
     async showScoreBoard(gameId) {
         const { mainElement } = this;
-        const gameEl = mainElement.querySelector("pong-game");
+        const gameEl = mainElement.querySelector("pong-remote");
         const scoreBoardEl = mainElement.querySelector("score-board");
         if (!scoreBoardEl)
             return;

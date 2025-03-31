@@ -42,7 +42,7 @@ class Ball(Hitbox):
         self._init_velocity()
 
     def _init_velocity(self):
-        initial_speed = 0.03
+        initial_speed = 0.04
         initial_angle = random.uniform(-math.pi/4, math.pi/4)
         self.speed_x = abs(initial_speed * math.cos(initial_angle))
         self.speed_y = initial_speed * math.sin(initial_angle)
