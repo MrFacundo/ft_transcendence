@@ -15,11 +15,13 @@ class Game:
         self.comm = None
         self.players_ready = [False, False]
         self.players_connected = [False, False]
+        self.reset_timer = False
 
     def reset(self):
         self.ball = Ball(0.5 - 0.01, 0.5 - 0.01)
         self.paddles[0].y = 0.5 - 0.075
         self.paddles[1].y = 0.5 - 0.075
+        self.reset_timer = True
 
     async def handle_disconnect(self):
         if hasattr(self.socket, 'side'):
@@ -45,7 +47,7 @@ class Game:
     async def handle_keys(self, side, message_type, key):
         async with self.socket.update_lock:
             if message_type == "keydown":
-                self.paddles[side].moving = -0.02 if key == "w" else 0.02
+                self.paddles[side].moving = -0.04 if key == "w" else 0.04
             elif message_type == "keyup":
                 self.paddles[side].moving = 0
 
@@ -57,9 +59,6 @@ class Game:
         while not self.disconnected:
             counter += 1
 
-            if counter % 10 == 0:
-                await self.comm.send_score_update()
-
             if self.score[0] >= 3 or self.score[1] >= 3:
                 winner = 0 if self.score[0] >= 3 else 1
                 await self.db.set_score()
@@ -68,6 +67,10 @@ class Game:
                 await self.db.set_game_status("completed")
                 await self.comm.send_game_over()
                 return
+            
+            if self.reset_timer:
+                await asyncio.sleep(0.5)
+                self.reset_timer = False
 
             self._update_game_state()
             await self._handle_collisions()
