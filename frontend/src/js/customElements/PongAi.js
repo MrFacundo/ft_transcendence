@@ -48,6 +48,7 @@ class PongAi extends Pong {
 
   startGame(difficulty) {
     super.startGame();
+    this.addEventListeners();
     this.resetBall();
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     const diff = difficulty ? difficulty.toLowerCase() : "easy";
@@ -247,8 +248,6 @@ class PongAi extends Pong {
 
   draw() {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    this.ctx.fillStyle = "#202428";
-    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
     this.ctx.fillStyle = "#f1f1f1";
     this.ctx.fillRect(
       this.playerPaddle.x,
