@@ -41,7 +41,6 @@ class Pong extends BaseElement {
     this.playerScore = 0;
     this.opponentScore = 0;
     this.gameOver = false;
-    this.keys = {};
   }
 
   createElement(id) {
@@ -57,14 +56,6 @@ class Pong extends BaseElement {
   setSideUsernames(side1Username, side2Username) {
     this.side1Username.textContent = side1Username;
     this.side2Username.textContent = side2Username;
-  }
-
-  handleKeyDown(e) {
-    this.keys[e.key.toLowerCase()] = true;
-  }
-
-  handleKeyUp(e) {
-    this.keys[e.key.toLowerCase()] = false;
   }
 
   startGame() {
@@ -91,16 +82,9 @@ class Pong extends BaseElement {
   }
 
   addEventListeners() {
-    this.handleKeyDown = this.handleKeyDown.bind(this);
-    this.handleKeyUp = this.handleKeyUp.bind(this);
-    
-    window.addEventListener("keydown", this.handleKeyDown);
-    window.addEventListener("keyup", this.handleKeyUp);
   }
 
   cleanup() {
-    window.removeEventListener("keydown", this.handleKeyDown);
-    window.removeEventListener("keyup", this.handleKeyUp);
     this.gameOver = true;
     if (this.page?.app.stateManager.state.currentGame) {
       this.page?.app.stateManager.updateState("currentGame", false);
