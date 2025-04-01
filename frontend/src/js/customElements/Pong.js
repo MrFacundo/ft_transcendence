@@ -8,19 +8,30 @@ class Pong extends BaseElement {
 
   init() {
     this.innerHTML = "";
-    this.setupCanvas();
-    this.setupUIElements();
-    this.setupGameState();
+    this.setCanvas();
+    this.setRandomBackground();
+    this.setUIElements();
+    this.setGameState();
   }
 
-  setupCanvas() {
+  setCanvas() {
     this.canvas = document.createElement("canvas");
     this.canvas.width = 1000;
     this.canvas.height = 700;
     this.ctx = this.canvas.getContext("2d");
   }
 
-  setupUIElements() {
+  setRandomBackground() {
+    const images = [
+      "../static/images/mk3-subway-stage.gif",
+      "../static/images/mk3-waterfront-stage.gif",
+      "../static/images/mk3-the-streets-stage.gif",
+    ];
+    const randomImage = images[Math.floor(Math.random() * images.length)];
+    this.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('${randomImage}')`;
+  }
+
+  setUIElements() {
     this.scoreboard = this.createElement("scoreboard");
     this.side1Username = this.createElement("side1Username");
     this.side2Username = this.createElement("side2Username");
@@ -37,7 +48,7 @@ class Pong extends BaseElement {
     );
   }
 
-  setupGameState() {
+  setGameState() {
     this.playerScore = 0;
     this.opponentScore = 0;
     this.gameOver = false;

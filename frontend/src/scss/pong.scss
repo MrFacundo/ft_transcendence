@@ -7,7 +7,9 @@ pong-remote, pong-ai {
 	justify-self: center;
 	margin: 0 auto; // Firefox
 	margin-top: 8rem;
-
+    background-size: cover;
+    background-position: center;
+		
 	#statusMessage {
 		position: absolute;
 		top: 20px;
