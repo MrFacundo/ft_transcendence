@@ -43,6 +43,7 @@ class PongAi extends Pong {
     this.aiInterval = null;
     this.firstPrediction = false;
     this.gameLoop = this.gameLoop.bind(this);
+    this.keys = {};
   }
 
   startGame(difficulty) {
@@ -278,6 +279,24 @@ class PongAi extends Pong {
     super.cleanup();
     if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId);
     if (this.aiInterval) clearInterval(this.aiInterval);
+    window.removeEventListener("keydown", this.handleKeyDown);
+    window.removeEventListener("keyup", this.handleKeyUp);
+  }
+
+  handleKeyDown(e) {
+    this.keys[e.key.toLowerCase()] = true;
+  }
+
+  handleKeyUp(e) {
+    this.keys[e.key.toLowerCase()] = false;
+  }
+
+  addEventListeners() {
+    this.handleKeyDown = this.handleKeyDown.bind(this);
+    this.handleKeyUp = this.handleKeyUp.bind(this);
+    
+    window.addEventListener("keydown", this.handleKeyDown);
+    window.addEventListener("keyup", this.handleKeyUp);
   }
 }
 

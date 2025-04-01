@@ -141,18 +141,6 @@ class PongRemote extends Pong {
         Object.assign(this.ball.style, ball);
     }
 
-    addEventListeners() {
-        super.addEventListeners();
-
-        this.keyDownHandler = (e) => this.handleKey(e, "keydown");
-        this.keyUpHandler = (e) => this.handleKey(e, "keyup");
-        this.beforeUnloadHandler = () => this.ws?.close();
-
-        document.addEventListener("keydown", this.keyDownHandler);
-        document.addEventListener("keyup", this.keyUpHandler);
-        window.addEventListener("beforeunload", this.beforeUnloadHandler);
-    }
-
     handleKey(event, type) {
         if (this.ws?.readyState === WebSocket.OPEN && ["w", "s", "W", "S"].includes(event.key)) {
             const key = event.key.toLowerCase();
@@ -183,6 +171,16 @@ class PongRemote extends Pong {
         this.ws = null;
         this.dispatchEvent(new CustomEvent("gameOver"));
         super.cleanup();
+    }
+
+    addEventListeners() {
+        this.keyDownHandler = (e) => this.handleKey(e, "keydown");
+        this.keyUpHandler = (e) => this.handleKey(e, "keyup");
+        this.beforeUnloadHandler = () => this.ws?.close();
+
+        document.addEventListener("keydown", this.keyDownHandler);
+        document.addEventListener("keyup", this.keyUpHandler);
+        window.addEventListener("beforeunload", this.beforeUnloadHandler);
     }
 
     removeEventListeners() {
