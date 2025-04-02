@@ -9,12 +9,12 @@ class PongRemote extends Pong {
 
     init() {
         super.init();
-        this.setupWebSocketState();
+        this.setWebSocketState();
         this.readyButton.addEventListener("click", () => this.sendPlayerReady());
     }
 
-    setupUIElements() {
-        super.setupUIElements();
+    setUIElements() {
+        super.setUIElements();
         this.paddels = {
             left: this.createElement("leftPaddle"),
             right: this.createElement("rightPaddle"),
@@ -24,7 +24,7 @@ class PongRemote extends Pong {
         this.append(this.statusMessage, this.paddels.left, this.paddels.right, this.ball);
     }
 
-    setupWebSocketState() {
+    setWebSocketState() {
         this.ws = null;
         this.playersJoined = [false, false];
         this.playersReady = [false, false];
