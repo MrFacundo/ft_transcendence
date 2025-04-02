@@ -97,9 +97,7 @@ class Pong extends BaseElement {
 
   cleanup() {
     this.gameOver = true;
-    if (this.page?.app.stateManager.state.currentGame) {
-      this.page?.app.stateManager.updateState("currentGame", false);
-    }
+    this.page?.app.stateManager.updateState("currentGame", false);
   }
 
   connectedCallback() {
