@@ -1,10 +1,15 @@
-pong-game {
+pong-remote, pong-ai {
 	width: 1000px;
-	display: inline-block;
+	display: flex;
 	height: 700px;
 	background: #202428;
 	position: relative;
-
+	justify-self: center;
+	margin: 0 auto; // Firefox
+	margin-top: 8rem;
+    background-size: cover;
+    background-position: center;
+		
 	#statusMessage {
 		position: absolute;
 		top: 20px;
@@ -73,7 +78,7 @@ pong-game {
 		position: absolute;
 		left: calc(50% - 5px);
 		top: calc(50% - 5px);
-		transition: top 0.1s, left 0.1s;
+		transition: top 0.1s linear, left 0.1s linear;
 	}
 	#rightPaddle {
 		left: unset;

@@ -18,9 +18,18 @@ class GameStatsSerializer(serializers.ModelSerializer):
         model = GameStats
         fields = ['total_matches', 'wins', 'losses']
 
+class PlayerSerializer(serializers.ModelSerializer, AvatarUploadMixin):
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'avatar_oauth', 'avatar_upload']
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        return self.add_avatar_upload_path(representation, instance)
+
 class PongGameSerializer(serializers.ModelSerializer):
-    player1 = UserSerializer(read_only=True)
-    player2 = UserSerializer(read_only=True)
+    player1 = PlayerSerializer(read_only=True)
+    player2 = PlayerSerializer(read_only=True)
     
     class Meta:
         model = PongGame

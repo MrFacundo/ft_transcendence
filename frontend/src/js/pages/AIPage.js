@@ -19,37 +19,57 @@ class AIPage extends Page {
     difficultyCards.forEach(card => {
       card.onclick = () => {
         const difficulty = card.dataset.difficulty;
-        this.startGame(difficulty);
+        if (!this.app.stateManager.state.currentGame) this.startGame(difficulty);
       };
     });
 
     this.mainElement.addEventListener("gameEnd", this.handleGameEnd);
   }
 
+  createGameObject(gameData) {
+      const player1 = this.app.auth.user;
+      const winner = gameData.playerScore > gameData.opponentScore ? player1.id : "ai";
+  
+      return {
+          id: "",
+          player1: {
+              id: player1.id,
+              username: player1.username,
+              avatar_oauth: player1.avatar_oauth,
+              avatar_upload: player1.avatar_upload,
+          },
+          player2: { id: "ai", username: "AI", avatar_oauth: "", avatar_upload: "" },
+          date_played: "",
+          score_player1: gameData.playerScore,
+          score_player2: gameData.opponentScore,
+          status: "completed",
+          winner: winner,
+          tournament: null
+      };
+  }
+
   startGame(difficulty) {
-    this.app.stateManager.updateState("currentGame", true);
-
     const settingsEl = this.mainElement.querySelector("#ai-game-settings");
+    const pongAiEl = this.mainElement.querySelector("pong-ai");
+    pongAiEl.page = this;
+    const scoreBoardEl = this.mainElement.querySelector("score-board");
     settingsEl.classList.add("d-none");
-
-    const gameEl = document.createElement("div");
-    gameEl.id = "Game";
-    gameEl.style.cssText = `display:flex;justify-content:center;align-items:start;height:100vh;`;
-
-    const pongAi = document.createElement("pong-ai");
-    pongAi.setApp(this.app);
-    pongAi.setAttribute("difficulty", difficulty);
-
-    this.mainElement.appendChild(gameEl);
-    gameEl.appendChild(pongAi);
+    scoreBoardEl.classList.add("d-none");
+    pongAiEl.classList.remove("d-none");
+    pongAiEl.startGame(difficulty);
   }
 
   handleGameEnd(e) {
-    const gameEl = this.mainElement.querySelector("#Game");
-    gameEl && gameEl.remove();
+    const pongAiEl = this.mainElement.querySelector("pong-ai");
+    pongAiEl && pongAiEl.classList.add("d-none");
     const settingsEl = this.mainElement.querySelector("#ai-game-settings");
     settingsEl.classList.remove("d-none");
-    this.app.stateManager.updateState("currentGame", false);
+    const scoreBoardEl = this.mainElement.querySelector("score-board");
+    if (!scoreBoardEl)
+        return;
+    scoreBoardEl.page = this;
+    scoreBoardEl.displayMatch(this.createGameObject(e.detail));
+    scoreBoardEl.classList.remove("d-none");
   }
 
   close() {

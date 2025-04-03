@@ -40,7 +40,11 @@ class GameConsumer(AsyncWebsocketConsumer):
     @database_sync_to_async
     def game_has_winner(self, game: PongGame):
         return game.winner is not None
-
+    
+    @database_sync_to_async
+    def get_game_id(self, game: PongGame):
+        return game.id
+    
     @database_sync_to_async
     def set_channel_group_name(self, game: PongGame, group_name: str):
         game.channel_group_name = group_name
@@ -129,8 +133,9 @@ class GameConsumer(AsyncWebsocketConsumer):
         )
 
     async def disconnect(self, close_code):
+        game_id = await self.get_game_id(self.db_game)
+        self.db_game = await database_sync_to_async(PongGame.objects.filter(id=game_id).first)()
         self.is_connected = False
-        game_id = self.scope["url_route"].get("game_id")
 
         if self.game_group_name and hasattr(self, 'side'):
             try:
@@ -153,9 +158,8 @@ class GameConsumer(AsyncWebsocketConsumer):
         if hasattr(self, 'game') and self.game:
             await self.game.handle_disconnect()
 
-        if hasattr(self, 'db_game') and self.db_game:
-            if self.db_game.status == "in_progress":
-                await self.game.handle_interruption()
+        if self.db_game.status == "in_progress":
+            await self.game.handle_interruption()
 
         if game_id in active_games and self.db_game.status in ["completed", "interrupted"]:
             del active_games[game_id]
