@@ -139,6 +139,11 @@ class PongOffline extends Pong {
       } else {
         this.playerScore++;
       }
+      if (this.playerScore >= 3 || this.opponentScore >= 3) {
+        this.gameOver = true;
+        this.scoreboard.textContent = "Game Over!";
+        this.readyButton.style.display = 'block';
+      }
       this.resetBall();
       this.updateScoreDisplay();
     }
@@ -188,6 +193,15 @@ class PongOffline extends Pong {
   }
 
   gameLoop() {
+    if (this.gameOver) {
+      this.cleanup();
+      this.scoreboard.textContent = "Game Over!";
+      const winnerText = this.playerScore >= 3 ? "Player 1" : "Player 2";
+      this.displayResult(this.playerScore, this.opponentScore, winnerText);
+      this.readyButton.style.display = 'block';
+      this.readyButton.textContent = "Play Again";
+      return;
+    }
     this.updatePaddles();
     this.updateBall();
     this.drawGameElements();
