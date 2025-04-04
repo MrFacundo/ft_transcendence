@@ -7,9 +7,9 @@ pong-remote, pong-ai {
 	justify-self: center;
 	margin: 0 auto; // Firefox
 	margin-top: 8rem;
-    background-size: cover;
-    background-position: center;
-		
+	background-size: cover;
+	background-position: center;
+
 	#statusMessage {
 		position: absolute;
 		top: 20px;
@@ -43,20 +43,39 @@ pong-remote, pong-ai {
 		color: #f1f1f1;
 		font-size: 24px;
 		position: absolute;
+		top: 15px;
+	}
+
+	#scoreboard {
+		left: 50%;
+		transform: translateX(-50%);
 		top: 60px;
 	}
 
-	#scoreboard{
-		left: 50%;
-		transform: translateX(-50%);
-	}
-
 	#side1Username {
-		left: 40px;
+		left: 120px;
 	}
 
 	#side2Username {
-		right: 40px;
+		right: 120px;
+	}
+
+	.user-container {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		position: absolute;
+		left: 0;
+		right: 0;
+		padding: 0 30px;
+		top: 50px;
+	}
+
+	.col-avatar img {
+		border-radius: 50%;
+		object-fit: cover;
+		border: 1px solid #dee2e6;
+		transition: opacity 0.3s;
 	}
 
 	#leftPaddle,
@@ -71,6 +90,7 @@ pong-remote, pong-ai {
 		position: absolute;
 		transition: top 0.1s;
 	}
+	
 	#ball {
 		width: 10px;
 		height: 10px;
@@ -83,5 +103,24 @@ pong-remote, pong-ai {
 	#rightPaddle {
 		left: unset;
 		right: 0;
+	}
+
+	#game-winner {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		margin-bottom: 1rem;
+		position: absolute;
+		top: 25%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		text-align: center;
+		color: white;
+		padding: 20px;
+		border-radius: 10px;
+		z-index: 20;
+		font-family: "CustomFont", sans-serif;
+		text-transform: uppercase;
+		font-size: 32px;
 	}
 }
