@@ -108,7 +108,7 @@ class PongAi extends Pong {
       if (diff === "easy") {
         predictedY += (Math.random() - 0.9) * 500;
       } else if (diff === "medium") {
-        predictedY += (Math.random() - 0.5) * 200;
+        predictedY += (Math.random() - 0.5) * 100;
       } else if (diff === "hard") {
         predictedY += (Math.random() - 0.5) * 30;
       }
