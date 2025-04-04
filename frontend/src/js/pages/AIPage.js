@@ -10,7 +10,7 @@ class AIPage extends Page {
       isProtected: true,
       app: app,
     });
-    this.handleGameEnd = this.handleGameEnd.bind(this);
+    this.handleGameOver = this.handleGameOver.bind(this);
   }
 
   async render() {
@@ -23,58 +23,30 @@ class AIPage extends Page {
       };
     });
 
-    this.mainElement.addEventListener("gameEnd", this.handleGameEnd);
-  }
-
-  createGameObject(gameData) {
-      const player1 = this.app.auth.user;
-      const winner = gameData.playerScore > gameData.opponentScore ? player1.id : "ai";
-  
-      return {
-          id: "",
-          player1: {
-              id: player1.id,
-              username: player1.username,
-              avatar_oauth: player1.avatar_oauth,
-              avatar_upload: player1.avatar_upload,
-          },
-          player2: { id: "ai", username: "AI", avatar_oauth: "", avatar_upload: "" },
-          date_played: "",
-          score_player1: gameData.playerScore,
-          score_player2: gameData.opponentScore,
-          status: "completed",
-          winner: winner,
-          tournament: null
-      };
+    this.mainElement.addEventListener("gameOver", this.handleGameOver);
   }
 
   startGame(difficulty) {
     const settingsEl = this.mainElement.querySelector("#ai-game-settings");
     const pongAiEl = this.mainElement.querySelector("pong-ai");
     pongAiEl.page = this;
-    const scoreBoardEl = this.mainElement.querySelector("score-board");
     settingsEl.classList.add("d-none");
-    scoreBoardEl.classList.add("d-none");
     pongAiEl.classList.remove("d-none");
     pongAiEl.startGame(difficulty);
   }
 
-  handleGameEnd(e) {
+  handleGameOver(e) {
     const pongAiEl = this.mainElement.querySelector("pong-ai");
-    pongAiEl && pongAiEl.classList.add("d-none");
     const settingsEl = this.mainElement.querySelector("#ai-game-settings");
-    settingsEl.classList.remove("d-none");
-    const scoreBoardEl = this.mainElement.querySelector("score-board");
-    if (!scoreBoardEl)
-        return;
-    scoreBoardEl.page = this;
-    scoreBoardEl.displayMatch(this.createGameObject(e.detail));
-    scoreBoardEl.classList.remove("d-none");
+    setTimeout(() => {
+      pongAiEl.classList.add("d-none");
+      settingsEl.classList.remove("d-none");
+    }, 3000);
   }
 
   close() {
     super.close();
-    this.mainElement.removeEventListener("gameEnd", this.handleGameEnd);
+    this.mainElement.removeEventListener("gameOver", this.handleGameOver);
   }
 }
 
