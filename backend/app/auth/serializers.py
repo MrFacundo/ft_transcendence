@@ -37,7 +37,7 @@ class LoginSerializer(serializers.Serializer):
         if not user.check_password(attrs.get('password')):
             raise AuthenticationFailed('Invalid credentials.')
 
-        if not user.email_is_verified:
+        if not user.email_is_verified and not user.is_staff:
             raise EmailNotVerifiedException()
 
         attrs['user'] = user
