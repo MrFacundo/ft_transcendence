@@ -7,13 +7,8 @@ class PongOffline extends Pong {
 
   init() {
     super.init();
-
     this.addEventListeners();
-
     this.setGameState();
-    this.updateScoreDisplay();
-
-    this.drawGameElements();
   }
 
   setGameState() {
@@ -42,8 +37,8 @@ class PongOffline extends Pong {
       y: this.canvas.height / 2,
       width: 10,
       height: 10,
-      speedX: 5,
-      speedY: 5,
+      speedX: 3,
+      speedY: 3,
     };
 
     this.playerScore = 0;
@@ -56,31 +51,12 @@ class PongOffline extends Pong {
     this.moveRightPaddleDown = false;
   }
 
-  updateScoreDisplay() {
-    if (this.gameOver) {
-      this.scoreboard.textContent = "Game Over!";
-    } else {
-      this.scoreboard.textContent = `${this.playerScore} - ${this.opponentScore}`;
-    }
-  }
-
   addEventListeners() {
     window.addEventListener("keydown", (event) => this.handleKeydown(event));
     window.addEventListener("keyup", (event) => this.handleKeyup(event));
 
     this.readyButton.addEventListener("click", () => {
-      this.readyButton.style.display = "none";
-      this.playAgainButton.style.display = "none";
-      this.setGameState();
-      this.updateScoreDisplay();
-      this.gameLoop();
-    });
-
-    this.playAgainButton.addEventListener("click", () => {
-      this.playAgainButton.style.display = "none";
-      this.readyButton.style.display = "none";
-      this.setGameState();
-      this.updateScoreDisplay();
+      this.startGame();
       this.gameLoop();
     });
   }
@@ -175,12 +151,12 @@ class PongOffline extends Pong {
     }
   }
 
-resetBall() {
-  this.ball.x = this.canvas.width / 2;
-  this.ball.y = this.canvas.height / 2;
+  resetBall() {
+    this.ball.x = this.canvas.width / 2;
+    this.ball.y = this.canvas.height / 2;
 
-  const currentSpeed = Math.sqrt(this.ball.speedX ** 2 + this.ball.speedY ** 2);
-  const increasedSpeed = currentSpeed + Math.log(currentSpeed + 1) * 0.1;
+    const currentSpeed = Math.sqrt(this.ball.speedX ** 2 + this.ball.speedY ** 2);
+    const increasedSpeed = currentSpeed + Math.log(currentSpeed + 1) * 0.1;
 
     // Choose from better preset angles (in radians)
     const angles = [30, 45, 60].map((deg) => (deg * Math.PI) / 180);
@@ -192,9 +168,9 @@ resetBall() {
     // Randomize horizontal direction (left/right)
     const direction = Math.random() < 0.5 ? -1 : 1;
 
-  this.ball.speedX = direction * increasedSpeed * Math.cos(angle);
-  this.ball.speedY = increasedSpeed * Math.sin(angle);
-}
+    this.ball.speedX = direction * increasedSpeed * Math.cos(angle);
+    this.ball.speedY = increasedSpeed * Math.sin(angle);
+  }
 
   drawGameElements() {
     this.clearCanvas();
@@ -226,19 +202,22 @@ resetBall() {
   }
 
   gameLoop() {
-    if (this.gameOver) {
-      this.cancelAnimationIfNeeded();
-      this.scoreboard.textContent = "Game Over!";
-      this.playAgainButton.style.display = "block";
-      return;
-    }
+    if (this.gameOver) return this.endGame();
 
     this.updatePaddles();
     this.updateBall();
-
     this.drawGameElements();
-
     this.animationId = requestAnimationFrame(this.gameLoop.bind(this));
+  }
+
+  endGame() {
+    this.cancelAnimationIfNeeded();
+    const winner = this.playerScore >= 3 ? "Player 1" : "Player 2";
+    this.clearCanvas();
+    this.displayResult(this.playerScore, this.opponentScore, winner);
+    this.readyButton.textContent = "Play Again";
+    this.readyButton.style.display = "block";
+    this.cleanup();
   }
 
   cancelAnimationIfNeeded() {

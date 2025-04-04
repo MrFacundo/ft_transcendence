@@ -14,6 +14,7 @@ class OfflinePvpPage extends Page {
 
   render() {
     const pongOfflineElement = new PongOffline();
+    pongOfflineElement.page = this;
     this.mainElement.appendChild(pongOfflineElement);
   }
 }
