@@ -122,15 +122,15 @@ class PongRemote extends Pong {
                 break;
         }
     }
-
-    toggleBallDisplay(message) {
-        if (message === "score") {
-            this.ball.style.display = "none";
-        } else if (message === "gameState" && this.ball.style.display === "none") {
-            setTimeout(() => this.ball.style.display = "block", 500);
-        }
-    }
-
+	toggleBallDisplay(message) {
+		if (message === "score") {
+			this.ball.style.display = "none";
+		} else if (message === "gameState" && this.ball.style.display === "none") {
+			setTimeout(() => {
+				if (!this.gameOver) this.ball.style.display = "block";
+			}, 500);
+		}
+	}
     updateStatus(message) {
         this.statusMessage.textContent = message;
     }
