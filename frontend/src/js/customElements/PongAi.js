@@ -9,7 +9,7 @@ class PongAi extends Pong {
 
   init() {
     super.init();
-    
+
     this.readyButton.addEventListener("click", () => {
       this.readyButton.style.display = "none";
       this.lastTime = performance.now();
@@ -21,7 +21,7 @@ class PongAi extends Pong {
     const paddleInitialY = (this.canvas.height - paddleHeight) / 2;
     const playerPaddleX = 0;
     const aiPaddleX = this.canvas.width - paddleWidth;
-    
+
     this.playerPaddle = {
       x: playerPaddleX,
       y: paddleInitialY,
@@ -29,7 +29,7 @@ class PongAi extends Pong {
       height: paddleHeight,
       speed: 6,
     };
-    
+
     this.aiPaddle = {
       x: aiPaddleX,
       y: paddleInitialY,
@@ -37,7 +37,7 @@ class PongAi extends Pong {
       height: paddleHeight,
       speed: 7,
     };
-    
+
     this.ball = { x: 450, y: 250, size: 10, vx: 3, vy: 3 };
     this.aiKeys = { ArrowUp: false, ArrowDown: false };
     this.aiInterval = null;
@@ -53,7 +53,7 @@ class PongAi extends Pong {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     const diff = difficulty ? difficulty.toLowerCase() : "easy";
     this.setSideUsernames(this.page.app.auth.user.username, "AI" + (difficulty ? ` (${difficulty})` : ""));
-
+    this.setAvatars(this.page.app.auth.user, { username: "AI" });
     if (diff === "hard") {
       this.aiPaddle.speed = 7;
       this.aiReactionDelay = 200;
@@ -274,6 +274,13 @@ class PongAi extends Pong {
     this.firstPrediction = false;
   }
 
+  endGame() {
+    this.cleanup();
+    const winnerText = this.playerScore > this.opponentScore ? this.page.app.auth.user.username : "AI";
+    this.displayResult(this.playerScore, this.opponentScore, winnerText);
+    this.dispatchEvent(new CustomEvent("gameOver", { bubbles: true}));
+  }
+
   cleanup() {
     super.cleanup();
     if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId);
@@ -293,7 +300,7 @@ class PongAi extends Pong {
   addEventListeners() {
     this.handleKeyDown = this.handleKeyDown.bind(this);
     this.handleKeyUp = this.handleKeyUp.bind(this);
-    
+
     window.addEventListener("keydown", this.handleKeyDown);
     window.addEventListener("keyup", this.handleKeyUp);
   }
