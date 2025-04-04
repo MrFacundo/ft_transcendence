@@ -86,11 +86,9 @@ INSTALLED_APPS = [
     'channels',
     'corsheaders',
     'rest_framework_simplejwt.token_blacklist',
-    'drf_yasg'
+    'drf_yasg',
+    'silk',
 ]
-
-if DEBUG and not PRODUCTION:
-    INSTALLED_APPS.append('silk')
 
 ASGI_APPLICATION = 'app.asgi.application'
 
@@ -116,19 +114,24 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'silk.middleware.SilkyMiddleware',
 ]
 
-if DEBUG and not PRODUCTION:
-    MIDDLEWARE.append('silk.middleware.SilkyMiddleware')
+# if DEBUG and not PRODUCTION:
+    # MIDDLEWARE.append('silk.middleware.SilkyMiddleware')
 
-FRONTEND_URL = "http://localhost:8080"
-WAF_URL = "http://localhost:8081"
+FRONTEND_URL = "https://localhost"
+WAF_URL = "https://localhost/api/"
 
 CORS_ALLOWED_ORIGINS = [
     FRONTEND_URL,
 ]
 
 CORS_ALLOW_CREDENTIALS = True
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://localhost',
+]
 
 ROOT_URLCONF = 'app.urls'
 
@@ -202,8 +205,6 @@ APPEND_SLASH=False
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
-
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
@@ -263,7 +264,11 @@ import os
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
-import os
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_URL = '/static/'
+
 if not os.path.exists(MEDIA_ROOT):
     os.makedirs(MEDIA_ROOT)
     os.makedirs(os.path.join(MEDIA_ROOT, 'avatars'), exist_ok=True)
+    
+    
