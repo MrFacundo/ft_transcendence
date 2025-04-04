@@ -134,12 +134,12 @@ class PongOffline extends Pong {
     }
 
     if (this.ball.x <= 0 || this.ball.x + this.ball.width >= this.canvas.width) {
-      this.resetBall();
       if (this.ball.x <= 0) {
         this.opponentScore++;
       } else {
         this.playerScore++;
       }
+      this.resetBall();
       this.updateScoreDisplay();
     }
   }
