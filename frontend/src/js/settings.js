@@ -1,5 +1,5 @@
 const EMPTY_AVATAR_URL = "/static/images/empty-avatar.jpg";
-const API_URL = "http://localhost:8081";
+const API_URL = "http://localhost:8081/api";
 const MEDIA_URL = "http://localhost:8000/media";
 const WS_URL = "ws://localhost:8000/ws";
 const DEBUG = process.env.NODE_ENV !== 'production';

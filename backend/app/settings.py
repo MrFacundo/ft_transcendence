@@ -29,7 +29,7 @@ SECRET_KEY = 'django-insecure-sm^l$qx=e&7q13f(o7&^@e$(^2ta7plc+b6&1yq-bdi4u=m%^%
 DEBUG = config('DEBUG', default=True, cast=bool)
 PRODUCTION = not DEBUG
 
-#ALLOWED_HOSTS = ["localhost", "127.0.0.1", "172.22.0.1"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "172.22.0.1"]
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost').split(',')
 
 PASSWORD_HASHERS = [
@@ -120,17 +120,17 @@ MIDDLEWARE = [
 # if DEBUG and not PRODUCTION:
     # MIDDLEWARE.append('silk.middleware.SilkyMiddleware')
 
-FRONTEND_URL = "https://localhost"
-WAF_URL = "https://localhost/api/"
+
+LOCALHOST = "https://localhost"
 
 CORS_ALLOWED_ORIGINS = [
-    FRONTEND_URL,
+    LOCALHOST
 ]
 
 CORS_ALLOW_CREDENTIALS = True
 
 CSRF_TRUSTED_ORIGINS = [
-    'https://localhost',
+    LOCALHOST
 ]
 
 ROOT_URLCONF = 'app.urls'
