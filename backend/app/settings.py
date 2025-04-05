@@ -165,7 +165,7 @@ DATABASES = {
         'USER': vault_client.get_db_vars("username"), #TODO: See this later
         'PASSWORD': vault_client.get_db_vars("password"), #TODO: See this later
         'HOST': vault_client.get_db_vars("host"), #TODO: See this later
-        'PORT': vault_client.get_db_vars("port"), #TODO: See this later
+        'PORT': 5432, #TODO: See this later
     }
 }
 
