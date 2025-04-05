@@ -91,3 +91,6 @@ schema.json
 #file blockchain
 blockchain/deployedAddress.json
 menu.sh
+
+# Ignore HashiCorp Vault files
+hashiCorpVault/data/
