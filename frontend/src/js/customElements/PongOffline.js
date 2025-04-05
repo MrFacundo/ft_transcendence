@@ -3,13 +3,12 @@ import Pong from "./Pong.js";
 class PongOffline extends Pong {
   constructor() {
     super();
-    this.ballSpeedMultiplier = 1;
   }
 
   init() {
     super.init();
-    this.setGameState();
     this.addEventListeners();
+    this.setGameState();
   }
 
   setGameState() {
@@ -22,7 +21,7 @@ class PongOffline extends Pong {
       y: paddleInitialY,
       width: paddleWidth,
       height: paddleHeight,
-      speed: 6
+      speed: 6,
     };
 
     this.rightPaddle = {
@@ -30,7 +29,7 @@ class PongOffline extends Pong {
       y: paddleInitialY,
       width: paddleWidth,
       height: paddleHeight,
-      speed: 6
+      speed: 6,
     };
 
     this.ball = {
@@ -38,107 +37,115 @@ class PongOffline extends Pong {
       y: this.canvas.height / 2,
       width: 10,
       height: 10,
-      speedX: 2,
-      speedY: 2,
+      speedX: 3,
+      speedY: 3,
     };
 
     this.playerScore = 0;
     this.opponentScore = 0;
     this.gameOver = false;
+
     this.moveLeftPaddleUp = false;
     this.moveLeftPaddleDown = false;
     this.moveRightPaddleUp = false;
     this.moveRightPaddleDown = false;
   }
 
-  updateScoreDisplay() {
-    this.scoreboard.textContent = `${this.playerScore} - ${this.opponentScore}`;
-  }
-
   addEventListeners() {
-    window.addEventListener("keydown", this.handleKeydown.bind(this));
-    window.addEventListener("keyup", this.handleKeyup.bind(this));
+    window.addEventListener("keydown", (event) => this.handleKeydown(event));
+    window.addEventListener("keyup", (event) => this.handleKeyup(event));
 
     this.readyButton.addEventListener("click", () => {
       this.startGame();
+      this.gameLoop();
     });
   }
 
   handleKeydown(event) {
-    if (event.key === "w") {
-      this.moveLeftPaddleUp = true;
-    }
-    if (event.key === "s") {
-      this.moveLeftPaddleDown = true;
-    }
-    if (event.key === "ArrowUp") {
-      this.moveRightPaddleUp = true;
-    }
-    if (event.key === "ArrowDown") {
-      this.moveRightPaddleDown = true;
-    }
+    if (event.key === "w") this.moveLeftPaddleUp = true;
+    if (event.key === "s") this.moveLeftPaddleDown = true;
+    if (event.key === "ArrowUp") this.moveRightPaddleUp = true;
+    if (event.key === "ArrowDown") this.moveRightPaddleDown = true;
   }
 
   handleKeyup(event) {
-    if (event.key === "w") {
-      this.moveLeftPaddleUp = false;
-    }
-    if (event.key === "s") {
-      this.moveLeftPaddleDown = false;
-    }
-    if (event.key === "ArrowUp") {
-      this.moveRightPaddleUp = false;
-    }
-    if (event.key === "ArrowDown") {
-      this.moveRightPaddleDown = false;
-    }
+    if (event.key === "w") this.moveLeftPaddleUp = false;
+    if (event.key === "s") this.moveLeftPaddleDown = false;
+    if (event.key === "ArrowUp") this.moveRightPaddleUp = false;
+    if (event.key === "ArrowDown") this.moveRightPaddleDown = false;
   }
 
   updatePaddles() {
     if (this.moveLeftPaddleUp) {
-      this.leftPaddle.y -= this.leftPaddle.speed;
+      this.leftPaddle.y = Math.max(
+        0,
+        this.leftPaddle.y - this.leftPaddle.speed,
+      );
     }
     if (this.moveLeftPaddleDown) {
-      this.leftPaddle.y += this.leftPaddle.speed;
+      this.leftPaddle.y = Math.min(
+        this.canvas.height - this.leftPaddle.height,
+        this.leftPaddle.y + this.leftPaddle.speed,
+      );
     }
 
     if (this.moveRightPaddleUp) {
-      this.rightPaddle.y -= this.rightPaddle.speed;
+      this.rightPaddle.y = Math.max(
+        0,
+        this.rightPaddle.y - this.rightPaddle.speed,
+      );
     }
     if (this.moveRightPaddleDown) {
-      this.rightPaddle.y += this.rightPaddle.speed;
+      this.rightPaddle.y = Math.min(
+        this.canvas.height - this.rightPaddle.height,
+        this.rightPaddle.y + this.rightPaddle.speed,
+      );
     }
-
-    this.leftPaddle.y = Math.max(0, Math.min(this.canvas.height - this.leftPaddle.height, this.leftPaddle.y));
-    this.rightPaddle.y = Math.max(0, Math.min(this.canvas.height - this.rightPaddle.height, this.rightPaddle.y));
   }
 
   updateBall() {
     this.ball.x += this.ball.speedX;
     this.ball.y += this.ball.speedY;
 
-    if (this.ball.y <= 0 || this.ball.y + this.ball.height >= this.canvas.height) {
+    if (
+      this.ball.y <= 0 ||
+      this.ball.y + this.ball.height >= this.canvas.height
+    ) {
       this.ball.speedY *= -1;
     }
 
-    if (this.ball.x <= this.leftPaddle.x + this.leftPaddle.width &&
+    if (
+      this.ball.x <= this.leftPaddle.x + this.leftPaddle.width &&
       this.ball.y + this.ball.height >= this.leftPaddle.y &&
-      this.ball.y <= this.leftPaddle.y + this.leftPaddle.height) {
+      this.ball.y <= this.leftPaddle.y + this.leftPaddle.height
+    ) {
       this.ball.speedX *= -1;
     }
 
-    if (this.ball.x + this.ball.width >= this.rightPaddle.x &&
+    if (
+      this.ball.x + this.ball.width >= this.rightPaddle.x &&
       this.ball.y + this.ball.height >= this.rightPaddle.y &&
-      this.ball.y <= this.rightPaddle.y + this.rightPaddle.height) {
+      this.ball.y <= this.rightPaddle.y + this.rightPaddle.height
+    ) {
       this.ball.speedX *= -1;
     }
 
-    if (this.ball.x <= 0 || this.ball.x + this.ball.width >= this.canvas.width) {
+    if (
+      this.ball.x <= 0 ||
+      this.ball.x + this.ball.width >= this.canvas.width
+    ) {
       if (this.ball.x <= 0) {
         this.opponentScore++;
       } else {
         this.playerScore++;
       }
+
+      if (this.playerScore >= 3 || this.opponentScore >= 3) {
+        this.gameOver = true;
+        this.updateScoreDisplay();
+        return;
+      }
+
       this.resetBall();
       this.updateScoreDisplay();
     }
@@ -148,74 +155,76 @@ class PongOffline extends Pong {
     this.ball.x = this.canvas.width / 2;
     this.ball.y = this.canvas.height / 2;
 
-    this.ball.speedX *= -1;
+    const currentSpeed = Math.sqrt(this.ball.speedX ** 2 + this.ball.speedY ** 2);
+    const increasedSpeed = currentSpeed + Math.log(currentSpeed + 1) * 0.1;
 
-    const speedIncrease = 0.1;
-    const maxSpeed = 10;
+    // Choose from better preset angles (in radians)
+    const angles = [30, 45, 60].map((deg) => (deg * Math.PI) / 180);
+    let angle = angles[Math.floor(Math.random() * angles.length)];
 
-    if (Math.abs(this.ball.speedX) < maxSpeed && Math.abs(this.ball.speedY) < maxSpeed) {
-      this.ball.speedX += speedIncrease;
-      this.ball.speedY += speedIncrease;
-    }
+    // Randomize vertical direction (up/down)
+    if (Math.random() < 0.5) angle = -angle;
 
-    if (Math.abs(this.ball.speedX) > maxSpeed) {
-      this.ball.speedX = maxSpeed * Math.sign(this.ball.speedX);
-    }
-    if (Math.abs(this.ball.speedY) > maxSpeed) {
-      this.ball.speedY = maxSpeed * Math.sign(this.ball.speedY);
-    }
+    // Randomize horizontal direction (left/right)
+    const direction = Math.random() < 0.5 ? -1 : 1;
+
+    this.ball.speedX = direction * increasedSpeed * Math.cos(angle);
+    this.ball.speedY = increasedSpeed * Math.sin(angle);
   }
 
   drawGameElements() {
     this.clearCanvas();
-    this.drawPaddles();
-    this.drawBall();
+
+    this.ctx.fillStyle = "white";
+    this.ctx.fillRect(
+      this.leftPaddle.x,
+      this.leftPaddle.y,
+      this.leftPaddle.width,
+      this.leftPaddle.height,
+    );
+    this.ctx.fillRect(
+      this.rightPaddle.x,
+      this.rightPaddle.y,
+      this.rightPaddle.width,
+      this.rightPaddle.height,
+    );
+
+    this.ctx.fillRect(
+      this.ball.x,
+      this.ball.y,
+      this.ball.width,
+      this.ball.height,
+    );
   }
 
   clearCanvas() {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
   }
 
-  drawPaddles() {
-    this.ctx.fillStyle = "white";
-    this.ctx.fillRect(this.leftPaddle.x, this.leftPaddle.y, this.leftPaddle.width, this.leftPaddle.height);
-    this.ctx.fillRect(this.rightPaddle.x, this.rightPaddle.y, this.rightPaddle.width, this.rightPaddle.height);
-  }
-
-  drawBall() {
-    this.ctx.fillStyle = "white";
-    this.ctx.fillRect(this.ball.x, this.ball.y, this.ball.width, this.ball.height);
-  }
-
   gameLoop() {
+    if (this.gameOver) return this.endGame();
+
     this.updatePaddles();
     this.updateBall();
     this.drawGameElements();
+    this.animationId = requestAnimationFrame(this.gameLoop.bind(this));
+  }
 
-    if (!this.gameOver) {
-      requestAnimationFrame(this.gameLoop.bind(this));
+  endGame() {
+    this.cancelAnimationIfNeeded();
+    const winner = this.playerScore >= 3 ? "Player 1" : "Player 2";
+    this.clearCanvas();
+    this.displayResult(this.playerScore, this.opponentScore, winner);
+    this.readyButton.textContent = "Play Again";
+    this.readyButton.style.display = "block";
+    this.cleanup();
+  }
+
+  cancelAnimationIfNeeded() {
+    if (this.animationId) {
+      cancelAnimationFrame(this.animationId);
+      this.animationId = null;
     }
-  }
-
-  startGame() {
-    this.gameOver = false;
-    this.playerScore = 0;
-    this.opponentScore = 0;
-    this.ballSpeedMultiplier = 1;
-    this.updateScoreDisplay();
-    this.gameLoop();
-    this.readyButton.remove();
-    this.readyButton.style.display = 'none';
-  }
-
-  removeEventListeners() {
-    window.removeEventListener("keydown", this.handleKeydown.bind(this));
-    window.removeEventListener("keyup", this.handleKeyup.bind(this));
-  }
-
-  cleanup() {
-    this.gameOver = true;
-    this.removeEventListeners();
   }
 }
 
