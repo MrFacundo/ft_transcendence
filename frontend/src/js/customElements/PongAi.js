@@ -47,13 +47,10 @@ class PongAi extends Pong {
   }
 
   startGame(difficulty) {
-    super.startGame();
-    this.addEventListeners();
+    const diff = difficulty ? difficulty.toLowerCase() : "easy";
+    super.startGame(null, this.page.app.auth.user, { username: `AI (${diff})`});
     this.resetBall();
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    const diff = difficulty ? difficulty.toLowerCase() : "easy";
-    this.setSideUsernames(this.page.app.auth.user.username, "AI" + (difficulty ? ` (${difficulty})` : ""));
-    this.setAvatars(this.page.app.auth.user, { username: "AI" });
     if (diff === "hard") {
       this.aiPaddle.speed = 7;
       this.aiReactionDelay = 200;
@@ -291,6 +288,7 @@ class PongAi extends Pong {
 
   handleKeyDown(e) {
     this.keys[e.key.toLowerCase()] = true;
+    console.log(this.keys);
   }
 
   handleKeyUp(e) {
