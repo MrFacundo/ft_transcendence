@@ -1,4 +1,4 @@
-pong-remote, pong-ai {
+pong-offline, pong-remote, pong-ai {
 	width: 1000px;
 	display: flex;
 	height: 700px;
@@ -6,7 +6,6 @@ pong-remote, pong-ai {
 	position: relative;
 	justify-self: center;
 	margin: 0 auto; // Firefox
-	margin-top: 8rem;
 	background-size: cover;
 	background-position: center;
 

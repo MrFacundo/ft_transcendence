@@ -5,6 +5,7 @@ class PongAi extends Pong {
     super();
     this.animationFrameId = null;
     this.lastTime = performance.now();
+    this.lastAIDecisionTime = 0;
   }
 
   init() {
@@ -47,15 +48,12 @@ class PongAi extends Pong {
   }
 
   startGame(difficulty) {
-    super.startGame();
-    this.addEventListeners();
+    const diff = difficulty ? difficulty.toLowerCase() : "easy";
+    super.startGame(null, this.page.app.auth.user, { username: `AI (${diff})`});
     this.resetBall();
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    const diff = difficulty ? difficulty.toLowerCase() : "easy";
-    this.setSideUsernames(this.page.app.auth.user.username, "AI" + (difficulty ? ` (${difficulty})` : ""));
-    this.setAvatars(this.page.app.auth.user, { username: "AI" });
     if (diff === "hard") {
-      this.aiPaddle.speed = 7;
+      this.aiPaddle.speed = 4;
       this.aiReactionDelay = 200;
       this.aiErrorMargin = 10;
     } else if (diff === "medium") {
@@ -79,6 +77,10 @@ class PongAi extends Pong {
   }
 
   simulateAIInput(difficulty) {
+    const now = Date.now();
+    if (now - this.lastAIDecisionTime < 1000) return;
+    this.lastAIDecisionTime = now;
+
     const diff = difficulty ? difficulty.toLowerCase() : "easy";
 
     if (this.ball.vx > 0) {
@@ -101,9 +103,9 @@ class PongAi extends Pong {
       }
 
       if (diff === "easy") {
-        predictedY += (Math.random() - 0.9) * 400;
+        predictedY += (Math.random() - 0.9) * 500;
       } else if (diff === "medium") {
-        predictedY += (Math.random() - 0.5) * 200;
+        predictedY += (Math.random() - 0.5) * 100;
       } else if (diff === "hard") {
         predictedY += (Math.random() - 0.5) * 30;
       }
@@ -291,6 +293,7 @@ class PongAi extends Pong {
 
   handleKeyDown(e) {
     this.keys[e.key.toLowerCase()] = true;
+    console.log(this.keys);
   }
 
   handleKeyUp(e) {

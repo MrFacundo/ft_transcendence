@@ -2,48 +2,53 @@
 @import "./pong.scss";
 
 @font-face {
-	font-family: "CustomFont";
-	src: url("../fonts/mk3.woff") format("woff");
+  font-family: "CustomFont";
+  src: url("../fonts/mk3.woff") format("woff");
 }
 
 @font-face {
-	font-family: "CustomFont2";
-	src: url("../fonts/warlock.woff") format("woff");
+  font-family: "CustomFont2";
+  src: url("../fonts/warlock.woff") format("woff");
 }
 
 @import url("https://fonts.googleapis.com/css2?family=Titillium+Web:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700&display=swap");
 
-html {
-	overflow-y: scroll;
+body {
+  overflow-y: auto;
+  margin: 0;
+  padding: 0;
+  position: relative;
+  color: #fff;
+  font-family: "Titillium Web", sans-serif;
 }
 
 body {
-	margin: 0;
-	padding: 0;
-	position: relative;
-	color: #fff;
-	font-family: "Titillium Web", sans-serif;
+  margin: 0;
+  padding: 0;
+  position: relative;
+  color: #fff;
+  font-family: "Titillium Web", sans-serif;
 }
 
 #background {
-	position: fixed;
-	top: 0;
-	left: 0;
-	width: 100vw;
-	height: 100vh;
-	background-image: url("../static/images/bg.png");
-	background-size: cover;
-	background-position: center;
-	filter: brightness(70%) blur(2px);
-	z-index: -1;
-	opacity: 0;
-	transition: opacity 0.5s ease-in-out;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-image: url("../static/images/bg.png");
+  background-size: cover;
+  background-position: center;
+  filter: brightness(70%) blur(2px);
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
 }
 
 [data-href],
 .cursor-pointer,
 .card {
-	cursor: pointer;
+  cursor: pointer;
 }
 
 /* 
@@ -53,88 +58,88 @@ body {
  */
 
 .form-signin {
-	min-width: 400px;
+  min-width: 400px;
 }
 
 #main {
-	padding: 3rem;
-	@media (min-width: 1200px) {
-		padding: 3rem 10rem;
-	}
+  padding: 3rem;
+  @media (min-width: 1200px) {
+    padding: 3rem 10rem;
+  }
 }
 
 .card {
-	transition: transform 0.3s, box-shadow 0.3s;
-	height: 270px;
-	max-width: 400px;
-	background-image: url("../static/images/card.png");
-	background-position: initial;
-	background-repeat: round;
+  transition: transform 0.3s, box-shadow 0.3s;
+  height: 270px;
+  max-width: 400px;
+  background-image: url("../static/images/card.png");
+  background-position: initial;
+  background-repeat: round;
 
-	img {
-		filter: invert(1) brightness(2);
-	}
+  img {
+    filter: invert(1) brightness(2);
+  }
 
-	&:hover {
-		.card-body {
-			border: red solid 10px;
-		}
-	}
+  &:hover {
+    .card-body {
+      border: red solid 10px;
+    }
+  }
 
-	.card-body {
-		color: #fff;
-		z-index: 1;
-		justify-content: center;
-		align-content: center;
+  .card-body {
+    color: #fff;
+    z-index: 1;
+    justify-content: center;
+    align-content: center;
 
-		h5 {
-			font-size: 24px;
-		}
-	}
+    h5 {
+      font-size: 24px;
+    }
+  }
 }
 
 .fade-in {
-	animation: fadeIn 1s ease-in-out;
+  animation: fadeIn 1s ease-in-out;
 }
 
 @keyframes fadeIn {
-	from {
-		opacity: 0;
-	}
-	to {
-		opacity: 1;
-	}
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .message-popup {
-	bottom: 20px;
+  bottom: 20px;
 }
 
 .transition-opacity {
-	transition: opacity 0.3s ease-in-out;
+  transition: opacity 0.3s ease-in-out;
 }
 
 .title {
-	font-family: "CustomFont", sans-serif;
-	text-transform: uppercase;
+  font-family: "CustomFont", sans-serif;
+  text-transform: uppercase;
 }
 
 #settings-container {
-	background: #202428;
+  background: #202428;
 
-	a {
-		color: #fff;
-		&.active {
-			color: black;
-		}
-	}
+  a {
+    color: #fff;
+    &.active {
+      color: black;
+    }
+  }
 }
 
 button {
-	background: #383e45 !important;
-	border: 1px solid grey !important;
+  background-color: #383e45 !important;
+  border: #202428 solid 2px !important;
 }
 
 #tournament-title {
-	font-family: "CustomFont2", sans-serif;
+  font-family: "CustomFont2", sans-serif;
 }

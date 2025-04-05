@@ -41,8 +41,6 @@ class PongRemote extends Pong {
     }
 
     setWebsocket(id) {
-        this.addEventListeners();
-
         this.playersJoined = [false, false];
         this.playersReady = [false, false];
 
@@ -122,15 +120,15 @@ class PongRemote extends Pong {
                 break;
         }
     }
-
-    toggleBallDisplay(message) {
-        if (message === "score") {
-            this.ball.style.display = "none";
-        } else if (message === "gameState" && this.ball.style.display === "none") {
-            setTimeout(() => this.ball.style.display = "block", 500);
-        }
-    }
-
+	toggleBallDisplay(message) {
+		if (message === "score") {
+			this.ball.style.display = "none";
+		} else if (message === "gameState" && this.ball.style.display === "none") {
+			setTimeout(() => {
+				if (!this.gameOver) this.ball.style.display = "block";
+			}, 500);
+		}
+	}
     updateStatus(message) {
         this.statusMessage.textContent = message;
     }
@@ -148,9 +146,9 @@ class PongRemote extends Pong {
         }
     }
 
-    async startGame(gameId) {
-        super.startGame();
-        this.setWebsocket(gameId);
+    async startGame(game) {
+        super.startGame(game.id, game.player1, game.player2);
+        this.setWebsocket(game.id);
         this.updateStatus("Connecting to game...");
         this.readyButton.style.display = "none";
 
