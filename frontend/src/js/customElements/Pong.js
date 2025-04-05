@@ -11,7 +11,6 @@ class Pong extends BaseElement {
   init() {
     this.innerHTML = "";
     this.setCanvas();
-    this.setRandomBackground();
     this.setUIElements();
     this.setGameState();
   }
@@ -94,6 +93,7 @@ class Pong extends BaseElement {
   }
 
   setAvatars = async (player1, player2) => {
+    if (!this.page) return;
     const { api } = this.page.app;
 
     const setAvatar = async (id, user) => {
@@ -114,13 +114,24 @@ class Pong extends BaseElement {
     ]);
   };
 
-  startGame() {
-    this.playerScore = this.opponentScore = 0;
-    this.winnerDisplay.textContent = "";
+  startGame(gameId = null, player1 = null, player2 = null) {
+    this.playerScore = 0;
+    this.opponentScore = 0;
     this.updateScoreDisplay();
+    this.updateInfoUI(gameId, player1, player2);
+    this.winnerDisplay.textContent = "";
     this.gameOver = false;
     this.page?.app.stateManager.updateState("currentGame", true);
     this.readyButton.style.display = "none";
+    this.addEventListeners();
+  }
+
+  updateInfoUI(gameId = null, player1 = null, player2 = null) {
+    this.setRandomBackground(gameId);
+    if (player1 && player2) {
+      this.setSideUsernames(player1.username, player2.username);
+      this.setAvatars(player1, player2);
+    }
   }
 
   displayResult(scorePlayer1, scorePlayer2, winnerUsername, status = null) {
@@ -134,16 +145,12 @@ class Pong extends BaseElement {
       .forEach(el => el?.style && (el.style.display = "none"));
   }
 
-  addEventListeners() {
-  }
-
   cleanup() {
     this.gameOver = true;
     this.page?.app.stateManager.updateState("currentGame", false);
   }
 
   connectedCallback() {
-    this.addEventListeners();
   }
 
   disconnectedCallback() {

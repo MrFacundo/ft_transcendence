@@ -41,8 +41,6 @@ class PongRemote extends Pong {
     }
 
     setWebsocket(id) {
-        this.addEventListeners();
-
         this.playersJoined = [false, false];
         this.playersReady = [false, false];
 
@@ -148,9 +146,9 @@ class PongRemote extends Pong {
         }
     }
 
-    async startGame(gameId) {
-        super.startGame();
-        this.setWebsocket(gameId);
+    async startGame(game) {
+        super.startGame(game.id, game.player1, game.player2);
+        this.setWebsocket(game.id);
         this.updateStatus("Connecting to game...");
         this.readyButton.style.display = "none";
 

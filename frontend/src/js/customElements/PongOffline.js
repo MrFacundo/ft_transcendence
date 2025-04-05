@@ -4,11 +4,15 @@ class PongOffline extends Pong {
   constructor() {
     super();
   }
-
+    
   init() {
     super.init();
-    this.addEventListeners();
     this.setGameState();
+    this.updateInfoUI(null, "player 1", "player 2");
+    this.readyButton.addEventListener("click", () => {
+      this.startGame(null, "player 1", "player 2");
+      this.gameLoop();
+    });
   }
 
   setGameState() {
@@ -37,8 +41,8 @@ class PongOffline extends Pong {
       y: this.canvas.height / 2,
       width: 10,
       height: 10,
-      speedX: 3,
-      speedY: 3,
+      speedX: 5,
+      speedY: 5,
     };
 
     this.playerScore = 0;
@@ -51,15 +55,6 @@ class PongOffline extends Pong {
     this.moveRightPaddleDown = false;
   }
 
-  addEventListeners() {
-    window.addEventListener("keydown", (event) => this.handleKeydown(event));
-    window.addEventListener("keyup", (event) => this.handleKeyup(event));
-
-    this.readyButton.addEventListener("click", () => {
-      this.startGame();
-      this.gameLoop();
-    });
-  }
 
   handleKeydown(event) {
     if (event.key === "w") this.moveLeftPaddleUp = true;
@@ -142,6 +137,7 @@ class PongOffline extends Pong {
 
       if (this.playerScore >= 3 || this.opponentScore >= 3) {
         this.gameOver = true;
+        this.resetBall();
         this.updateScoreDisplay();
         return;
       }
@@ -210,6 +206,13 @@ class PongOffline extends Pong {
     this.animationId = requestAnimationFrame(this.gameLoop.bind(this));
   }
 
+  cancelAnimationIfNeeded() {
+    if (this.animationId) {
+      cancelAnimationFrame(this.animationId);
+      this.animationId = null;
+    }
+  }
+
   endGame() {
     this.cancelAnimationIfNeeded();
     const winner = this.playerScore >= 3 ? "Player 1" : "Player 2";
@@ -217,14 +220,20 @@ class PongOffline extends Pong {
     this.displayResult(this.playerScore, this.opponentScore, winner);
     this.readyButton.textContent = "Play Again";
     this.readyButton.style.display = "block";
-    this.cleanup();
   }
 
-  cancelAnimationIfNeeded() {
-    if (this.animationId) {
-      cancelAnimationFrame(this.animationId);
-      this.animationId = null;
-    }
+  addEventListeners() {
+    this.boundHandleKeydown = this.handleKeydown.bind(this);
+    this.boundHandleKeyup = this.handleKeyup.bind(this);
+    window.addEventListener("keydown", this.boundHandleKeydown);
+    window.addEventListener("keyup", this.boundHandleKeyup);
+  }
+  
+  cleanup() {
+    window.removeEventListener("keydown", this.boundHandleKeydown);
+    window.removeEventListener("keyup", this.boundHandleKeyup);
+    this.readyButton.removeEventListener("click", this.boundStartGame);
+    super.cleanup();
   }
 }
 
