@@ -61,11 +61,6 @@ class Pong extends BaseElement {
     this.readyButton.id = "readyButton";
     this.readyButton.textContent = "Ready to Play";
 
-    this.playAgainButton = document.createElement("button");
-    this.playAgainButton.id = "playAgainButton";
-    this.playAgainButton.textContent = "Play Again";
-    this.playAgainButton.style.display = "none";
-
     this.winnerDisplay = this.createElement("game-winner");
 
     this.append(
@@ -73,7 +68,6 @@ class Pong extends BaseElement {
       this.scoreboard,
       this.userContainer,
       this.readyButton,
-      this.playAgainButton,
       this.winnerDisplay
     );
   }
@@ -126,9 +120,6 @@ class Pong extends BaseElement {
     this.updateScoreDisplay();
     this.gameOver = false;
     this.page?.app.stateManager.updateState("currentGame", true);
-
-    this.playAgainButton.style.display = "none";
-    this.readyButton.style.display = "none";
   }
 
   displayResult(scorePlayer1, scorePlayer2, winnerUsername, status = null) {
