@@ -16,3 +16,4 @@ faker
 qrcode
 django-crontab
 drf_yasg
+hvac>=1.0,<2.0

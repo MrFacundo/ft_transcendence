@@ -9,26 +9,25 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
-
-import hvac
-
+import sys
 from datetime import timedelta
 from pathlib import Path
 from decouple import config
 from datetime import timedelta
+import os
+
+from app.vault.vault import VaultClient
+
+vault_client = VaultClient()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
-client = hvac.Client(url=config('VAULT_ADDR'), token=config('VAULT_TOKEN'))
-
-secrets =
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-sm^l$qx=e&7q13f(o7&^@e$(^2ta7plc+b6&1yq-bdi4u=m%^%' #TODO: put on hashicorp vault
+#SECRET_KEY = vault_client.get_JWT_key() #TODO: See this later
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=True, cast=bool)
@@ -45,6 +44,8 @@ PASSWORD_HASHERS = [
     "django.contrib.auth.hashers.ScryptPasswordHasher",
 ]
 
+SECRET_KEY = vault_client.get_jwt_key()
+
 # jwt settings
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=int(config('ACCESS_TOKEN_LIFETIME', default='60'))),
@@ -53,7 +54,7 @@ SIMPLE_JWT = {
     'BLACKLIST_AFTER_ROTATION': True,
     'UPDATE_LAST_LOGIN': False,
     'ALGORITHM': 'HS256',
-    'SIGNING_KEY': SECRET_KEY,
+    'SIGNING_KEY': vault_client.get_jwt_key(), #TODO: Maybe implement an hashicorp vault key generator for this key
     'VERIFYING_KEY': None,
     'AUDIENCE': None,
     'ISSUER': None,
@@ -91,7 +92,7 @@ INSTALLED_APPS = [
     'channels',
     'corsheaders',
     'rest_framework_simplejwt.token_blacklist',
-    'drf_yasg'
+    'drf_yasg',
 ]
 
 if DEBUG and not PRODUCTION:
@@ -103,11 +104,9 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            'hosts': [f'redis://:{config("REDIS_PASSWORD")}@{config("REDIS_HOST")}:{config("REDIS_PORT")}/0'],
+            'hosts': [f'redis://:{vault_client.get_redis_vars("password")}@{vault_client.get_redis_vars("host")}:{vault_client.get_redis_vars("port")}/0'],
             'capacity': 1500,
             'expiry': 5,
-            # 'hosts': [(config('REDIS_HOST'), config('REDIS_PORT', default=6379))],
-            # 'password': config('REDIS_PASSWORD', default=None),
         },
     },
 }
@@ -163,10 +162,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': config('POSTGRES_DB'),
-        'USER': config('POSTGRES_USER'),
-        'PASSWORD': config('POSTGRES_PASSWORD'),
-        'HOST': config('POSTGRES_HOST', default='db'),
-        'PORT': config('POSTGRES_PORT', default='5432'),
+        'USER': vault_client.get_db_vars("username"), #TODO: See this later
+        'PASSWORD': vault_client.get_db_vars("password"), #TODO: See this later
+        'HOST': vault_client.get_db_vars("host"), #TODO: See this later
+        'PORT': vault_client.get_db_vars("port"), #TODO: See this later
     }
 }
 
@@ -216,11 +215,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Email settings
 EMAIL_BACKEND = config('EMAIL_BACKEND', default='django.core.mail.backends.smtp.EmailBackend')
-EMAIL_HOST = config('EMAIL_HOST', default='smtp.gmail.com')
-EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
+EMAIL_HOST = vault_client.get_email_vars("host") #TODO: See this later
+EMAIL_PORT = vault_client.get_email_vars("port") #TODO: See this later
 EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=True, cast=bool)
-EMAIL_HOST_USER = config('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+EMAIL_HOST_USER = vault_client.get_email_vars("username") #TODO: See this later
+EMAIL_HOST_PASSWORD = vault_client.get_email_vars("password") #TODO: See this later
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')
 
 ADMIN_USER_NAME = config('ADMIN_USER_NAME', default='admin')
@@ -235,9 +234,9 @@ if all([ADMIN_USER_NAME, ADMIN_EMAIL]):
 MANAGERS = ADMINS
 
 #OAuth
-OAUTH_42_CLIENT_ID = config('OAUTH_42_CLIENT_ID')
-OAUTH_42_CLIENT_SECRET = config('OAUTH_42_CLIENT_SECRET')
-OAUTH_42_REDIRECT_URI = config('OAUTH_42_REDIRECT_URI')
+OAUTH_42_CLIENT_ID = vault_client.get_42_vars("client_id")
+OAUTH_42_CLIENT_SECRET = vault_client.get_42_vars("client_secret")
+OAUTH_42_REDIRECT_URI = vault_client.get_42_vars("redirect_uri")
 
 LOGGING = {
     'version': 1,
@@ -263,11 +262,10 @@ LOGGING = {
 }
 
 # Media settings
-import os
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
-import os
+
 if not os.path.exists(MEDIA_ROOT):
     os.makedirs(MEDIA_ROOT)
     os.makedirs(os.path.join(MEDIA_ROOT, 'avatars'), exist_ok=True)
