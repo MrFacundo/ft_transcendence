@@ -38,24 +38,6 @@ pong-offline, pong-remote, pong-ai {
 		cursor: not-allowed;
 	}
 
-	#playAgainButton {
-		position: absolute;
-		bottom: 30px;
-		left: 50%;
-		transform: translateX(-50%);
-		padding: 10px 20px;
-		color: white;
-		border: none;
-		border-radius: 4px;
-		cursor: pointer;
-		font-size: 16px;
-	}
-
-	#playAgainButton:disabled {
-		background-color: #cccccc;
-		cursor: not-allowed;
-	}
-
 	#scoreboard , #side1Username, #side2Username {
 		color: #f1f1f1;
 		font-size: 24px;
