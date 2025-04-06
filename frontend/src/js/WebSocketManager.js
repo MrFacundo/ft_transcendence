@@ -155,7 +155,7 @@ export class WebSocketManager {
     handleTournamentGameOverMessage(data, currentPage, stateManager) {
         stateManager.updateState('currentTournament', data.tournament);
         if (currentPage.name === "game") {
-            this.app.navigate("/tournament");
+            setTimeout(() => this.app.navigate("/tournament"), 3000);
         }
     }
 
