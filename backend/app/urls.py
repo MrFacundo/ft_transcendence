@@ -13,7 +13,7 @@ from app.views import ProtectedMediaView
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
-
+from django.shortcuts import redirect
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -27,22 +27,29 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
-    path('swagger<format>/', schema_view.without_ui(cache_timeout=0), name='schema-json'),
-    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-    path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
-    # Admin
-    path('admin/', admin.site.urls),
+    path('api/', lambda request: redirect('schema-swagger-ui', permanent=False)),
+    path('api/swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    path('api/swagger<format>/', schema_view.without_ui(cache_timeout=0), name='schema-json'),
+    path('api/redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
 
+    # Admin
+    path('api/admin/', admin.site.urls),
+
+    # App URLs
     path('api/', include('app.users.urls')),
     path('api/', include('app.auth.urls')),
     path('api/', include('app.games.urls')),
     path('api/', include('app.tournaments.urls')),
 
-    # Profiling (Django Silk)
-    path('silk/', include('silk.urls', namespace='silk')),
+    path('api/silk/', include('silk.urls', namespace='silk')),
 ]
 
-# Handle media files
+if not settings.DEBUG:
+    urlpatterns += static('/api' + settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+else:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+
+
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 elif settings.PRODUCTION:
