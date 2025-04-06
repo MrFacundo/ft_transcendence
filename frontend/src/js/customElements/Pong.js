@@ -11,7 +11,6 @@ class Pong extends BaseElement {
   init() {
     this.innerHTML = "";
     this.setCanvas();
-    this.setRandomBackground();
     this.setUIElements();
     this.setGameState();
   }
@@ -62,13 +61,15 @@ class Pong extends BaseElement {
     this.readyButton.textContent = "Ready to Play";
 
     this.winnerDisplay = this.createElement("game-winner");
+    this.flawlessVictory = this.createElement("flawless-victory");
 
     this.append(
       this.canvas,
       this.scoreboard,
       this.userContainer,
       this.readyButton,
-      this.winnerDisplay
+      this.winnerDisplay,
+      this.flawlessVictory
     );
   }
 
@@ -94,6 +95,7 @@ class Pong extends BaseElement {
   }
 
   setAvatars = async (player1, player2) => {
+    if (!this.page) return;
     const { api } = this.page.app;
 
     const setAvatar = async (id, user) => {
@@ -114,12 +116,24 @@ class Pong extends BaseElement {
     ]);
   };
 
-  startGame() {
-    this.playerScore = this.opponentScore = 0;
-    this.winnerDisplay.textContent = "";
+  startGame(gameId = null, player1 = null, player2 = null) {
+    this.playerScore = 0;
+    this.opponentScore = 0;
     this.updateScoreDisplay();
+    this.updateInfoUI(gameId, player1, player2);
+    this.winnerDisplay.textContent = "";
     this.gameOver = false;
     this.page?.app.stateManager.updateState("currentGame", true);
+    this.readyButton.style.display = "none";
+    this.addEventListeners();
+  }
+
+  updateInfoUI(gameId = null, player1 = null, player2 = null) {
+    this.setRandomBackground(gameId);
+    if (player1 && player2) {
+      this.setSideUsernames(player1.username, player2.username);
+      this.setAvatars(player1, player2);
+    }
   }
 
   displayResult(scorePlayer1, scorePlayer2, winnerUsername, status = null) {
@@ -127,13 +141,14 @@ class Pong extends BaseElement {
     this.opponentScore = scorePlayer2;
     this.updateScoreDisplay();
 
-    this.winnerDisplay.textContent = status === "interrupted" ? "Pong interrupted" : `${winnerUsername} wins!`;
+    this.winnerDisplay.textContent = status === "interrupted" ? "Pong interrupted" : `${winnerUsername} wins`;
+
+    if ((this.playerScore === 0 || this.opponentScore === 0) && status !== "interrupted") {
+      setTimeout(() => this.flawlessVictory.textContent = "Flawless victory", 1000);
+    }
 
     [this.readyButton, this.ball, this.paddels?.left, this.paddels?.right]
       .forEach(el => el?.style && (el.style.display = "none"));
-  }
-
-  addEventListeners() {
   }
 
   cleanup() {
@@ -142,7 +157,6 @@ class Pong extends BaseElement {
   }
 
   connectedCallback() {
-    this.addEventListeners();
   }
 
   disconnectedCallback() {

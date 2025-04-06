@@ -1,4 +1,25 @@
 services:
+  reverse-proxy:
+    container_name: reverse_proxy
+    image: nginx:latest
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./reverse_proxy/nginx.conf:/etc/nginx/nginx.conf
+      - ./reverse_proxy/certs:/etc/nginx/ssl
+      - ./frontend/src/static:/usr/src/app/frontend_static/static
+      - ./backend/static:/usr/src/app/backend_static/static
+    networks:
+      - backend-network
+    depends_on:
+      backend: 
+        condition: service_healthy
+      frontend:
+        condition: service_started
+      waf:
+        condition: service_started
   frontend:
     container_name: transcendence_front
     build:
@@ -6,15 +27,18 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./frontend:/usr/src/app
-    ports:
-      - "8080:8080"
+    expose:
+      - 8080
     restart: unless-stopped
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
     env_file:
       - .env
     environment:
       - NODE_ENV=${NODE_ENV}
+    networks:
+      - backend-network
   backend:
     container_name: transcendence_back
     build:
@@ -22,10 +46,15 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./backend:/usr/src/app
-    ports:
-      - "8000:8000"
+    expose:
+      - 8000
     networks:
       - backend-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/ht/"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
     depends_on:
       db:
         condition: service_healthy
@@ -47,8 +76,8 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_HOST: ${POSTGRES_HOST}
       POSTGRES_PORT: ${POSTGRES_PORT}
-    ports:
-      - "5432:5432"
+    expose:
+      - 5432
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
@@ -64,20 +93,22 @@ services:
       - backend-network
     command: redis-server --requirepass ${REDIS_PASSWORD}
     healthcheck:
-      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
+      test: [ "CMD", "redis-cli", "ping" ]
     volumes:
       - cache_data:/data
     restart: unless-stopped
   waf:
     container_name: modecurity_waf
-    build:
-      context: ./modsecurity_waf
-      dockerfile: Dockerfile
+    image: bit3/nginx-waf:latest
     platform: linux/amd64
-    ports:
-      - "8081:8081" # WAF exposed to the client
+    expose:
+      - 8081
+    volumes:
+      - ./modsecurity_waf/nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./modsecurity_waf/crs-setup.conf:/usr/local/owasp-modsecurity-crs-3.2.0/crs-setup.conf
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
     networks:
       - backend-network
   blockchain:
@@ -96,15 +127,15 @@ services:
         GANACHE_PORT: ${GANACHE_PORT}
       dockerfile: Dockerfile
     image: blockchain:local
-    ports:
-      - "8545:8545"
+    expose:
+      - 8545
     volumes:
       - ./blockchain:/usr/src/app:delegated
     networks:
       - backend-network
     depends_on:
-      backend:
-        condition: service_started
+      db:
+        condition: service_healthy
     env_file:
       - .env
 

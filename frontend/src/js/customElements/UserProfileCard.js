@@ -71,7 +71,7 @@ class UserProfileCard extends BaseElement {
             .profile-avatar {
                 border-radius: 50%;
                 object-fit: cover;
-                border: 1px solid #dee2e6;
+                border: 2px solid #dee2e6;
                 cursor: pointer;
                 box-shadow: 0 3px 6px rgba(0, 0, 0, 0.40), 0 3px 6px rgba(0, 0, 0, 0.50);
             }

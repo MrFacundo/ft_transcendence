@@ -98,8 +98,8 @@ The following commands are available in the Makefile:
 
 ### Accessing the Applications
 
-- Frontend: http://localhost:8080
-- Django Admin: http://localhost:8000/admin/
-- Silk Profiling: http://localhost:8000/silk/
-- Swagger: http://localhost:8000/swagger/
-- Redoc: http://localhost:8000/redoc/
+- Frontend: https://localhost
+- Django Admin: https://localhost/api/admin/
+- Silk Profiling: https://localhost/api/silk/
+- Swagger: https://localhost/api/swagger/
+- Redoc: https://localhost/api/redoc/

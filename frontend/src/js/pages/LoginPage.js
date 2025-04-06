@@ -26,7 +26,8 @@ class LoginPage extends Page {
             } catch (error) {
                 if (error.response) {
                     if (error.response.status === 401) {
-                        form.showFormError("Invalid email or password");
+                        const errorMessage = error.response.data.detail;
+                        form.showFormError(errorMessage);
                     } else {
                         form.showFormError("An error ocurred, please try again later.");
                     }
