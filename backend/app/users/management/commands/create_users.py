@@ -12,10 +12,6 @@ class Command(BaseCommand):
     help = "Create 10 users"
 
     def handle(self, *args, **kwargs):
-        if CustomUser.objects.count() >=10:
-            self.stdout.write(self.style.WARNING("Users already exist. Exiting script."))
-            return
-
         fake = Faker()
         number_of_users = 10
 
