@@ -146,12 +146,8 @@ class UserSettingsPage extends Page {
     }
     
     handleUpdateError(error) {
-        const errorMessage = error.response?.data?.[Object.keys(error.response.data)[0]]?.[0];
-        showMessage(
-            capitalizeFirstLetter(errorMessage) || 
-            "An error occurred while updating the settings.", 
-            "error"
-        );
+        const errorMessage = error.response?.data?.error || error.response?.data?.[Object.keys(error.response.data)[0]]?.[0] || "An error occurred while updating the settings.";
+        showMessage(capitalizeFirstLetter(errorMessage), "error");
     }
     
     updateUserAndRefresh(updatedUser, successMessage) {
