@@ -18,3 +18,4 @@ django-crontab
 drf_yasg
 py-avataaars
 cairosvg
+django-health-check

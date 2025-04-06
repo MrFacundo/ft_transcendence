@@ -87,7 +87,15 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',
     'drf_yasg',
     'silk',
+    'health_check',
+    'health_check.db',
+    'health_check.contrib.migrations',
 ]
+
+HEALTH_CHECK = {
+    'DISK_USAGE_MAX': 90,  # percent
+    'MEMORY_MIN': 100,    # in MB
+}
 
 ASGI_APPLICATION = 'app.asgi.application'
 
