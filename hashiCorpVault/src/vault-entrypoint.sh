@@ -22,26 +22,26 @@ vault kv put secret/database \
     password=${POSTGRES_PASSWORD} \
     db_url=${DATABASE_URL} \
 
-vault secrets enable database
+# vault secrets enable database
 
-vault write database/config/postgresql \
-    plugin_name=postgresql-database-plugin \
-    connection_url="postgresql://{{username}}:{{password}}@${POSTGRES_HOST}:5432/transcendence?sslmode=disable" \
-    allowed_roles="myrole" \
-    username=${POSTGRES_USER} \
-    password=${POSTGRES_PASSWORD}
+# vault write database/config/postgresql \
+#     plugin_name=postgresql-database-plugin \
+#     connection_url="postgresql://{{username}}:{{password}}@${POSTGRES_HOST}:5432/transcendence?sslmode=disable" \
+#     allowed_roles="myrole" \
+#     username=${POSTGRES_USER} \
+#     password=${POSTGRES_PASSWORD}
 
-vault write database/roles/myrole \
-    db_name=postgresql \
-    creation_statements="
-    CREATE ROLE \"{{name}}\" WITH LOGIN PASSWORD '{{password}}';
-    GRANT CONNECT ON DATABASE ${POSTGRES_DB} TO \"{{name}}\";
-    GRANT USAGE ON SCHEMA public TO \"{{name}}\";
-    GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO \"{{name}}\";
-    GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO \"{{name}}\";
-    " \
-    default_ttl="1h" \
-    max_ttl="24h"
+# vault write database/roles/myrole \
+#     db_name=postgresql \
+#     creation_statements="
+#     CREATE ROLE \"{{name}}\" WITH LOGIN PASSWORD '{{password}}';
+#     GRANT CONNECT ON DATABASE ${POSTGRES_DB} TO \"{{name}}\";
+#     GRANT USAGE ON SCHEMA public TO \"{{name}}\";
+#     GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO \"{{name}}\";
+#     GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO \"{{name}}\";
+#     " \
+#     default_ttl="1h" \
+#     max_ttl="24h"
 
 # 42Oauth
 vault kv put secret/42oauth \

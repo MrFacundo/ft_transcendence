@@ -29,16 +29,18 @@ class VaultClient:
 
     def get_db_vars(self, var):
         secret = self.client.secrets.kv.read_secret_version(path="database")
-        credentials = self.client.secrets.database.generate_credentials('myrole')
+        #credentials = self.client.secrets.database.generate_credentials('myrole')
 
         if var == "host":
             return secret['data']['data']['host']
         elif var == "port":
             return secret['data']['data']['port']
         elif var == "username":
-            return credentials['data']['username']
+            #return credentials['data']['username']
+            return secret['data']['data']['username']
         elif var == "password":
-            return credentials['data']['password']
+            # return credentials['data']['password']
+            return secret['data']['data']['password']
         elif var == "db_url":
             return secret['data']['data']['db_url']
         else:
