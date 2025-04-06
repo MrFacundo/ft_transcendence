@@ -10,6 +10,7 @@ class UserList extends BaseElement {
     this.itemHeight = 104;
     this.buffer = 1;
     this.visibleCount = 0;
+    this.userCardCache = new Map(); // Cache for user cards
     this.handleScroll = this.handleScroll.bind(this);
     this._pageSetCallback = () => {
       this.unsubscribe = this.page.app.stateManager.subscribe(
@@ -86,6 +87,7 @@ class UserList extends BaseElement {
   }
 
   removeUser(userId) {
+    this.userCardCache.delete(userId);
     this.setState({
       users: this.state.users.filter((user) => user.id !== userId),
     });
@@ -97,6 +99,11 @@ class UserList extends BaseElement {
         user.id === updatedUser.id ? updatedUser : user,
       ),
     });
+    
+    const cachedCard = this.userCardCache.get(updatedUser.id);
+    if (cachedCard) {
+      cachedCard.setState({ user: updatedUser });
+    }
   }
 
   setState(newState) {
@@ -112,18 +119,20 @@ class UserList extends BaseElement {
       Math.floor(scrollTop / this.itemHeight) - this.buffer,
     );
 
-    this.render(startIndex);
+    this.updateVisibleItems(startIndex);
   }
 
-  render(startIndex = 0) {
+  updateVisibleItems(startIndex = 0) {
     const scrollContainer = this.shadowRoot.querySelector(".scroll-container");
     const listGroup = this.shadowRoot.querySelector(".list-group");
     const spacer = this.shadowRoot.querySelector(".spacer");
     const users = this.state.users;
-    const containerHeight = scrollContainer.clientHeight;
-    this.visibleCount =
-      Math.ceil(containerHeight / this.itemHeight) + this.buffer * 2;
+    
     spacer.style.height = `${users.length * this.itemHeight}px`;
+    
+    const containerHeight = scrollContainer.clientHeight;
+    this.visibleCount = Math.ceil(containerHeight / this.itemHeight) + this.buffer * 2;
+    
     if (!this.renderPool) {
       this.renderPool = [];
       for (let i = 0; i < this.visibleCount; i++) {
@@ -137,6 +146,7 @@ class UserList extends BaseElement {
     for (let i = 0; i < this.renderPool.length; i++) {
       const listItem = this.renderPool[i];
       const userIndex = startIndex + i;
+      
       if (userIndex >= users.length) {
         listItem.style.display = "none";
         continue;
@@ -146,46 +156,18 @@ class UserList extends BaseElement {
       listItem.style.display = "block";
       listItem.style.top = `${userIndex * this.itemHeight}px`;
 
-      let existingCard = listItem.querySelector("user-profile-small");
-      if (!existingCard) {
+      let userCard = listItem.querySelector("user-profile-small");
+      
+      if (!userCard || userCard.getAttribute("data-user-id") !== user.id.toString()) {
+        userCard = this.userCardCache.get(user.id);
+        
+        if (!userCard) {
+          userCard = this.createUserCard(user);
+          this.userCardCache.set(user.id, userCard);
+        }
+        
         listItem.innerHTML = "";
-        existingCard = this.createUserCard(user);
-        listItem.appendChild(existingCard);
-      } else if (existingCard.state?.user?.id !== user.id) {
-        existingCard.setState({ user });
-        existingCard.setAttribute("data-user-id", user.id);
-
-        const isPending =
-          user.game_invite?.expires_at ||
-          user.friendship?.status === "pending" ||
-          user.isPending;
-        if (isPending) {
-          existingCard.appendPendingButton(user.game_invite?.expires_at);
-        }
-
-        const profileContainer =
-          existingCard.shadowRoot.querySelector(".profile-container");
-        if (user.id === this.selectedUserId) {
-          profileContainer?.classList.add("selected");
-        } else {
-          profileContainer?.classList.remove("selected");
-        }
-
-        existingCard.onclick = () => {
-          this.actionButton?.classList.add("d-none");
-          this.selectedUserId = user.id;
-          this.selectedUserCard?.setState({ user });
-          this.updateSelectedStyles();
-          if (
-            this.actionButton &&
-            (this.actionText === "Accept" || !isPending)
-          ) {
-            this.actionButton.classList.remove("d-none");
-            this.actionButton.textContent = this.actionText;
-            this.actionButton.onclick = () =>
-              this.actionCallback?.(user, existingCard);
-          }
-        };
+        listItem.appendChild(userCard);
       }
     }
   }
@@ -200,7 +182,9 @@ class UserList extends BaseElement {
       user.game_invite?.expires_at ||
       user.friendship?.status === "pending" ||
       user.isPending;
+    
     if (isPending) userCardSm.appendPendingButton(user.game_invite?.expires_at);
+    
     if (user.id === this.selectedUserId) {
       userCardSm.shadowRoot
         .querySelector(".profile-container")
@@ -255,7 +239,7 @@ class UserList extends BaseElement {
                 top: 0;
                 left: 0;
                 right: 0;
-                margin: 0; /* remove default list margin/padding if needed */
+                margin: 0;
                 padding: 0;
                 list-style: none;
             }
@@ -292,4 +276,3 @@ class UserList extends BaseElement {
 if (!customElements.get("user-list")) {
   customElements.define("user-list", UserList);
 }
-
