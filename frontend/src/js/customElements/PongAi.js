@@ -53,7 +53,10 @@ class PongAi extends Pong {
     this.resetBall();
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     const diff = difficulty ? difficulty.toLowerCase() : "easy";
-    this.setSideUsernames(this.page.app.auth.user.username, "AI" + (difficulty ? ` (${difficulty})` : ""));
+    this.setSideUsernames(
+      this.page.app.auth.user.username,
+      "AI" + (difficulty ? ` (${difficulty})` : "")
+    );
     this.setAvatars(this.page.app.auth.user, { username: "AI" });
     if (diff === "hard") {
       this.aiPaddle.speed = 4;
@@ -281,9 +284,12 @@ class PongAi extends Pong {
 
   endGame() {
     this.cleanup();
-    const winnerText = this.playerScore > this.opponentScore ? this.page.app.auth.user.username : "AI";
+    const winnerText =
+      this.playerScore > this.opponentScore
+        ? this.page.app.auth.user.username
+        : "AI";
     this.displayResult(this.playerScore, this.opponentScore, winnerText);
-    this.dispatchEvent(new CustomEvent("gameOver", { bubbles: true}));
+    this.dispatchEvent(new CustomEvent("gameOver", { bubbles: true }));
   }
 
   cleanup() {
@@ -295,11 +301,11 @@ class PongAi extends Pong {
   }
 
   handleKeyDown(e) {
-    this.keys[e.key.toLowerCase()] = true;
+    if (e.key) this.keys[e.key.toLowerCase()] = true;
   }
 
   handleKeyUp(e) {
-    this.keys[e.key.toLowerCase()] = false;
+    if (e.key) this.keys[e.key.toLowerCase()] = false;
   }
 
   addEventListeners() {
