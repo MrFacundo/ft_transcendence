@@ -5,6 +5,7 @@ from django.db import transaction
 
 from rest_framework.generics import ListAPIView, CreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated, BasePermission
+from rest_framework.exceptions import  APIException
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response

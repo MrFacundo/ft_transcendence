@@ -61,13 +61,15 @@ class Pong extends BaseElement {
     this.readyButton.textContent = "Ready to Play";
 
     this.winnerDisplay = this.createElement("game-winner");
+    this.flawlessVictory = this.createElement("flawless-victory");
 
     this.append(
       this.canvas,
       this.scoreboard,
       this.userContainer,
       this.readyButton,
-      this.winnerDisplay
+      this.winnerDisplay,
+      this.flawlessVictory
     );
   }
 
@@ -140,6 +142,10 @@ class Pong extends BaseElement {
     this.updateScoreDisplay();
 
     this.winnerDisplay.textContent = status === "interrupted" ? "Pong interrupted" : `${winnerUsername} wins!`;
+
+    if ((this.playerScore === 0 || this.opponentScore === 0) && status !== "interrupted") {
+      setTimeout(() => this.flawlessVictory.textContent = "Flawless victory", 1000);
+    }
 
     [this.readyButton, this.ball, this.paddels?.left, this.paddels?.right]
       .forEach(el => el?.style && (el.style.display = "none"));
