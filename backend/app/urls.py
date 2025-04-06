@@ -42,6 +42,7 @@ urlpatterns = [
     path('api/', include('app.tournaments.urls')),
 
     path('api/silk/', include('silk.urls', namespace='silk')),
+    path('api/ht/', include('health_check.urls')),
 ]
 
 if not settings.DEBUG:

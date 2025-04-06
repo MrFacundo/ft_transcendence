@@ -141,7 +141,7 @@ class Pong extends BaseElement {
     this.opponentScore = scorePlayer2;
     this.updateScoreDisplay();
 
-    this.winnerDisplay.textContent = status === "interrupted" ? "Pong interrupted" : `${winnerUsername} wins!`;
+    this.winnerDisplay.textContent = status === "interrupted" ? "Pong interrupted" : `${winnerUsername} wins`;
 
     if ((this.playerScore === 0 || this.opponentScore === 0) && status !== "interrupted") {
       setTimeout(() => this.flawlessVictory.textContent = "Flawless victory", 1000);
