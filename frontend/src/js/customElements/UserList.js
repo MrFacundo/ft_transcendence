@@ -167,7 +167,7 @@ class UserList extends BaseElement {
         <style>
             :host {
                 display: block;
-                height: 400px;
+                height: 420px;
             }
 
             .scroll-container {

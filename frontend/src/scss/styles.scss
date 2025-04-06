@@ -131,6 +131,13 @@ body {
     }
 }
 
+#deleteAccountModal {
+    .modal-content {
+        background: $background-dark;
+        color: $white;
+    }
+}
+
 button {
     background-color: $button-bg !important;
     border: $background-dark solid 2px !important;
