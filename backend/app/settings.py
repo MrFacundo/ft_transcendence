@@ -33,8 +33,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DEBUG = config('DEBUG', default=True, cast=bool)
 PRODUCTION = not DEBUG
 
-#ALLOWED_HOSTS = ["localhost", "127.0.0.1", "172.22.0.1"]
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost').split(',')
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "172.22.0.1", "waf"]
 
 PASSWORD_HASHERS = [
     "django.contrib.auth.hashers.PBKDF2PasswordHasher",
@@ -93,10 +92,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework_simplejwt.token_blacklist',
     'drf_yasg',
+    'silk',
 ]
-
-if DEBUG and not PRODUCTION:
-    INSTALLED_APPS.append('silk')
 
 ASGI_APPLICATION = 'app.asgi.application'
 
@@ -120,19 +117,26 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'silk.middleware.SilkyMiddleware',
 ]
 
-if DEBUG and not PRODUCTION:
-    MIDDLEWARE.append('silk.middleware.SilkyMiddleware')
+# if DEBUG and not PRODUCTION:
+    # MIDDLEWARE.append('silk.middleware.SilkyMiddleware')
 
-FRONTEND_URL = "http://localhost:8080"
-WAF_URL = "http://localhost:8081"
+
+LOCALHOST = "https://localhost"
 
 CORS_ALLOWED_ORIGINS = [
-    FRONTEND_URL,
+    LOCALHOST
 ]
 
 CORS_ALLOW_CREDENTIALS = True
+
+CSRF_TRUSTED_ORIGINS = [
+    LOCALHOST
+]
+
+FRONTEND_URL = LOCALHOST
 
 ROOT_URLCONF = 'app.urls'
 
@@ -206,8 +210,6 @@ APPEND_SLASH=False
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
-
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
@@ -222,8 +224,9 @@ EMAIL_HOST_USER = vault_client.get_email_vars("username") #TODO: See this later
 EMAIL_HOST_PASSWORD = vault_client.get_email_vars("password") #TODO: See this later
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL')
 
-ADMIN_USER_NAME = config('ADMIN_USER_NAME', default='admin')
-ADMIN_EMAIL = config('ADMIN_EMAIL', default='')
+ADMIN_USER_NAME = config('DJANGO_SUPERUSER_USERNAME', default='admin')
+ADMIN_EMAIL = config('DJANGO_SUPERUSER_EMAIL', default='admin@admin.com')
+ADMIN_PASSWORD = config('DJANGO_SUPERUSER_PASSWORD', default='admin')
 
 MANAGERS = []
 ADMINS = []
@@ -265,7 +268,11 @@ LOGGING = {
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
 
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_URL = '/static/'
 
 if not os.path.exists(MEDIA_ROOT):
     os.makedirs(MEDIA_ROOT)
     os.makedirs(os.path.join(MEDIA_ROOT, 'avatars'), exist_ok=True)
+    
+    

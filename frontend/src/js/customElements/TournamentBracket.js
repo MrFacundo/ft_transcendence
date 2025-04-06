@@ -139,13 +139,16 @@ class TournamentBracket extends BaseElement {
     renderWinner() {
         const { tournament } = this.state;
         if (!tournament?.final_game?.winner) return;
-
+    
         const { final_game } = tournament;
         const headerEl = this.shadowRoot.querySelector(".header h3");
-        const winnerUsername = final_game.winner === final_game.player1.id ? 
-            final_game.player1.username : 
-            final_game.player2.username;
-        headerEl.textContent = `${winnerUsername} wins`;
+        const winnerUsername = final_game.winner === final_game.player1.id 
+            ? final_game.player1.username 
+            : final_game.player2.username;
+    
+        headerEl.textContent = this.page.app.auth.user?.id === final_game.winner
+            ? "You are the ultimate pong champion"
+            : `${winnerUsername} is the ultimate pong champion`;
     }
 
     handleStartButtonClick = () => {
@@ -193,7 +196,7 @@ class TournamentBracket extends BaseElement {
             }
 
             .header h3 {
-                font-size: 2.5em;
+                font-size: 2em;
                 margin: 0;
                 font-family: "CustomFont", sans-serif;
 	            text-transform: uppercase;

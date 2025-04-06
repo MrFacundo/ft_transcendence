@@ -24,7 +24,9 @@ class Navbar extends BaseElement {
 
         if (this.state.authenticated) {
             const { user } = this.state;
-            profileEl.querySelector("img").src = user.avatarUrl || settings.EMPTY_AVATAR_URL;
+            const avatarImg = profileEl.querySelector("img");
+            avatarImg.src = user.avatarUrl;
+            avatarImg.title = user.username; 
             profileEl.setAttribute("data-href", `/profile/${user.id}`);
             this.setDisplay([loginEl, registerEl], "none");
             this.setDisplay([settingsEl, logoutEl], "flex");

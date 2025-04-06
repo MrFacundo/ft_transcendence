@@ -75,10 +75,10 @@ export class WebSocketManager {
     async handleGameInvitationMessage(event) {
         const data = JSON.parse(event.data);
         if (data.type === "game_accepted") {
-            if (this.app.stateManager.currentGame) return;
+            if (this.app.stateManager.state.currentGame) return;
             this.app.navigate(data.game_url);
         } else if (data.type === "game_invited") {
-            if (this.app.stateManager.currentGame) return;
+            if (this.app.stateManager.state.currentGame) return;
             if (confirm(`You have been challenged by ${data.invitation.sender.username}. Do you accept?`)) {
                 try {
                     const response = await this.app.api.gameAccept(data.invitation.id);
@@ -155,7 +155,7 @@ export class WebSocketManager {
     handleTournamentGameOverMessage(data, currentPage, stateManager) {
         stateManager.updateState('currentTournament', data.tournament);
         if (currentPage.name === "game") {
-            this.app.navigate("/tournament");
+            setTimeout(() => this.app.navigate("/tournament"), 3000);
         }
     }
 
