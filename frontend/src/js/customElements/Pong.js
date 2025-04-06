@@ -122,6 +122,7 @@ class Pong extends BaseElement {
     this.updateScoreDisplay();
     this.updateInfoUI(gameId, player1, player2);
     this.winnerDisplay.textContent = "";
+    this.flawlessVictory.textContent = "";
     this.gameOver = false;
     this.page?.app.stateManager.updateState("currentGame", true);
     this.readyButton.style.display = "none";
