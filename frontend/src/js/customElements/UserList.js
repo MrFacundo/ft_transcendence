@@ -109,22 +109,38 @@ class UserList extends BaseElement {
         const scrollContainer = this.shadowRoot.querySelector('.scroll-container');
         const listGroup = this.shadowRoot.querySelector(".list-group");
         const spacer = this.shadowRoot.querySelector(".spacer");
-
         const users = this.state.users;
         const containerHeight = scrollContainer.clientHeight;
-
         this.visibleCount = Math.ceil(containerHeight / this.itemHeight) + this.buffer * 2;
-
-        listGroup.innerHTML = '';
         spacer.style.height = `${users.length * this.itemHeight}px`;
-        const endIndex = Math.min(startIndex + this.visibleCount, users.length);
-        for (let i = startIndex; i < endIndex; i++) {
-            const user = users[i];
-            const listItem = document.createElement("li");
-            listItem.className = "list-group-item";
-            listItem.style.top = `${i * this.itemHeight}px`;
-            listItem.appendChild(this.createUserCard(user));
-            listGroup.appendChild(listItem);
+
+        if (!this.renderPool) {
+            this.renderPool = [];
+            for (let i = 0; i < this.visibleCount; i++) {
+                const listItem = document.createElement("li");
+                listItem.className = "list-group-item";
+                listGroup.appendChild(listItem);
+                this.renderPool.push(listItem);
+            }
+        }
+    
+        for (let i = 0; i < this.renderPool.length; i++) {
+            const listItem = this.renderPool[i];
+            const userIndex = startIndex + i;
+            if (userIndex >= users.length) {
+                listItem.style.display = "none";
+                continue;
+            }
+    
+            const user = users[userIndex];
+            listItem.style.display = "block";
+            listItem.style.top = `${userIndex * this.itemHeight}px`;
+    
+            const existingCard = listItem.querySelector("user-profile-small");
+            if (existingCard?.state?.user?.id !== user.id) {
+                listItem.innerHTML = "";
+                listItem.appendChild(this.createUserCard(user));
+            }
         }
     }
 
