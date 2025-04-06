@@ -5,14 +5,30 @@ class PongOffline extends Pong {
     super();
   }
     
-  init() {
+  init(retried = false) {
+    const app = this.page?.app;
+  
+    if (!app) {
+      if (retried) {
+        console.warn("PongOffline: page is still not ready after retry.");
+        return;
+      }
+  
+      return setTimeout(() => this.init(true), 0);
+    }
     super.init();
     this.setGameState();
-    this.updateInfoUI(null, "player 1", "player 2");
-    this.readyButton.addEventListener("click", () => {
-      this.startGame(null, "player 1", "player 2");
+  
+    this.player1 = app.auth?.user ?? { username: "Player 1", id: null };
+    this.player2 = { username: "Player 2", id: null };
+    this.updateInfoUI(null, this.player1, this.player2);
+  
+    this.boundStartGame = () => {
+      this.startGame(null, this.player1, this.player2);
       this.gameLoop();
-    });
+    };
+  
+    this.readyButton.addEventListener("click", this.boundStartGame);
   }
 
   setGameState() {
@@ -215,7 +231,11 @@ class PongOffline extends Pong {
 
   endGame() {
     this.cancelAnimationIfNeeded();
-    const winner = this.playerScore >= 3 ? "Player 1" : "Player 2";
+    const winner =
+    this.playerScore >= 3 
+      ? this.player1?.username || "Player 1"
+      : this.player2?.username || "Player 2";
+  
     this.clearCanvas();
     this.displayResult(this.playerScore, this.opponentScore, winner);
     this.readyButton.textContent = "Play Again";
