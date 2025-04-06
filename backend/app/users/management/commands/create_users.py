@@ -2,9 +2,12 @@ from django.core.management.base import BaseCommand
 from app.users.models import CustomUser
 from faker import Faker
 import random
-import requests
 from django.core.files.base import ContentFile
 from io import BytesIO
+import cairosvg
+import py_avataaars as pa
+import random
+
 class Command(BaseCommand):
     help = "Create 10 users"
 
@@ -33,17 +36,36 @@ class Command(BaseCommand):
                 email_is_verified=True
             )
 
-            self.stdout.write(self.style.NOTICE(f"User {username} created. Downloading avatar..."))
+            self.stdout.write(self.style.NOTICE(f"User {username} created. Generating avatar..."))
 
-            image_url = fake.image_url()
-            response = requests.get(image_url)
-            if response.status_code == 200:
-                image_name = f"{username}.jpg"
-                user.avatar_upload.save(image_name, ContentFile(response.content), save=True)
-                self.stdout.write(self.style.NOTICE(f"Avatar for {username} saved as {image_name}"))
-            else:
-                self.stdout.write(self.style.WARNING(f"Failed to download avatar for {username}"))
+            avatar = pa.PyAvataaar(
+                style=random.choice(list(pa.AvatarStyle)),
+                skin_color=random.choice(list(pa.SkinColor)),
+                hair_color=random.choice(list(pa.HairColor)),
+                facial_hair_type=random.choice(list(pa.FacialHairType)),
+                facial_hair_color=random.choice(list(pa.HairColor)),
+                top_type=random.choice(list(pa.TopType)),
+                hat_color=random.choice(list(pa.Color)),
+                mouth_type=random.choice(list(pa.MouthType)),
+                eye_type=random.choice(list(pa.EyesType)),
+                eyebrow_type=random.choice(list(pa.EyebrowType)),
+                nose_type=random.choice(list(pa.NoseType)),
+                accessories_type=random.choice(list(pa.AccessoriesType)),
+                clothe_type=random.choice(list(pa.ClotheType)),
+                clothe_color=random.choice(list(pa.Color)),
+                clothe_graphic_type=random.choice(list(pa.ClotheGraphicType)),
+            )
 
-            self.stdout.write(self.style.SUCCESS(f"Successfully created user: {username}, Password: pass"))
+            svg_str = avatar.render_svg()
+            svg_io = BytesIO(svg_str.encode("utf-8"))
+            svg_io.seek(0)
+            png_io = BytesIO()
+            cairosvg.svg2png(bytestring=svg_io.read(), write_to=png_io)
+            png_io.seek(0)
+
+            image_name = f"{username}.png"
+            user.avatar_upload.save(image_name, ContentFile(png_io.read()), save=True)
+
+            self.stdout.write(self.style.SUCCESS(f"User created: {username}, Password: pass"))
 
         self.stdout.write(self.style.SUCCESS("User creation process completed."))
