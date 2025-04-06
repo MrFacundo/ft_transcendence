@@ -30,6 +30,7 @@ module.exports = (env, argv) => {
       historyApiFallback: true,
       hot: !isProduction,
       compress: isProduction,
+      webSocketServer: false,
       client: {
         logging: isProduction ? 'error' : 'info',
         overlay: true,
