@@ -1,51 +1,85 @@
 import { settings } from "../settings.js";
-import { getAvatarSrc } from "../utils.js";
+import { getCachedAvatarSrc } from "../utils.js";
 import BaseElement from "./BaseElement.js";
 
 class UserProfileCardSm extends BaseElement {
-    constructor() {
-        super().attachShadow({ mode: "open" });
-        this.setupTemplate();
-        this.state = { user: null };
+  constructor() {
+    super().attachShadow({ mode: "open" });
+    this.setupTemplate();
+    this.state = { user: null };
+    this._lastUserId = null;
+    this._lastAvatarUrl = null;
+  }
+
+  async render() {
+    const user = this.state.user;
+    if (!user) return;
+
+    const avatarEl = this.shadowRoot.getElementById("profile-avatar");
+    const usernameEl = this.shadowRoot.getElementById("profile-username");
+
+    if (
+      user.id !== this._lastUserId ||
+      !this._lastAvatarUrl ||
+      avatarEl.src === settings.EMPTY_AVATAR_URL
+    ) {
+      const newSrc = await getCachedAvatarSrc(
+        user,
+        this.page.app.api.fetchAvatarObjectUrl
+      );
+
+      if (avatarEl.src !== newSrc) {
+        avatarEl.src = newSrc;
+      }
+
+      this._lastUserId = user.id;
+      this._lastAvatarUrl = newSrc;
     }
 
-    async render() {
-        if (!this.state.user) return;
+    usernameEl.textContent = user.username;
 
-        const avatarEl = this.shadowRoot.getElementById("profile-avatar");
-        const usernameEl = this.shadowRoot.getElementById("profile-username");
+    const { stateManager } = this.page.app;
+    const status = stateManager.state.onlineStatuses?.get(user.id)?.is_online;
+    this.updateOnlineStatus(status);
+  }
 
-        avatarEl.src = await getAvatarSrc(this.state.user, this.page.app.api.fetchAvatarObjectUrl);
-        usernameEl.textContent = this.state.user.username;
+  appendPendingButton(expiresAt = null) {
+    this.clearPendingButton();
 
-        const { stateManager } = this.page.app;
-        stateManager.state.onlineStatuses && this.updateOnlineStatus(stateManager.state.onlineStatuses.get(this.state.user.id)?.is_online);
+    if (!expiresAt) {
+      expiresAt = "Pending";
+    } else {
+      expiresAt = `expires at ${new Date(expiresAt).toLocaleTimeString()}`;
     }
 
-    appendPendingButton(expiresAt = null) {
-        if (!expiresAt) expiresAt = "Pending";
-        else expiresAt = `expires at ${new Date(expiresAt).toLocaleTimeString()}`;
+    const profileContainer =
+      this.shadowRoot.querySelector(".profile-container");
+    const pendingButton = document.createElement("button");
+    pendingButton.className = "btn-warning";
+    pendingButton.style.position = "absolute";
+    pendingButton.style.right = "16px";
+    pendingButton.innerText = expiresAt;
+    profileContainer.appendChild(pendingButton);
+  }
 
-        const profileContainer = this.shadowRoot.querySelector(".profile-container");
-        if (!profileContainer.querySelector(".btn-warning")) {
-            const pendingButton = document.createElement("button");
-            pendingButton.className = "btn-warning";
-            pendingButton.style.position = "absolute";
-            pendingButton.style.right = "16px";
-            pendingButton.innerText = expiresAt;
-            profileContainer.appendChild(pendingButton);
-        }
+  updateOnlineStatus(isOnline) {
+    const statusIndicator = this.shadowRoot.querySelector(".status-indicator");
+    if (statusIndicator) {
+      statusIndicator.style.backgroundColor = isOnline ? "#e0a800" : "#a6a6a6";
     }
+  }
 
-    updateOnlineStatus(isOnline) {
-        const statusIndicator = this.shadowRoot.querySelector('.status-indicator');
-        if (statusIndicator) {
-            statusIndicator.style.backgroundColor = isOnline ? "#e0a800" : "#a6a6a6";
-        }
+  clearPendingButton() {
+    const profileContainer =
+      this.shadowRoot.querySelector(".profile-container");
+    const pendingButton = profileContainer?.querySelector(".btn-warning");
+    if (pendingButton) {
+      pendingButton.remove();
     }
+  }
 
-    setupTemplate() {
-        this.shadowRoot.innerHTML = `
+  setupTemplate() {
+    this.shadowRoot.innerHTML = `
         <style>
             .profile-container {
                 display: flex;
@@ -107,8 +141,8 @@ class UserProfileCardSm extends BaseElement {
             <span id="profile-username" class="profile-username"></span>
         </div>
     `;
-    }
+  }
 }
 
 if (!customElements.get("user-profile-small"))
-    customElements.define("user-profile-small", UserProfileCardSm);
+  customElements.define("user-profile-small", UserProfileCardSm);

@@ -15,7 +15,7 @@ class UserList extends BaseElement {
       this.unsubscribe = this.page.app.stateManager.subscribe(
         "onlineStatuses",
         (statuses, updatedUserId) =>
-          this.handleOnlineStatusUpdate(statuses, updatedUserId),
+          this.handleOnlineStatusUpdate(statuses, updatedUserId)
       );
     };
   }
@@ -59,7 +59,7 @@ class UserList extends BaseElement {
 
   handleOnlineStatusUpdate(statuses, updatedUserId) {
     const userCard = this.shadowRoot.querySelector(
-      `[data-user-id="${updatedUserId}"]`,
+      `[data-user-id="${updatedUserId}"]`
     );
     if (userCard) {
       const status = statuses.get(updatedUserId);
@@ -94,7 +94,7 @@ class UserList extends BaseElement {
   updateUser(updatedUser) {
     this.setState({
       users: this.state.users.map((user) =>
-        user.id === updatedUser.id ? updatedUser : user,
+        user.id === updatedUser.id ? updatedUser : user
       ),
     });
   }
@@ -109,7 +109,7 @@ class UserList extends BaseElement {
     const scrollTop = scrollContainer.scrollTop;
     const startIndex = Math.max(
       0,
-      Math.floor(scrollTop / this.itemHeight) - this.buffer,
+      Math.floor(scrollTop / this.itemHeight) - this.buffer
     );
 
     this.render(startIndex);
@@ -155,6 +155,7 @@ class UserList extends BaseElement {
         existingCard.setState({ user });
         existingCard.setAttribute("data-user-id", user.id);
 
+        existingCard.clearPendingButton?.();
         const isPending =
           user.game_invite?.expires_at ||
           user.friendship?.status === "pending" ||
@@ -292,4 +293,3 @@ class UserList extends BaseElement {
 if (!customElements.get("user-list")) {
   customElements.define("user-list", UserList);
 }
-
