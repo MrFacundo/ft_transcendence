@@ -1,17 +1,21 @@
 services:
   reverse-proxy:
     container_name: reverse_proxy
-    image: nginx:latest
-    restart: unless-stopped
+    build:
+      context: ./reverse_proxy
+      dockerfile: Dockerfile
+    restart: no
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - ./reverse_proxy/nginx.conf:/etc/nginx/nginx.conf
       - ./reverse_proxy/certs:/etc/nginx/ssl
       - ./frontend/src/static:/usr/src/app/frontend_static/static
       - ./backend/static:/usr/src/app/backend_static/static
       - ./backend/media:/usr/src/app/backend_static/media
+      - ./hashiCorpVault/data/.root-token:/vault/data/.root-token
+    environment:
+      - VAULT_ADDR=http://hashicorpvault:8200
     networks:
       - backend-network
     depends_on:
@@ -21,6 +25,9 @@ services:
         condition: service_started
       waf:
         condition: service_started
+      hashicorpvault:
+        condition: service_healthy
+
   frontend:
     container_name: transcendence_front
     build:
@@ -47,6 +54,8 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./backend:/usr/src/app
+      - ./hashiCorpVault/data/.root-token:/vault/data/.root-token
+      - ./hashiCorpVault/data/.unseal-key:/vault/data/.unseal-key
     expose:
       - 8000
     networks:
@@ -57,13 +66,12 @@ services:
       timeout: 5s
       retries: 3
     depends_on:
-      db:
-        condition: service_healthy
-      cache:
+      hashicorpvault:
         condition: service_healthy
     restart: unless-stopped
     env_file:
       - .env
+
   db:
     container_name: transcendence_db
     image: postgres:17
@@ -85,6 +93,7 @@ services:
       timeout: 5s
       retries: 5
     restart: unless-stopped
+
   cache:
     image: redis:6
     container_name: transcendence_cache
@@ -113,6 +122,7 @@ services:
         condition: service_healthy
     networks:
       - backend-network
+
   blockchain:
     container_name: blockchain
     environment:
@@ -129,17 +139,45 @@ services:
         GANACHE_PORT: ${GANACHE_PORT}
       dockerfile: Dockerfile
     image: blockchain:local
-    expose:
-      - 8545
+    ports:
+      - "8545:8545"
     volumes:
       - ./blockchain:/usr/src/app:delegated
     networks:
       - backend-network
     depends_on:
-      db:
-        condition: service_healthy
+      backend:
+        condition: service_started
     env_file:
       - .env
+
+  hashicorpvault:
+    container_name: hashicorpvault
+    build:
+      context: ./hashiCorpVault
+      dockerfile: Dockerfile
+    ports:
+      - "8200:8200"
+    volumes:
+      - ./hashiCorpVault/src/vault-config.hcl:/vault/config/vault.hcl
+      - ./hashiCorpVault/data/.root-token:/vault/data/.root-token
+      - ./hashiCorpVault/data/.unseal-key:/vault/data/.unseal-key
+    environment:
+      - VAULT_CLUSTER_ADDR=http://localhost:8201
+      - VAULT_DEV_LISTEN_ADDRESS=
+      - VAULT_UI=true
+    env_file:
+      - .env
+    cap_add:
+      - IPC_LOCK
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s http://localhost:8200/v1/sys/health | grep '\"initialized\":true'"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    networks:
+      - backend-network
 
 networks:
   backend-network:

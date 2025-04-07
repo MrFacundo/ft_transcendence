@@ -18,7 +18,7 @@ down:
 	@echo "All services are down"
 
 build:
-	$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) build
+	$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) build --no-cache --parallel
 	@echo "All services are built"
 
 clean:
@@ -42,6 +42,12 @@ blockchain:
 
 waf:
 	$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) up -d waf
+
+vault:
+	$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) up -d hashicorpvault
+
+reverse-proxy:
+	$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) up -d reverse-proxy
 
 # Commands
 create_users:
@@ -77,4 +83,4 @@ blockchain_gamesbytournament:
 %:
 	@:
 
-.PHONY: all up down build clean backend frontend db cache blockchain waf create_users blockchain_startmonitor blockchain_stopmonitor blockchain_listallgames blockchain_gamesbyplayers blockchain_gamesbytournament
+.PHONY: all up down build clean backend frontend db cache blockchain waf reverse-proxy create_users blockchain_startmonitor blockchain_stopmonitor blockchain_listallgames blockchain_gamesbyplayers blockchain_gamesbytournament
