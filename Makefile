@@ -47,7 +47,7 @@ vault:
 	$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) up -d hashicorpvault
 
 reverse-proxy:
-    $(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) up -d reverse-proxy
+	$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) up -d reverse-proxy
 
 # Commands
 create_users:
