@@ -89,7 +89,7 @@ $VAULT_BIN kv put secret/email_host \
     host=${EMAIL_HOST} \
     port=${EMAIL_PORT} \
     username=${EMAIL_HOST_USER} \
-    password=${EMAIL_HOST_PASSWORD} || { echo "ERROR: Failed to store email host secrets. Exiting."; exit 1; }
+    password="${EMAIL_HOST_PASSWORD}" || { echo "ERROR: Failed to store email host secrets. Exiting."; exit 1; }
 
 # Database secrets
 $VAULT_BIN kv put secret/database \
