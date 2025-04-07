@@ -150,7 +150,15 @@ class UserSettingsPage extends Page {
     }
     
     handleUpdateError(error) {
-        const errorMessage = error.response?.data?.error.message || "An error occurred while updating the settings.";
+        const data = error?.response?.data;
+
+        const errorMessage = data?.error?.message
+          || (typeof data === 'object' && data !== null
+              ? Object.values(data)
+                  .flat()
+                  .filter(msg => typeof msg === 'string')
+                  .join('\n')
+              : "An error occurred while updating the settings.");  
         showMessage(capitalizeFirstLetter(errorMessage), "error");
     }
     
