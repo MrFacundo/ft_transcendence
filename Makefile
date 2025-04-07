@@ -83,4 +83,4 @@ blockchain_gamesbytournament:
 %:
 	@:
 
-.PHONY: all up down build clean backend frontend db cache blockchain waf create_users blockchain_startmonitor blockchain_stopmonitor blockchain_listallgames blockchain_gamesbyplayers blockchain_gamesbytournament
+.PHONY: all up down build clean backend frontend db cache blockchain waf reverse-proxy create_users blockchain_startmonitor blockchain_stopmonitor blockchain_listallgames blockchain_gamesbyplayers blockchain_gamesbytournament
