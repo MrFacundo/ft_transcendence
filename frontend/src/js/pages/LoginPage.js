@@ -8,6 +8,7 @@ class LoginPage extends Page {
             pageElement: "#Login",
             isProtected: false,
             app: app,
+            isAuthPage: true,
         });
     }
 

@@ -8,6 +8,7 @@ class TwoFactorAuthPage extends Page {
 			pageElement: "#TwoFactorAuth",
 			isProtected: false,
 			app: app,
+			isAuthPage: true,
 		});
 	}
 
