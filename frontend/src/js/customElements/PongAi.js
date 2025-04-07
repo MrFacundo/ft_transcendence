@@ -10,7 +10,6 @@ class PongAi extends Pong {
 
   init() {
     super.init();
-
     this.readyButton.addEventListener("click", () => {
       this.readyButton.style.display = "none";
       this.lastTime = performance.now();
@@ -45,17 +44,28 @@ class PongAi extends Pong {
     this.firstPrediction = false;
     this.gameLoop = this.gameLoop.bind(this);
     this.keys = {};
+    this.waitForBall = false;
   }
 
   startGame(difficulty) {
     const diff = difficulty ? difficulty.toLowerCase() : "easy";
-    super.startGame(null, this.page.app.auth.user, { username: `AI (${diff})`});
+    super.startGame(null, this.page.app.auth.user, {
+      username: `AI (${diff})`,
+    });
+    this.addEventListeners();
+    this.playerPaddle.y = (this.canvas.height - this.playerPaddle.height) / 2;
+    this.aiPaddle.y = (this.canvas.height - this.aiPaddle.height) / 2;
     this.resetBall();
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.setSideUsernames(
+      this.page.app.auth.user.username,
+      "AI" + (difficulty ? ` (${difficulty})` : "")
+    );
+    this.setAvatars(this.page.app.auth.user, { username: "AI" });
     if (diff === "hard") {
       this.aiPaddle.speed = 4;
-      this.aiReactionDelay = 200;
-      this.aiErrorMargin = 10;
+      this.aiReactionDelay = 100;
+      this.aiErrorMargin = 0;
     } else if (diff === "medium") {
       this.aiPaddle.speed = 5;
       this.aiReactionDelay = 500;
@@ -84,7 +94,6 @@ class PongAi extends Pong {
     const diff = difficulty ? difficulty.toLowerCase() : "easy";
 
     if (this.ball.vx > 0) {
-      // Ball moving toward AI
       if (!this.firstPrediction && this.ball.x < this.canvas.width * 0.3) {
         this.aiKeys["ArrowUp"] = false;
         this.aiKeys["ArrowDown"] = false;
@@ -111,12 +120,26 @@ class PongAi extends Pong {
       }
 
       const paddleCenter = this.aiPaddle.y + this.aiPaddle.height / 2;
-      const threshold = 15;
+      const threshold = diff === "hard" ? 1 : 15;
 
-      if (Math.abs(predictedY - paddleCenter) < threshold) {
+      if (
+        diff === "hard" &&
+        predictedY >= this.aiPaddle.y &&
+        predictedY <= this.aiPaddle.y + this.aiPaddle.height
+      ) {
         this.aiKeys["ArrowUp"] = false;
         this.aiKeys["ArrowDown"] = false;
-      } else if (predictedY < paddleCenter) {
+      } else {
+        if (predictedY < paddleCenter) {
+          this.aiKeys["ArrowUp"] = true;
+          this.aiKeys["ArrowDown"] = false;
+        } else {
+          this.aiKeys["ArrowDown"] = true;
+          this.aiKeys["ArrowUp"] = false;
+        }
+      }
+
+      if (predictedY < paddleCenter) {
         this.aiKeys["ArrowUp"] = true;
         this.aiKeys["ArrowDown"] = false;
       } else {
@@ -274,13 +297,19 @@ class PongAi extends Pong {
     this.ball.vx = 5 * (Math.random() > 0.5 ? 1 : -1);
     this.ball.vy = 5 * (Math.random() > 0.5 ? 1 : -1);
     this.firstPrediction = false;
+    this.waitForBall = false;
   }
 
   endGame() {
     this.cleanup();
-    const winnerText = this.playerScore > this.opponentScore ? this.page.app.auth.user.username : "AI";
+    const winnerText =
+      this.playerScore > this.opponentScore
+        ? this.page.app.auth.user.username
+        : "AI";
     this.displayResult(this.playerScore, this.opponentScore, winnerText);
-    this.dispatchEvent(new CustomEvent("gameOver", { bubbles: true}));
+    this.dispatchEvent(new CustomEvent("gameOver", { bubbles: true }));
+    this.flawlessVictory.textContent = "";
+    this.selectedDifficulty = null;
   }
 
   cleanup() {
@@ -292,12 +321,11 @@ class PongAi extends Pong {
   }
 
   handleKeyDown(e) {
-    this.keys[e.key.toLowerCase()] = true;
-    console.log(this.keys);
+    if (e.key) this.keys[e.key.toLowerCase()] = true;
   }
 
   handleKeyUp(e) {
-    this.keys[e.key.toLowerCase()] = false;
+    if (e.key) this.keys[e.key.toLowerCase()] = false;
   }
 
   addEventListeners() {
