@@ -128,6 +128,10 @@ class UserSettingsPage extends Page {
                     return;
                 }
                 const file = fileInput.files[0];
+                if (file.size > 5 * 1024 * 1024) {
+                    showMessage("Upload error: File size must not exceed 5MB.", "error");
+                    return;
+                }
                 const updatedUser = await this.app.api.uploadAvatar(file);
                 this.updateUserAndRefresh(updatedUser, successMessage);
                 return;
@@ -146,12 +150,16 @@ class UserSettingsPage extends Page {
     }
     
     handleUpdateError(error) {
-        const errorMessage = error.response?.data?.[Object.keys(error.response.data)[0]]?.[0];
-        showMessage(
-            capitalizeFirstLetter(errorMessage) || 
-            "An error occurred while updating the settings.", 
-            "error"
-        );
+        const data = error?.response?.data;
+
+        const errorMessage = data?.error?.message
+          || (typeof data === 'object' && data !== null
+              ? Object.values(data)
+                  .flat()
+                  .filter(msg => typeof msg === 'string')
+                  .join('\n')
+              : "An error occurred while updating the settings.");  
+        showMessage(capitalizeFirstLetter(errorMessage), "error");
     }
     
     updateUserAndRefresh(updatedUser, successMessage) {

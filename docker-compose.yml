@@ -12,6 +12,7 @@ services:
       - ./reverse_proxy/certs:/etc/nginx/ssl
       - ./frontend/src/static:/usr/src/app/frontend_static/static
       - ./backend/static:/usr/src/app/backend_static/static
+      - ./backend/media:/usr/src/app/backend_static/media
       - ./hashiCorpVault/data/.root-token:/vault/data/.root-token
     environment:
       - VAULT_ADDR=http://hashicorpvault:8200
@@ -115,6 +116,7 @@ services:
     volumes:
       - ./modsecurity_waf/nginx.conf:/etc/nginx/conf.d/default.conf
       - ./modsecurity_waf/crs-setup.conf:/usr/local/owasp-modsecurity-crs-3.2.0/crs-setup.conf
+      - ./modsecurity_waf/rules/:/usr/local/owasp-modsecurity-crs-3.2.0/rules/
     depends_on:
       backend:
         condition: service_healthy
