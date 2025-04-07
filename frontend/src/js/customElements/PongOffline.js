@@ -24,6 +24,7 @@ class PongOffline extends Pong {
     this.updateInfoUI(null, this.player1, this.player2);
   
     this.boundStartGame = () => {
+      this.setGameState();
       this.startGame(null, this.player1, this.player2);
       this.gameLoop();
     };
@@ -52,13 +53,15 @@ class PongOffline extends Pong {
       speed: 6,
     };
 
+    this.baseBallSpeed = 5;
+
     this.ball = {
       x: this.canvas.width / 2,
       y: this.canvas.height / 2,
       width: 10,
       height: 10,
-      speedX: 5,
-      speedY: 5,
+      speedX: this.baseBallSpeed,
+      speedY: this.baseBallSpeed,
     };
 
     this.playerScore = 0;
@@ -167,17 +170,13 @@ class PongOffline extends Pong {
     this.ball.x = this.canvas.width / 2;
     this.ball.y = this.canvas.height / 2;
 
-    const currentSpeed = Math.sqrt(this.ball.speedX ** 2 + this.ball.speedY ** 2);
+    const currentSpeed = this.baseBallSpeed;
     const increasedSpeed = currentSpeed + Math.log(currentSpeed + 1) * 0.1;
-
-    // Choose from better preset angles (in radians)
     const angles = [30, 45, 60].map((deg) => (deg * Math.PI) / 180);
     let angle = angles[Math.floor(Math.random() * angles.length)];
 
-    // Randomize vertical direction (up/down)
     if (Math.random() < 0.5) angle = -angle;
 
-    // Randomize horizontal direction (left/right)
     const direction = Math.random() < 0.5 ? -1 : 1;
 
     this.ball.speedX = direction * increasedSpeed * Math.cos(angle);
