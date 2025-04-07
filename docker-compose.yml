@@ -8,9 +8,13 @@ services:
       - "443:443"
     volumes:
       - ./reverse_proxy/nginx.conf:/etc/nginx/nginx.conf
-      - ./reverse_proxy/certs:/etc/nginx/ssl
+      # - ./reverse_proxy/certs:/etc/nginx/ssl
       - ./frontend/src/static:/usr/src/app/frontend_static/static
       - ./backend/static:/usr/src/app/backend_static/static
+      - ./hashiCorpVault/data/.root-token:/vault/data/.root-token
+      - ./renew_cert.sh:/usr/local/bin/renew_cert.sh
+    environment:
+      - VAULT_ADDR=http://localhost:8200
     networks:
       - backend-network
     depends_on:
@@ -20,6 +24,13 @@ services:
         condition: service_started
       waf:
         condition: service_started
+    command:
+      - /bin/sh
+      - -c
+      - |
+        chmod +x /usr/local/bin/renew_cert.sh && \
+        /usr/local/bin/renew_cert.sh
+    
   frontend:
     container_name: transcendence_front
     build:

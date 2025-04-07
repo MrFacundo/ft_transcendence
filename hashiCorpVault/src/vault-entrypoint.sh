@@ -74,5 +74,17 @@ vault kv put secret/redis \
 # JWT
 vault kv put secret/jwt \
 	secret_key=${JWT_SECRET_KEY}
+
+# Certificates issuing
+vault secrets enable pki
+vault secrets tune -max-lease-ttl=8760h pki
+vault write pki/root/generate/internal common_name="localhost" ttl=8760h
+vault write pki/config/urls issuing_certificates="http://127.0.0.1:8200/v1/pki/ca" crl_distribution_points="http://127.0.0.1:8200/v1/pki/crl"
+
+vault write pki/roles/localhost \
+    allowed_domains="localhost" \
+    allow_subdomains=true \
+    max_ttl="72h"
+
  
 wait "$VAULT_PID"
