@@ -122,14 +122,20 @@ class PongAi extends Pong {
       const paddleCenter = this.aiPaddle.y + this.aiPaddle.height / 2;
       const threshold = diff === "hard" ? 1 : 15;
 
-      if (diff === "hard") {
-        const ballWillHitPaddle =
-          predictedY >= this.aiPaddle.y &&
-          predictedY <= this.aiPaddle.y + this.aiPaddle.height;
-        if (ballWillHitPaddle) {
-          this.aiKeys["ArrowUp"] = false;
+      if (
+        diff === "hard" &&
+        predictedY >= this.aiPaddle.y &&
+        predictedY <= this.aiPaddle.y + this.aiPaddle.height
+      ) {
+        this.aiKeys["ArrowUp"] = false;
+        this.aiKeys["ArrowDown"] = false;
+      } else {
+        if (predictedY < paddleCenter) {
+          this.aiKeys["ArrowUp"] = true;
           this.aiKeys["ArrowDown"] = false;
-          return;
+        } else {
+          this.aiKeys["ArrowDown"] = true;
+          this.aiKeys["ArrowUp"] = false;
         }
       }
 
