@@ -1,66 +1,78 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
-# Iniciar o Vault no modo de desenvolvimento (se não estiver em produção)
-vault server -dev -dev-root-token-id=${VAULT_TOKEN} -dev-listen-address="0.0.0.0:8200" &
+set -euxo pipefail
 
-# Aguardar o Vault estar pronto
-echo "Aguardando o Vault iniciar..."
-sleep 5
+export VAULT_ADDR="http://127.0.0.1:8200"
+VAULT=/bin/vault
+VAULT_UNSEAL_KEY_FILE=/vault/data/.unseal-key
+VAULT_TOKEN_FILE=/vault/data/.root-token
 
-# Email Host
+echo "Starting Vault server..."
+$VAULT server -config=/vault/config/vault.hcl &
+VAULT_PID=$!
+
+echo "Waiting for Vault to be ready..."
+# Wait for Vault to be ready
+sleep 10
+
+# Check if Vault is initialized
+if [ "$($VAULT status | awk '/Initialized/ { print $2 }')" = "false" ]; then
+    echo "Initializing Vault..."
+    $VAULT operator init -key-shares=1 -key-threshold=1 > /vault/data/.vault-init
+    grep 'Unseal Key 1:' /vault/data/.vault-init | awk '{ print $NF }' > "$VAULT_UNSEAL_KEY_FILE"
+    grep 'Initial Root Token:' /vault/data/.vault-init | awk '{ print $NF }' > "$VAULT_TOKEN_FILE"
+    chmod 600 "$VAULT_UNSEAL_KEY_FILE" "$VAULT_TOKEN_FILE"
+    rm /vault/data/.vault-init
+    echo "Vault initialized!"
+else
+    echo "Vault already initialized."
+    if [ -f "$VAULT_UNSEAL_KEY_FILE" ]; then
+        echo "Loading unseal key from $VAULT_UNSEAL_KEY_FILE..."
+    else
+        echo "WARNING: Unseal key file not found. Expecting key from environment..."
+    fi
+fi
+
+export VAULT_UNSEAL_KEY="$(cat "$VAULT_UNSEAL_KEY_FILE")"
+export VAULT_TOKEN="$(cat "$VAULT_TOKEN_FILE")"
+
+echo "Loading unseal key from $VAULT_UNSEAL_KEY_FILE..."
+
+VAULT_UNSEAL_KEY="$(cat "$VAULT_UNSEAL_KEY_FILE")"
+
+$VAULT operator unseal "$VAULT_UNSEAL_KEY"
+
+# Create secrets engine
+$VAULT secrets enable -path=secret kv-v2
+
 vault kv put secret/email_host \
-    host=${EMAIL_HOST} \
-    port=${EMAIL_PORT} \
-    username=${EMAIL_HOST_USER} \
-    password=${EMAIL_HOST_PASSWORD}
+	host=${EMAIL_HOST} \
+	port=${EMAIL_PORT} \
+	username=${EMAIL_HOST_USER} \
+	password=${EMAIL_HOST_PASSWORD}
 
-# Banco de Dados
+# Database
 vault kv put secret/database \
-    host=${POSTGRES_HOST} \
-    port=${POSTGRES_PORT} \
-    username=${POSTGRES_USER} \
-    password=${POSTGRES_PASSWORD} \
-    db_url=${DATABASE_URL} \
-
-# vault secrets enable database
-
-# vault write database/config/postgresql \
-#     plugin_name=postgresql-database-plugin \
-#     connection_url="postgresql://{{username}}:{{password}}@${POSTGRES_HOST}:5432/transcendence?sslmode=disable" \
-#     allowed_roles="myrole" \
-#     username=${POSTGRES_USER} \
-#     password=${POSTGRES_PASSWORD}
-
-# vault write database/roles/myrole \
-#     db_name=postgresql \
-#     creation_statements="
-#     CREATE ROLE \"{{name}}\" WITH LOGIN PASSWORD '{{password}}';
-#     GRANT CONNECT ON DATABASE ${POSTGRES_DB} TO \"{{name}}\";
-#     GRANT USAGE ON SCHEMA public TO \"{{name}}\";
-#     GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO \"{{name}}\";
-#     GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO \"{{name}}\";
-#     " \
-#     default_ttl="1h" \
-#     max_ttl="24h"
+	host=${POSTGRES_HOST} \
+	port=${POSTGRES_PORT} \
+	username=${POSTGRES_USER} \
+	password=${POSTGRES_PASSWORD} \
+	db_url=${DATABASE_URL}
 
 # 42Oauth
 vault kv put secret/42oauth \
-    client_id=${OAUTH_42_CLIENT_ID} \
-    client_secret=${OAUTH_42_CLIENT_SECRET} \
-    redirect_uri=${OAUTH_42_REDIRECT_URI}
+	client_id=${OAUTH_42_CLIENT_ID} \
+	client_secret=${OAUTH_42_CLIENT_SECRET} \
+	redirect_uri=${OAUTH_42_REDIRECT_URI}
 
 # Redis
 vault kv put secret/redis \
-    host=${REDIS_HOST} \
-    port=${REDIS_PORT} \
-    password=${REDIS_PASSWORD}
-
-# Ganache
-vault kv put secret/ganache \
-    code=${GANACHE_COD} \
+	host=${REDIS_HOST} \
+	port=${REDIS_PORT} \
+	password=${REDIS_PASSWORD}
 
 # JWT
 vault kv put secret/jwt \
-    secret_key=${JWT_SECRET_KEY} \
-
-wait
+	secret_key=${JWT_SECRET_KEY}
+ 
+wait "$VAULT_PID"

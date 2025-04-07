@@ -1,18 +1,24 @@
 import hvac
 import os
+import time
 
 class VaultClient:
     def __init__(self, vault_addr=None, vault_token=None):
-        # Configura a conexão com o Vault
+        # Configures the Vault connection
         self.vault_addr = vault_addr or os.getenv("VAULT_ADDR")
-        self.vault_token = vault_token or os.getenv("VAULT_TOKEN")
+        if vault_token:
+            self.vault_token = vault_token
+        else:
+            with open("/vault/data/.root-token", "r") as f:
+                self.vault_token = f.read().strip()
 
-        # Cria o cliente do Vault
+
+        # Creates the Vault client
         self.client = hvac.Client(url=self.vault_addr)
         self.client.token = self.vault_token
 
-    def get_email_vars(self, var):
 
+    def get_email_vars(self, var):
         secret = self.client.secrets.kv.read_secret_version(path="email_host")
 
         if var == "username":
@@ -26,20 +32,16 @@ class VaultClient:
         else:
             raise ValueError("Invalid variable name. Choose from: email_host_user, email_host_password, host, port.")
 
-
     def get_db_vars(self, var):
         secret = self.client.secrets.kv.read_secret_version(path="database")
-        #credentials = self.client.secrets.database.generate_credentials('myrole')
 
         if var == "host":
             return secret['data']['data']['host']
         elif var == "port":
             return secret['data']['data']['port']
         elif var == "username":
-            #return credentials['data']['username']
             return secret['data']['data']['username']
         elif var == "password":
-            # return credentials['data']['password']
             return secret['data']['data']['password']
         elif var == "db_url":
             return secret['data']['data']['db_url']

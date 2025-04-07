@@ -25,6 +25,11 @@ clean:
 	$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) down --volumes --remove-orphans
 	@echo "All services, volumes and orphans are removed"
 
+fclean:
+	$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) down --volumes --remove-orphans
+	$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) build --no-cache
+	@echo "All services, volumes and orphans are removed and all services are built with no cache"
+
 backend:
 	$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) up -d backend
 
@@ -42,6 +47,9 @@ blockchain:
 
 waf:
 	$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) up -d waf
+
+vault:
+	$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) up -d hashicorpvault
 
 # Commands
 create_users:

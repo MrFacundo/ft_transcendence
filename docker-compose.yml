@@ -46,6 +46,8 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./backend:/usr/src/app
+      - ./hashiCorpVault/data/.root-token:/vault/data/.root-token
+      - ./hashiCorpVault/data/.unseal-key:/vault/data/.unseal-key
     expose:
       - 8000
     networks:
@@ -56,9 +58,7 @@ services:
       timeout: 5s
       retries: 3
     depends_on:
-      db:
-        condition: service_healthy
-      cache:
+      hashicorpvault:
         condition: service_healthy
     restart: unless-stopped
     env_file:
@@ -101,9 +101,7 @@ services:
     restart: unless-stopped
   waf:
     container_name: modecurity_waf
-    build:
-      context: ./modsecurity_waf
-      dockerfile: Dockerfile
+    image: bit3/nginx-waf:latest
     platform: linux/amd64
     expose:
       - 8081
@@ -116,33 +114,33 @@ services:
     networks:
       - backend-network
 
-  blockchain:
-    container_name: blockchain
-    environment:
-      - DB_NAME=${POSTGRES_DB}
-      - DB_USER=${POSTGRES_USER}
-      - DB_PASSWORD=${POSTGRES_PASSWORD}
-      - DB_HOST=${POSTGRES_HOST}
-    restart: unless-stopped
-    build:
-      context: ./blockchain
-      args:
-        GANACHE_ENV: ${GANACHE_COD}
-        GANACHE_URL: ${GANACHE_URL}
-        GANACHE_PORT: ${GANACHE_PORT}
-      dockerfile: Dockerfile
-    image: blockchain:local
-    expose:
-      - 8545
-    volumes:
-      - ./blockchain:/usr/src/app:delegated
-    networks:
-      - backend-network
-    depends_on:
-      db:
-        condition: service_healthy
-    env_file:
-      - .env
+  # blockchain:
+  #   container_name: blockchain
+  #   environment:
+  #     - DB_NAME=${POSTGRES_DB}
+  #     - DB_USER=${POSTGRES_USER}
+  #     - DB_PASSWORD=${POSTGRES_PASSWORD}
+  #     - DB_HOST=${POSTGRES_HOST}
+  #   restart: unless-stopped
+  #   build:
+  #     context: ./blockchain
+  #     args:
+  #       GANACHE_ENV: ${GANACHE_COD}
+  #       GANACHE_URL: ${GANACHE_URL}
+  #       GANACHE_PORT: ${GANACHE_PORT}
+  #     dockerfile: Dockerfile
+  #   image: blockchain:local
+  #   ports:
+  #     - "8545:8545"
+  #   volumes:
+  #     - ./blockchain:/usr/src/app:delegated
+  #   networks:
+  #     - backend-network
+  #   depends_on:
+  #     backend:
+  #       condition: service_started
+  #   env_file:
+  #     - .env
 
   hashicorpvault:
     container_name: hashicorpvault
@@ -153,16 +151,23 @@ services:
       - "8200:8200"
     volumes:
       - ./hashiCorpVault/src/vault-config.hcl:/vault/config/vault.hcl
+      - ./hashiCorpVault/data/.root-token:/vault/data/.root-token
+      - ./hashiCorpVault/data/.unseal-key:/vault/data/.unseal-key
+    environment:
+      - VAULT_ADDR=http://localhost:8200
+      - VAULT_CLUSTER_ADDR=http://localhost:8201
+      - VAULT_DEV_LISTEN_ADDRESS=
+      - VAULT_UI=true
     env_file:
       - .env
     cap_add:
       - IPC_LOCK
     healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8200/v1/sys/health" ]
+      test: ["CMD-SHELL", "curl -s http://localhost:8200/v1/sys/health | grep '\"initialized\":true'"]
       interval: 5s
       timeout: 5s
       retries: 5
-      start_period: 10s
+      start_period: 20s
     networks:
       - backend-network
 
