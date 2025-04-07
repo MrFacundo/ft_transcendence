@@ -1,18 +1,18 @@
 services:
   reverse-proxy:
     container_name: reverse_proxy
-    image: nginx:latest
-    restart: unless-stopped
+    build:
+      context: ./reverse_proxy
+      dockerfile: Dockerfile
+    restart: no
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - ./reverse_proxy/nginx.conf:/etc/nginx/nginx.conf
-      # - ./reverse_proxy/certs:/etc/nginx/ssl
+      - ./reverse_proxy/certs:/etc/nginx/ssl
       - ./frontend/src/static:/usr/src/app/frontend_static/static
       - ./backend/static:/usr/src/app/backend_static/static
       - ./hashiCorpVault/data/.root-token:/vault/data/.root-token
-      - ./renew_cert.sh:/usr/local/bin/renew_cert.sh
     environment:
       - VAULT_ADDR=http://localhost:8200
     networks:
@@ -24,13 +24,9 @@ services:
         condition: service_started
       waf:
         condition: service_started
-    command:
-      - /bin/sh
-      - -c
-      - |
-        chmod +x /usr/local/bin/renew_cert.sh && \
-        /usr/local/bin/renew_cert.sh
-    
+      hashicorpvault:
+        condition: service_healthy
+
   frontend:
     container_name: transcendence_front
     build:
@@ -125,33 +121,33 @@ services:
     networks:
       - backend-network
 
-  blockchain:
-    container_name: blockchain
-    environment:
-      - DB_NAME=${POSTGRES_DB}
-      - DB_USER=${POSTGRES_USER}
-      - DB_PASSWORD=${POSTGRES_PASSWORD}
-      - DB_HOST=${POSTGRES_HOST}
-    restart: unless-stopped
-    build:
-      context: ./blockchain
-      args:
-        GANACHE_ENV: ${GANACHE_COD}
-        GANACHE_URL: ${GANACHE_URL}
-        GANACHE_PORT: ${GANACHE_PORT}
-      dockerfile: Dockerfile
-    image: blockchain:local
-    ports:
-      - "8545:8545"
-    volumes:
-      - ./blockchain:/usr/src/app:delegated
-    networks:
-      - backend-network
-    depends_on:
-      backend:
-        condition: service_started
-    env_file:
-      - .env
+  # blockchain:
+  #   container_name: blockchain
+  #   environment:
+  #     - DB_NAME=${POSTGRES_DB}
+  #     - DB_USER=${POSTGRES_USER}
+  #     - DB_PASSWORD=${POSTGRES_PASSWORD}
+  #     - DB_HOST=${POSTGRES_HOST}
+  #   restart: unless-stopped
+  #   build:
+  #     context: ./blockchain
+  #     args:
+  #       GANACHE_ENV: ${GANACHE_COD}
+  #       GANACHE_URL: ${GANACHE_URL}
+  #       GANACHE_PORT: ${GANACHE_PORT}
+  #     dockerfile: Dockerfile
+  #   image: blockchain:local
+  #   ports:
+  #     - "8545:8545"
+  #   volumes:
+  #     - ./blockchain:/usr/src/app:delegated
+  #   networks:
+  #     - backend-network
+  #   depends_on:
+  #     backend:
+  #       condition: service_started
+  #   env_file:
+  #     - .env
 
   hashicorpvault:
     container_name: hashicorpvault

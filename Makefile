@@ -18,7 +18,7 @@ down:
 	@echo "All services are down"
 
 build:
-	$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) build
+	$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) build --no-cache --parallel
 	@echo "All services are built"
 
 clean:
@@ -27,8 +27,7 @@ clean:
 
 fclean:
 	$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) down --volumes --remove-orphans
-	$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) build --no-cache
-	@echo "All services, volumes and orphans are removed and all services are built with no cache"
+	@echo "All services, volumes and orphans are removed"
 
 backend:
 	$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) up -d backend
