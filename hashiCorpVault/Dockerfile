@@ -2,8 +2,11 @@ FROM hashicorp/vault:1.18.4
 
 RUN apk add --no-cache bash curl jq
 
-# Set environment variables for Vault
-ENV VAULT_ADDR="http://localhost:8200"
+RUN apk add --no-cache \
+    bash \
+    curl \
+    jq \
+    && rm -rf /var/cache/apk/*
 
 # Create necessary directories
 RUN mkdir -p /vault/config /vault/data && \

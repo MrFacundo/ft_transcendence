@@ -14,7 +14,7 @@ services:
       - ./backend/static:/usr/src/app/backend_static/static
       - ./hashiCorpVault/data/.root-token:/vault/data/.root-token
     environment:
-      - VAULT_ADDR=http://localhost:8200
+      - VAULT_ADDR=http://hashicorpvault:8200
     networks:
       - backend-network
     depends_on:
@@ -121,33 +121,33 @@ services:
     networks:
       - backend-network
 
-  # blockchain:
-  #   container_name: blockchain
-  #   environment:
-  #     - DB_NAME=${POSTGRES_DB}
-  #     - DB_USER=${POSTGRES_USER}
-  #     - DB_PASSWORD=${POSTGRES_PASSWORD}
-  #     - DB_HOST=${POSTGRES_HOST}
-  #   restart: unless-stopped
-  #   build:
-  #     context: ./blockchain
-  #     args:
-  #       GANACHE_ENV: ${GANACHE_COD}
-  #       GANACHE_URL: ${GANACHE_URL}
-  #       GANACHE_PORT: ${GANACHE_PORT}
-  #     dockerfile: Dockerfile
-  #   image: blockchain:local
-  #   ports:
-  #     - "8545:8545"
-  #   volumes:
-  #     - ./blockchain:/usr/src/app:delegated
-  #   networks:
-  #     - backend-network
-  #   depends_on:
-  #     backend:
-  #       condition: service_started
-  #   env_file:
-  #     - .env
+  blockchain:
+    container_name: blockchain
+    environment:
+      - DB_NAME=${POSTGRES_DB}
+      - DB_USER=${POSTGRES_USER}
+      - DB_PASSWORD=${POSTGRES_PASSWORD}
+      - DB_HOST=${POSTGRES_HOST}
+    restart: unless-stopped
+    build:
+      context: ./blockchain
+      args:
+        GANACHE_ENV: ${GANACHE_COD}
+        GANACHE_URL: ${GANACHE_URL}
+        GANACHE_PORT: ${GANACHE_PORT}
+      dockerfile: Dockerfile
+    image: blockchain:local
+    ports:
+      - "8545:8545"
+    volumes:
+      - ./blockchain:/usr/src/app:delegated
+    networks:
+      - backend-network
+    depends_on:
+      backend:
+        condition: service_started
+    env_file:
+      - .env
 
   hashicorpvault:
     container_name: hashicorpvault
