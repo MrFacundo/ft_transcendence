@@ -87,6 +87,7 @@ module.exports = (env, argv) => {
               loader: "sass-loader",
               options: {
                 sourceMap: !isProduction,
+                additionalData: `$static-path: "${isProduction ?  "https://localhost/static/" : "../static/"}";\n`
               }
             },
           ],

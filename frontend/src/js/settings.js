@@ -1,7 +1,7 @@
 const EMPTY_AVATAR_URL = "/static/images/empty-avatar.jpg";
 
-const API_URL = "/api";
-const MEDIA_URL = "/media";
+const API_URL = "https://localhost/api";
+const MEDIA_URL = "https://localhost/media";
 const WS_URL = `wss://localhost/ws`;
 
 const DEBUG = process.env.NODE_ENV !== 'production';

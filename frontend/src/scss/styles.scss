@@ -38,7 +38,7 @@ body {
     left: 0;
     width: 100vw;
     height: 100vh;
-    background-image: url("../static/images/bg.png");
+    background-image: url("#{$static-path}/images/bg.png");
     background-size: cover;
     background-position: center;
     filter: brightness(70%) blur(2px);
@@ -68,7 +68,7 @@ body {
     transition: transform 0.3s, box-shadow 0.3s;
     height: 270px;
     max-width: 400px;
-    background-image: url("../static/images/card.png");
+    background-image: url("#{$static-path}/images/card.png");
     background-position: initial;
     background-repeat: round;
 
