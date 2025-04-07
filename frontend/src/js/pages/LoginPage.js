@@ -15,7 +15,6 @@ class LoginPage extends Page {
     async render() {
         require("../customElements/CustomForm.js");
         const { auth } = this.app;
-        if (auth.authenticated) { return this.app.navigate("/home") }
 
         const form = this.mainElement.querySelector("custom-form");
         form.submitForm = async (formData) => {

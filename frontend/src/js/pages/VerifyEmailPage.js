@@ -29,6 +29,7 @@ class VerifyEmailPage extends Page {
             const response = await this.app.api.verifyEmail(token);
             if (response) {
                 verificationMessageEl.textContent = response.message;
+                setTimeout(() => this.app.navigate("/login"), 3000);
             }
         } catch (error) {
             console.error("error", error);
