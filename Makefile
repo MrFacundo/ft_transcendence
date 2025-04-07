@@ -25,10 +25,6 @@ clean:
 	$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) down --volumes --remove-orphans
 	@echo "All services, volumes and orphans are removed"
 
-fclean:
-	$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) down --volumes --remove-orphans
-	@echo "All services, volumes and orphans are removed"
-
 backend:
 	$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) up -d backend
 
@@ -49,6 +45,9 @@ waf:
 
 vault:
 	$(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) up -d hashicorpvault
+
+reverse-proxy:
+    $(DOCKER_COMPOSE) -f $(DOCKER_COMPOSE_FILE) up -d reverse-proxy
 
 # Commands
 create_users:
