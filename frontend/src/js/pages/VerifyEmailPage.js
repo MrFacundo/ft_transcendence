@@ -8,6 +8,7 @@ class VerifyEmailPage extends Page {
             pageElement: "#VerifyEmail",
             isProtected: false,
             app: app,
+            isAuthPage: true,
         });
     }
 
