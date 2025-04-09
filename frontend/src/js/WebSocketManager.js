@@ -79,7 +79,7 @@ export class WebSocketManager {
             this.app.navigate(data.game_url);
         } else if (data.type === "game_invited") {
             if (this.app.stateManager.state.currentGame) return;
-            if (confirm(`You have been challenged by ${data.invitation.sender.username}. Do you accept?`)) {
+            if (confirm(`You have been challenged to Pong. Do you accept?`)) {
                 try {
                     const response = await this.app.api.gameAccept(data.invitation.id);
                     this.app.navigate(response.game_url);

@@ -64,8 +64,8 @@ class PongOffline extends Pong {
       speedY: this.baseBallSpeed,
     };
 
-    this.playerScore = 0;
-    this.opponentScore = 0;
+    this.player1Score = 0;
+    this.player2Score = 0;
     this.gameOver = false;
 
     this.moveLeftPaddleUp = false;
@@ -149,12 +149,12 @@ class PongOffline extends Pong {
       this.ball.x + this.ball.width >= this.canvas.width
     ) {
       if (this.ball.x <= 0) {
-        this.opponentScore++;
+        this.player2Score++;
       } else {
-        this.playerScore++;
+        this.player1Score++;
       }
 
-      if (this.playerScore >= 3 || this.opponentScore >= 3) {
+      if (this.player1Score >= 3 || this.player2Score >= 3) {
         this.gameOver = true;
         this.resetBall();
         this.updateScoreDisplay();
@@ -231,12 +231,12 @@ class PongOffline extends Pong {
   endGame() {
     this.cancelAnimationIfNeeded();
     const winner =
-    this.playerScore >= 3 
+    this.player1Score >= 3 
       ? this.player1?.username || "Player 1"
       : this.player2?.username || "Player 2";
   
     this.clearCanvas();
-    this.displayResult(this.playerScore, this.opponentScore, winner);
+    this.displayResult(this.player1Score, this.player2Score, winner);
     this.readyButton.textContent = "Play Again";
     this.readyButton.style.display = "block";
   }
