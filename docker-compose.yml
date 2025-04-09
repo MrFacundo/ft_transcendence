@@ -9,7 +9,6 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - ./reverse_proxy/certs:/etc/nginx/ssl
       - ./frontend/src/static:/usr/src/app/frontend_static/static
       - ./backend/static:/usr/src/app/backend_static/static
       - ./backend/media:/usr/src/app/backend_static/media
