@@ -92,11 +92,3 @@ schema.json
 #file blockchain
 blockchain/deployedAddress.json
 menu.sh
-
-#hashicorp
-**/.root-token
-**/.unseal-key
-
-#certs
-**/localhost.key
-**/localhost.crt
