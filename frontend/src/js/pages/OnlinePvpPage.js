@@ -62,7 +62,6 @@ class OnlinePvpPage extends Page {
                         return;
                     }
                     const response = await api.gameAccept(user.game_invite.id);
-                    console.log(`Game invite accepted from: ${user.username}`);
                     this.app.navigate(response.game_url);
                     return response;
                 } catch (error) {

@@ -74,8 +74,8 @@ class Pong extends BaseElement {
   }
 
   setGameState() {
-    this.playerScore = 0;
-    this.opponentScore = 0;
+    this.player1Score = 0;
+    this.player2Score = 0;
     this.gameOver = false;
   }
 
@@ -86,7 +86,7 @@ class Pong extends BaseElement {
   }
 
   updateScoreDisplay() {
-    this.scoreboard.textContent = `${this.playerScore} - ${this.opponentScore}`;
+    this.scoreboard.textContent = `${this.player1Score} - ${this.player2Score}`;
   }
 
   setSideUsernames(side1Username, side2Username) {
@@ -117,13 +117,14 @@ class Pong extends BaseElement {
   };
 
   startGame(gameId = null, player1 = null, player2 = null) {
-    this.playerScore = 0;
-    this.opponentScore = 0;
+    this.player1Score = 0;
+    this.player2Score = 0;
     this.updateScoreDisplay();
     this.updateInfoUI(gameId, player1, player2);
     this.winnerDisplay.textContent = "";
     this.flawlessVictory.textContent = "";
     this.gameOver = false;
+    this.opponentId = this.page?.app.auth.user.id === player1.id ? player2.id : player1.id;
     this.page?.app.stateManager.updateState("currentGame", true);
     this.readyButton.style.display = "none";
     this.addEventListeners();
@@ -138,13 +139,13 @@ class Pong extends BaseElement {
   }
 
   displayResult(scorePlayer1, scorePlayer2, winnerUsername, status = null) {
-    this.playerScore = scorePlayer1;
-    this.opponentScore = scorePlayer2;
+    this.player1Score = scorePlayer1;
+    this.player2Score = scorePlayer2;
     this.updateScoreDisplay();
 
     this.winnerDisplay.textContent = status === "interrupted" ? "Pong interrupted" : `${winnerUsername} wins`;
 
-    if ((this.playerScore === 0 || this.opponentScore === 0) && status !== "interrupted") {
+    if ((this.player1Score === 0 || this.player2Score === 0) && status !== "interrupted") {
       setTimeout(() => this.flawlessVictory.textContent = "Flawless victory", 1000);
     }
 

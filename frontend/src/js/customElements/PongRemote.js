@@ -106,8 +106,8 @@ class PongRemote extends Pong {
                 break;
             case "score":
                 this.toggleBallDisplay("score");
-                this.playerScore = data.score[this.playerSide];
-                this.opponentScore = data.score[1 - this.playerSide];
+                this.player1Score = data.score[this.playerSide];
+                this.player2Score = data.score[1 - this.playerSide];
                 this.updateScoreDisplay();
                 break;
             case "endGame":
@@ -120,15 +120,15 @@ class PongRemote extends Pong {
                 break;
         }
     }
-	toggleBallDisplay(message) {
-		if (message === "score") {
-			this.ball.style.display = "none";
-		} else if (message === "gameState" && this.ball.style.display === "none") {
-			setTimeout(() => {
-				if (!this.gameOver) this.ball.style.display = "block";
-			}, 500);
-		}
-	}
+    toggleBallDisplay(message) {
+        if (message === "score") {
+            this.ball.style.display = "none";
+        } else if (message === "gameState" && this.ball.style.display === "none") {
+            setTimeout(() => {
+                if (!this.gameOver) this.ball.style.display = "block";
+            }, 500);
+        }
+    }
     updateStatus(message) {
         this.statusMessage.textContent = message;
     }
@@ -161,6 +161,20 @@ class PongRemote extends Pong {
                 break;
             }
         }
+    }
+
+    displayPlayAgainButton() {
+        this.readyButton.textContent = "Play Again";
+        this.readyButton.style.display = "block";
+        this.readyButton.disabled = false;
+        this.readyButton.addEventListener("click", async () => {
+            try {
+                await this.page.app.api.gameRequest(this.opponentId);
+                this.readyButton.classList.add("d-none");
+            } catch (error) {
+                console.error("Error requesting new game:", error);
+            }
+        });
     }
 
     cleanup() {

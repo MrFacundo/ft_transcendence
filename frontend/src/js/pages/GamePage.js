@@ -32,6 +32,7 @@ export default class GamePage extends Page {
                 gameEl.addEventListener("gameOver", async () => {
                     const updatedGame = await app.api.getGame(gameId);
                     handleResult(updatedGame);
+                    gameEl.displayPlayAgainButton();
                 });
             } else if (game.status === "completed" || game.status === "interrupted") {
                 handleResult(game);

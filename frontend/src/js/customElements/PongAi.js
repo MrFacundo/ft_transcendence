@@ -253,17 +253,17 @@ class PongAi extends Pong {
     }
 
     if (this.ball.x <= 0) {
-      this.opponentScore++;
+      this.player2Score++;
       this.updateScoreDisplay();
-      if (this.opponentScore >= 3) {
+      if (this.player2Score >= 3) {
         this.endGame();
       } else {
         this.resetBall();
       }
     } else if (this.ball.x + this.ball.size >= this.canvas.width) {
-      this.playerScore++;
+      this.player1Score++;
       this.updateScoreDisplay();
-      if (this.playerScore >= 3) {
+      if (this.player1Score >= 3) {
         this.endGame();
       } else {
         this.resetBall();
@@ -303,10 +303,10 @@ class PongAi extends Pong {
   endGame() {
     this.cleanup();
     const winnerText =
-      this.playerScore > this.opponentScore
+      this.player1Score > this.player2Score
         ? this.page.app.auth.user.username
         : "AI";
-    this.displayResult(this.playerScore, this.opponentScore, winnerText);
+    this.displayResult(this.player1Score, this.player2Score, winnerText);
     this.dispatchEvent(new CustomEvent("gameOver", { bubbles: true }));
     this.flawlessVictory.textContent = "";
     this.selectedDifficulty = null;
