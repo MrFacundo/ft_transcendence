@@ -43,6 +43,7 @@ urlpatterns = [
 
     path('api/silk/', include('silk.urls', namespace='silk')),
     path('api/ht/', include('health_check.urls')),
+    path('api/', include('django_prometheus.urls')),
 ]
 
 if not settings.DEBUG:

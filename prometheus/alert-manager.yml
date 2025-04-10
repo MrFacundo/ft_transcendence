@@ -1,0 +1,21 @@
+global:
+  smtp_smarthost: "$EMAIL_HOST:$EMAIL_PORT"
+  smtp_from: "$DEFAULT_FROM_EMAIL"
+  smtp_auth_username: "$EMAIL_HOST_USER"
+  smtp_auth_password: "$EMAIL_HOST_PASSWORD"
+  smtp_require_tls: true
+
+route:
+  receiver: 'default'
+
+receivers:
+  - name: 'default'
+    email_configs:
+      - to: "$EMAIL_TO"
+        from: "$DEFAULT_FROM_EMAIL"
+        smarthost: "$EMAIL_HOST:$EMAIL_PORT"
+        auth_username: "$EMAIL_HOST_USER"
+        auth_identity: "$EMAIL_HOST_USER"
+        auth_password: "$EMAIL_HOST_PASSWORD"
+        require_tls: true
+        send_resolved: true

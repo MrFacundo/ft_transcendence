@@ -31,7 +31,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DEBUG = config('DEBUG', default=True, cast=bool)
 PRODUCTION = not DEBUG
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "172.22.0.1", "waf"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "172.22.0.1", "waf", "backend"]
 
 PASSWORD_HASHERS = [
     "django.contrib.auth.hashers.PBKDF2PasswordHasher",
@@ -94,6 +94,7 @@ INSTALLED_APPS = [
     'health_check',
     'health_check.db',
     'health_check.contrib.migrations',
+    'django_prometheus',
 ]
 
 HEALTH_CHECK = {
@@ -115,6 +116,7 @@ CHANNEL_LAYERS = {
 }
 
 MIDDLEWARE = [
+    'django_prometheus.middleware.PrometheusBeforeMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -124,6 +126,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'silk.middleware.SilkyMiddleware',
+    'django_prometheus.middleware.PrometheusAfterMiddleware',
 ]
 
 # if DEBUG and not PRODUCTION:
