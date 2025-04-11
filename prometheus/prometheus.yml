@@ -9,15 +9,16 @@ scrape_configs:
       - targets: ["backend:8000"]
   - job_name: "cache"
     static_configs:
-    - targets: ['redis_exporter:9121']
+      - targets: ['redis_exporter:9121']
   - job_name: "db"
     static_configs:
-    - targets: ['postgres_exporter:9187']
+      - targets: ['postgres_exporter:9187']
 
 rule_files:
   - 'alert-rules.yml'
+
 alerting:
   alertmanagers:
     - scheme: http
-    - static_configs:
+      static_configs:
         - targets: ['alertmanager:9093']
