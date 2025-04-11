@@ -19,11 +19,4 @@ groups:
           summary: "Instance {{ $labels.instance }} is down"
           description: "No data received from {{ $labels.job }} for 2+ minutes."
 
-      - alert: ServerDown
-        expr: up < 1
-        for: 1m
-        labels:
-          severity: critical
-        annotations:
-          summary: "Server {{ $labels.instance }} down"
-          description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 1 minute."
+# Removed the ServerDown alert to avoid duplication with InstanceDown.
