@@ -28,7 +28,7 @@
       "type": "0x2",
       "transactionHash": "0xe173f6080f5e73f3b3462f224d8ea376f0a8a99a2fa71f10d8336508debe49b3",
       "transactionIndex": "0x0",
-      "blockHash": "0xf9d882ce40c01b7c4e83daa2d216fba866a36dc3395a756d8224d398d4e53d1c",
+      "blockHash": "0x8a4ad97fce4a0d6723fabcb29838fd6314afebdd1d4d945a19e62d9a08ce392a",
       "blockNumber": "0x1",
       "gasUsed": "0x152e99",
       "effectiveGasPrice": "0x3b9aca01",
@@ -41,7 +41,7 @@
   "libraries": [],
   "pending": [],
   "returns": {},
-  "timestamp": 1744442816,
+  "timestamp": 1744441766,
   "chain": 31337,
   "commit": null
 }

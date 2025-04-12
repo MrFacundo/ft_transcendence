@@ -57,8 +57,6 @@ CONTRACT_ABI = [
 ]
 
 contract = web3.eth.contract(address=CONTRACT_ADDRESS, abi=CONTRACT_ABI)
-print(f"📝 Submitting game for registration on the blockchain..")
-
 def estimate_games_with_gas():
     try:
 
@@ -100,9 +98,6 @@ def reset_balance(address: str, amount_wei: int = 2**64 - 1):
         "id": 1
     }
     response = web3.provider.make_request(payload['method'], payload['params'])
-    print("📤 Sending transaction to addGame...")
-    print(f"✅ Balance reset to {address}: {hex_value}")
-    
     return response
 
 
@@ -119,7 +114,6 @@ def get_max_postgres_id_from_db():
         conn.close()
         return max_id if max_id is not None else 0
     except psycopg2.OperationalError:
-        print("Database is not available. Retrying in 5 seconds...")
         time.sleep(3)
         return 0
 
@@ -146,7 +140,6 @@ def monitor_game(last_checked_id):
                      "status": g[4], "player1_id": g[5], "player2_id": g[6],
                      "winner_id": g[7], "tournament_id": g[8]} for g in games]
         except psycopg2.OperationalError:
-            print("Database is not available. Retrying in 5 seconds...")
             time.sleep(3)
 
 def get_all_new_games():
@@ -164,7 +157,6 @@ def get_all_new_games():
             ORDER BY id ASC
         """, (last_blockchain_id,))
         games = cur.fetchall()
-        print(f"📥 {len(games)} games found in the bank to register.")
         cur.close()
         conn.close()
         return [{"id": g[0], "date_played": g[1], "score_player1": g[2], "score_player2": g[3],
@@ -183,8 +175,6 @@ def mark_game_registered(game_id):
         conn.commit()
         cur.close()
         conn.close()
-        print(f"📌 Game {game_id} marked as registered in the bank.")
-
     except psycopg2.OperationalError:
         print("Database is not available. Retrying in 5 seconds...")
         time.sleep(3)
@@ -228,12 +218,10 @@ def monitor_games():
     last_checked_id = get_max_postgres_id_from_db()
     while True:
         if os.path.exists('/usr/src/app/stop_monitor.flag'):
-            print("🛑 Stop flag detected. Exiting monitor...")
             os.remove('/usr/src/app/stop_monitor.flag')
             break
         new_game = monitor_game(last_checked_id)
         for game in new_game:
-            print(f"📝 Registering game {game['id']} on blockchain...")
             register_game_on_blockchain(game)
             mark_game_registered(game['id'])
         time.sleep(3)
@@ -242,7 +230,6 @@ def all_new_games():
     games = get_all_new_games()
     print(f"📥 {len(games)} games found in the bank to register.")
     for game in games:
-        print(f"📝 Registering game {game['id']} on blockchain...")
         register_game_on_blockchain(game)
         mark_game_registered(game['id'])
 
@@ -257,14 +244,10 @@ if __name__ == "__main__":
 
     if args.startMonitor:
         reset_balance(account.address)
-        print(f"📝 Start of pong monitoring...")
         monitor_games()
-        
-
     if args.stopMonitor:
         with open('/usr/src/app/stop_monitor.flag', 'w') as f:
             f.write('stop')
-        print("✅ Stop sign created.")
 
     if args.allNewGames:
         all_new_games()
