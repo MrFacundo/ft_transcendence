@@ -39,29 +39,41 @@ class Pong extends BaseElement {
   }
 
   setUIElements() {
-    const avatar1 = document.createElement("div");
-    avatar1.className = "col-avatar";
-    avatar1.innerHTML = `<img id="avatar-1" src="${settings.EMPTY_AVATAR_URL}" alt="Avatar" width="70" height="70">`;
+    const createAvatar = num => {
+      const avatar = document.createElement("div");
+      avatar.className = "col-avatar";
+      avatar.innerHTML = `<img id="avatar-${num}" src="${settings.EMPTY_AVATAR_URL}" alt="Avatar" width="70" height="70">`;
+      return avatar;
+    };
 
-    const avatar2 = document.createElement("div");
-    avatar2.className = "col-avatar";
-    avatar2.innerHTML = `<img id="avatar-2" src="${settings.EMPTY_AVATAR_URL}" alt="Avatar" width="70" height="70">`;
-
-    this.side1Username = this.createElement("side1Username");
-    this.side2Username = this.createElement("side2Username");
+    const createHealthBar = side => {
+      const bar = document.createElement("div");
+      bar.id = `${side}HealthBar`;
+      const health = document.createElement("div");
+      health.className = "health";
+      const username = this.createSpanElement(`${side}Username`);
+      bar.append(health, username);
+      this[`${side}HealthBar`] = bar;
+      this[`${side}Health`] = health;
+      this[`${side}Username`] = username;
+      return bar;
+    };
 
     this.userContainer = document.createElement("div");
     this.userContainer.className = "user-container";
-    this.userContainer.append(avatar1, this.side1Username, this.side2Username, avatar2);
+    this.userContainer.append(
+      createAvatar(1),
+      createHealthBar("side1"),
+      createHealthBar("side2"),
+      createAvatar(2)
+    );
 
-    this.scoreboard = this.createElement("scoreboard");
-
+    this.scoreboard = this.createSpanElement("scoreboard");
     this.readyButton = document.createElement("button");
     this.readyButton.id = "readyButton";
     this.readyButton.textContent = "Ready to Play";
-
-    this.winnerDisplay = this.createElement("game-winner");
-    this.flawlessVictory = this.createElement("flawless-victory");
+    this.winnerDisplay = this.createSpanElement("game-winner");
+    this.flawlessVictory = this.createSpanElement("flawless-victory");
 
     this.append(
       this.canvas,
@@ -79,7 +91,7 @@ class Pong extends BaseElement {
     this.gameOver = false;
   }
 
-  createElement(id) {
+  createSpanElement(id) {
     const el = document.createElement("span");
     el.id = id;
     return el;
@@ -87,7 +99,28 @@ class Pong extends BaseElement {
 
   updateScoreDisplay() {
     this.scoreboard.textContent = `${this.player1Score} - ${this.player2Score}`;
+    this.updateHealthBar();
+    if (this.player1Score === 0 && this.player2Score === 0) return;
+    this.triggerScreenShake();
   }
+
+  updateHealthBar() {
+    const maxScore = 3;
+    const side1Health = Math.max(0, (maxScore - this.player2Score) / maxScore * 100);
+    const side2Health = Math.max(0, (maxScore - this.player1Score) / maxScore * 100);
+
+    this.side1Health.style.width = `${side1Health}%`;
+    this.side2Health.style.width = `${side2Health}%`;
+  }
+
+  triggerScreenShake() {
+    this.style.animation = "shake 0.3s";
+    this.style.animationIterationCount = "1";
+    this.addEventListener("animationend", () => {
+      this.style.animation = "";
+    }, { once: true });
+  }
+
 
   setSideUsernames(side1Username, side2Username) {
     this.side1Username.textContent = side1Username;
