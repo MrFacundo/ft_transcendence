@@ -99,5 +99,11 @@ blockchain/*.log
 blockchain/cache/
 blockchain/broadcast/
 blockchain/out/
-
+blockchain/lib/forge-std/test/
+blockchain/lib/forge-std/CONTRIBUTING.md
+blockchain/lib/forge-std/README.md
+blockchain/lib/forge-std/cache/
+blockchain/lib/forge-std/out/
+blockchain/lib/forge-std.vscode
+blockchain/lib/forge-std.idea
 
