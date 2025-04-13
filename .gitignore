@@ -92,13 +92,12 @@ schema.json
 #file blockchain
 blockchain/deployedAddress.json
 menu.sh
-blockchain/lib/
 blockchain/__pycache__/
 blockchain/*.pyc
 blockchain/anvil.log
 blockchain/*.log
 blockchain/cache/
-blockchain/broadcast
-blockchain/out
+blockchain/broadcast/
+blockchain/out/
 
 
