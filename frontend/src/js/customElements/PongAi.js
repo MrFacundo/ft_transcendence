@@ -6,6 +6,7 @@ class PongAi extends Pong {
     this.animationFrameId = null;
     this.lastTime = performance.now();
     this.lastAIDecisionTime = 0;
+    this.handleReadyButtonClick = this.handleReadyButtonClick.bind(this);
   }
 
   init() {
@@ -170,7 +171,6 @@ class PongAi extends Pong {
     if (this.gameOver) return;
     const deltaTime = (timestamp - this.lastTime) / 1000; // in seconds
     this.lastTime = timestamp;
-
     this.update(deltaTime);
     this.draw();
     this.animationFrameId = requestAnimationFrame(this.gameLoop);
@@ -307,10 +307,17 @@ class PongAi extends Pong {
         ? this.page.app.auth.user.username
         : "AI";
     this.displayResult(this.player1Score, this.player2Score, winnerText);
-    this.dispatchEvent(new CustomEvent("gameOver", { bubbles: true }));
-    this.flawlessVictory.textContent = "";
-    this.selectedDifficulty = null;
+    this.readyButton.addEventListener("click", this.handleReadyButtonClick);
+    this.readyButton.textContent = "Play Again";
+    this.readyButton.style.display = "block";
   }
+
+  handleReadyButtonClick() {
+    this.startGame(this.selectedDifficulty);
+    this.readyButton.style.display = "none";
+    this.lastTime = performance.now();
+    this.gameLoop(this.lastTime);
+  };
 
   cleanup() {
     super.cleanup();
@@ -318,6 +325,8 @@ class PongAi extends Pong {
     if (this.aiInterval) clearInterval(this.aiInterval);
     window.removeEventListener("keydown", this.handleKeyDown);
     window.removeEventListener("keyup", this.handleKeyUp);
+    this.readyButton.removeEventListener("click", this.gameLoop);
+    this.readyButton.removeEventListener("click", this.handleReadyButtonClick);
   }
 
   handleKeyDown(e) {
