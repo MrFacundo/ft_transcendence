@@ -1,28 +1,15 @@
 import os
-import time
-import psycopg2
 import json
 import argparse
 import pandas as pd
 from web3 import Web3
 
-# PostgreSQL database configurations
-DB_NAME = os.getenv("POSTGRES_DB")
-DB_USER = os.getenv("POSTGRES_USER")
-DB_PASSWORD = os.getenv("POSTGRES_PASSWORD")
-DB_HOST = os.getenv("POSTGRES_HOST")
+GANACHE_URL = os.getenv("GANACHE_URL")
 
-
-FOUNDRY_URL = os.getenv("FOUNDRY_URL", "http://localhost:8545")
-FOUNDRY_PRIVATE_KEY = os.getenv("FOUNDRY_PRIVATE_KEY")
-
-web3 = Web3(Web3.HTTPProvider(FOUNDRY_URL))
-account = web3.eth.account.from_key(FOUNDRY_PRIVATE_KEY)
-
-
+# Read contract address from JSON file
 with open('/usr/src/app/deployedAddress.json') as f:
     data = json.load(f)
-CONTRACT_ADDRESS = data['address']
+    CONTRACT_ADDRESS = data['address']
     
 # Smart contract ABI
 CONTRACT_ABI = [
@@ -80,7 +67,8 @@ CONTRACT_ABI = [
     }
 ]
 
-
+# Connect to Ganache
+web3 = Web3(Web3.HTTPProvider(GANACHE_URL))
 contract = web3.eth.contract(address=CONTRACT_ADDRESS, abi=CONTRACT_ABI)
 
 # Function to convert list of games to DataFrame
@@ -111,9 +99,10 @@ def list_blockchain_games():
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="List games registered on the blockchain")
-    parser.add_argument("--lg", action="store_true", help="List games registered on the blockchain")
+    parser.add_argument("--list_blockchain_games", action="store_true", help="List games registered on the blockchain")
     
     args = parser.parse_args()
-    if args.lg:
+
+    if args.list_blockchain_games:
         db = list_blockchain_games()
         print(db.to_string(index=False))
