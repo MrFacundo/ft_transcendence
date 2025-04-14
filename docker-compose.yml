@@ -228,7 +228,7 @@ services:
 
 
   redis_exporter:
-    image: oliver006/redis_exporter:latest
+    image: oliver006/redis_exporter:v1.70.0-alpine
     container_name: redis_exporter
     restart: unless-stopped
     ports:
@@ -243,7 +243,7 @@ services:
       - monitoring-network
 
   postgres_exporter:
-    image: prometheuscommunity/postgres-exporter:latest
+    image: prometheuscommunity/postgres-exporter:v0.17.1
     container_name: postgres_exporter
     restart: unless-stopped
     ports:
@@ -257,7 +257,7 @@ services:
       - monitoring-network
 
   grafana:
-    image: grafana/grafana
+    image: grafana/grafana:11.6.0
     container_name: grafana
     restart: unless-stopped
     environment: 
