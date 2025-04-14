@@ -13,6 +13,12 @@ RUN mkdir -p /vault/config /vault/data && \
     chown -R vault:vault /vault && \
     chmod -R 750 /vault
 
+# CREATE root token and unseal key files
+RUN touch /vault/data/.root-token && \
+    touch /vault/data/.unseal-key && \
+    chmod 640 /vault/data/.root-token && \
+    chmod 640 /vault/data/.unseal-key
+
 # Copy entrypoint script for automated unsealing
 COPY src/vault-entrypoint.sh /vault/vault-entrypoint.sh
 RUN chmod +x /vault/vault-entrypoint.sh

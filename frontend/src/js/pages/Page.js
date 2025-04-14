@@ -13,7 +13,7 @@ class Page {
      * @param {boolean} isProtected - The User must be authenticated to access the page
      * @param {object} app - The app object
      */
-    constructor({ name, url, pageElement, isProtected, app }) {
+    constructor({ name, url, pageElement, isProtected, app, isAuthPage = false }) {
         this.name = name;
         this.url = url;
         this.pageElement = document.querySelector(pageElement);
@@ -21,6 +21,7 @@ class Page {
         this.mainElement = document.querySelector("#main");
         this.app = app;
         this.handleClick = this.handleClick.bind(this);
+        this.isAuthPage = isAuthPage;
     }
 
     /**

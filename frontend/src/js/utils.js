@@ -81,12 +81,9 @@ const avatarUrlCache = new Map();
 
 export async function getCachedAvatarSrc(user, apiFetchCallback) {
   if (avatarUrlCache.has(user.id)) {
-    console.log("Using cached avatar for user:", user.id);
     return avatarUrlCache.get(user.id);
   }
 
-  console.log("Fetching avatar for user:", user.id);
-  console.log("Current avatarUrlCache:", Array.from(avatarUrlCache.entries()));
   const newSrc = await getAvatarSrc(user, apiFetchCallback);
 
   avatarUrlCache.set(user.id, newSrc);

@@ -62,11 +62,12 @@ class App {
 
         console.log("Navigating to:", path, "page: ", page, "params: ", params, "queryParams: ", queryParams);
         
-        if (page.isProtected) {
-            await auth.authenticate();
-            if (!auth.authenticated) return auth.logout();
-        }
-        
+        await auth.authenticate();
+        if (page.isProtected &&  !auth.authenticated) return auth.logout();
+        if (page.isAuthPage && auth.authenticated) {
+            history.replaceState({}, "Home", "/home");
+            return this.navigate("/home");
+        }        
         if (this.currentPage) this.currentPage.close();
         page.params = params;
         this.mainElement.setAttribute("data-page", page.name);

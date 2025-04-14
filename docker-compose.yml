@@ -4,16 +4,15 @@ services:
     build:
       context: ./reverse_proxy
       dockerfile: Dockerfile
-    restart: no
+    restart: unless-stopped
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - ./reverse_proxy/certs:/etc/nginx/ssl
       - ./frontend/src/static:/usr/src/app/frontend_static/static
       - ./backend/static:/usr/src/app/backend_static/static
       - ./backend/media:/usr/src/app/backend_static/media
-      - ./hashiCorpVault/data/.root-token:/vault/data/.root-token
+      - vault_data:/vault/data
     environment:
       - VAULT_ADDR=http://hashicorpvault:8200
     networks:
@@ -57,8 +56,7 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./backend:/usr/src/app
-      - ./hashiCorpVault/data/.root-token:/vault/data/.root-token
-      - ./hashiCorpVault/data/.unseal-key:/vault/data/.unseal-key
+      - vault_data:/vault/data
     expose:
       - 8000
     networks:
@@ -129,6 +127,7 @@ services:
         condition: service_healthy
     networks:
       - backend-network
+    restart: unless-stopped
 
   blockchain:
     container_name: blockchain
@@ -163,12 +162,11 @@ services:
     build:
       context: ./hashiCorpVault
       dockerfile: Dockerfile
-    ports:
-      - "8200:8200"
+    expose:
+      - 8200
     volumes:
       - ./hashiCorpVault/src/vault-config.hcl:/vault/config/vault.hcl
-      - ./hashiCorpVault/data/.root-token:/vault/data/.root-token
-      - ./hashiCorpVault/data/.unseal-key:/vault/data/.unseal-key
+      - vault_data:/vault/data
     environment:
       - VAULT_CLUSTER_ADDR=http://localhost:8201
       - VAULT_DEV_LISTEN_ADDRESS=
@@ -304,6 +302,5 @@ volumes:
     driver: local
   cache_data:
     driver: local
-  blockchain_data:
+  vault_data:
     driver: local
-
