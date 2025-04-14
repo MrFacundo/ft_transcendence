@@ -65,20 +65,23 @@ frontend-dev: frontend-stop
 frontend-prod: frontend-stop
 	NODE_ENV=production $(DOCKER_COMPOSE) up -d frontend 
 
+blockchain_estimategas:
+	docker exec $(blockchain) python /usr/src/app/scriptspy/push_to_blockchain.py --estimateGas
+
 blockchain_startmonitor:
-	docker exec $(blockchain) python /usr/src/app/scripts/push_to_blockchain.py --startMonitor &
+	docker exec $(blockchain) python /usr/src/app/scriptspy/push_to_blockchain.py --startMonitor &
 
 blockchain_stopmonitor:
-	docker exec $(blockchain) python /usr/src/app/scripts/push_to_blockchain.py --stopMonitor
+	docker exec $(blockchain) python /usr/src/app/scriptspy/push_to_blockchain.py --stopMonitor
 
 blockchain_listallgames:
-	docker exec $(blockchain) python /usr/src/app/scripts/list_all_games.py --list_blockchain_games
+	docker exec $(blockchain) python /usr/src/app/scriptspy/list_all_games.py --lg
 
 blockchain_gamesbyplayers:
-	docker exec $(blockchain) python /usr/src/app/scripts/get_game_by_player.py --games_by_player $(filter-out $@,$(MAKECMDGOALS))
+	docker exec $(blockchain) python /usr/src/app/scriptspy/get_game_by_player.py --games_by_player $(filter-out $@,$(MAKECMDGOALS))
 
 blockchain_gamesbytournament:
-	docker exec $(blockchain) python /usr/src/app/scripts/get_game_by_tournament.py --games_by_tournament $(filter-out $@,$(MAKECMDGOALS))
+	docker exec $(blockchain) python /usr/src/app/scriptspy/get_game_by_tournament.py --games_by_tournament $(filter-out $@,$(MAKECMDGOALS))
 
 %:
 	@:
