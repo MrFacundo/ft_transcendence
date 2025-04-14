@@ -1,35 +1,22 @@
-FROM python:3.10
+FROM node:18-alpine
 
-RUN apt-get update && apt-get install -y \
-    procps \
-    curl \
-    git \
-    jq \
-    bc \
-    netcat-openbsd \
-    build-essential \
-    libssl-dev \
-    pkg-config \
-    ca-certificates && \
-    rm -rf /var/lib/apt/lists/*
+ARG GANACHE_ENV GANACHE_URL GANACHE_PORT
 
-RUN curl -L https://foundry.paradigm.xyz | bash && \
-    /root/.foundry/bin/foundryup
-
-ENV PATH="/root/.foundry/bin:$PATH"
+RUN apk add --no-cache \
+bash git python3 py3-pip py3-setuptools py3-wheel make g++ \
+libc6-compat linux-headers postgresql-client procps
 
 WORKDIR /usr/src/app
-
 COPY . .
 
-RUN git init && git config user.name "Temporary" && git config user.email "temporary@example.com"
-
-RUN rm -rf lib/forge-std && \
-    forge install foundry-rs/forge-std --no-commit
-
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt || true
+RUN npm install dotenv
 
 RUN chmod +x entrypoint.sh
 
-ENTRYPOINT ["./entrypoint.sh"]
+RUN pip install --no-cache-dir --break-system-packages -r requirements.txt
+
+RUN npm install -g ganache-cli@latest truffle@latest
+
+VOLUME ["/usr/src/app"]
+
+CMD ["sh", "/usr/src/app/entrypoint.sh"]

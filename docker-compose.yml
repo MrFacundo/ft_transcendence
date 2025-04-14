@@ -133,6 +133,10 @@ services:
     restart: unless-stopped
     build:
       context: ./blockchain
+      args:
+        GANACHE_ENV: ${GANACHE_COD}
+        GANACHE_URL: ${GANACHE_URL}
+        GANACHE_PORT: ${GANACHE_PORT}
       dockerfile: Dockerfile
     image: blockchain:local
     ports:

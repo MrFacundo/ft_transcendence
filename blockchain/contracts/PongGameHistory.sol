@@ -47,6 +47,7 @@ contract PongGameHistory {
         uint256 _tournamentId
     ) public onlyAdmin {
         gameCount++;
+
         games[gameCount] = Game(
             gameCount,
             _id,

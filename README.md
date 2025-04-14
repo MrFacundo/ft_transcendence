@@ -35,7 +35,7 @@ A full-stack web application that allows users to play games of Pong remotely, l
 | **Backend**                     | Django, PostgreSQL, Redis                               |
 | **Frontend**                    | NodeJs, Webpack, JavaScript, HTML, CSS, SCSS, Bootstrap |
 | **Profiling and Documentation** | Silk Profiling, Redoc, Swagger                          |
-| **Blockchain**                  | Faundry, Anvil, Solidity                                |
+| **Blockchain**                  | Truffle, Ganache, Solidity                              |
 ## Subject
 [📗️](en.subject.pdf) 
 

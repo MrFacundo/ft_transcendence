@@ -3,10 +3,9 @@ import json
 import pandas as pd
 from web3 import Web3
 
+GANACHE_URL = os.getenv("GANACHE_URL")
 
-FOUNDRY_URL = os.getenv("FOUNDRY_URL",)
-FOUNDRY_PRIVATE_KEY = os.getenv("FOUNDRY_PRIVATE_KEY")
-
+# Read contract address from JSON file
 with open('/usr/src/app/deployedAddress.json') as f:
     data = json.load(f)
     CONTRACT_ADDRESS = data['address']
@@ -16,9 +15,9 @@ CONTRACT_ABI = [
     {
         "constant": True,
         "inputs": [
-            {"name": "_playerId", "type": "uint256"}
+            {"name": "_tournamentId", "type": "uint256"}
         ],
-        "name": "getGamesByPlayer",
+        "name": "getGamesByTournament",
         "outputs": [
             {
                 "components": [
@@ -43,13 +42,14 @@ CONTRACT_ABI = [
     }
 ]
 
-
-web3 = Web3(Web3.HTTPProvider(FOUNDRY_URL))
+# Connect to Ganache
+web3 = Web3(Web3.HTTPProvider(GANACHE_URL))
 contract = web3.eth.contract(address=CONTRACT_ADDRESS, abi=CONTRACT_ABI)
 
-def get_games_by_player(player_id):
+# Function to list tournaments registered on the blockchain
+def get_games_by_tournament(tournament_id):
     try:
-        games = contract.functions.getGamesByPlayer(player_id).call()
+        games = contract.functions.getGamesByTournament(tournament_id).call()
         games_list = [{
             "gameId": game[0],
             "id": game[1],
@@ -64,17 +64,17 @@ def get_games_by_player(player_id):
         } for game in games]
         return pd.DataFrame(games_list)
     except Exception as e:
-        print(f"Error getting games by player: {e}")
+        print(f"Error getting games by tournament: {e}")
         return pd.DataFrame()
 
 if __name__ == "__main__":
     import argparse
 
-    parser = argparse.ArgumentParser(description="Interacting with games on the Blockchain")
-    parser.add_argument("--games_by_player", type=int, help="List all games in which a player participated by player ID")
+    parser = argparse.ArgumentParser(description="List games of a specific tournament on the blockchain")
+    parser.add_argument("--games_by_tournament", type=int, help="List all games of a specific tournament by tournament ID")
     
     args = parser.parse_args()
 
-    if args.games_by_player:
-        db = get_games_by_player(args.games_by_player)
+    if args.games_by_tournament:
+        db = get_games_by_tournament(args.games_by_tournament)
         print(db.to_string(index=False))
