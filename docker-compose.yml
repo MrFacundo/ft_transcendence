@@ -130,6 +130,7 @@ services:
       - DB_USER=${POSTGRES_USER}
       - DB_PASSWORD=${POSTGRES_PASSWORD}
       - DB_HOST=${POSTGRES_HOST}
+      - PROJECT_DIR=/usr/src/app
     restart: unless-stopped
     build:
       context: ./blockchain

@@ -13,8 +13,8 @@ contract EstimateGasScript is Script {
         PongGameHistory instance = new PongGameHistory();
         uint256 gasUsed = gasStart - gasleft();
 
-        console.log("Contrato implantado no endereco:", address(instance));
-        console.log("Gas usado para implantar o contrato:", gasUsed);
+        console.log("Contract implemented at the address", address(instance));
+        console.log("Gas used to implement the contract:", gasUsed);
 
         vm.stopBroadcast();
     }
