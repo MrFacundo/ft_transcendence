@@ -9,6 +9,7 @@ class RegisterPage extends Page {
             pageElement: "#Register",
             isProtected: false,
             app: app,
+            isAuthPage: true,
         });
     }
 

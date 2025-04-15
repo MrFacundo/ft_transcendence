@@ -16,11 +16,11 @@ class PongRemote extends Pong {
     setUIElements() {
         super.setUIElements();
         this.paddels = {
-            left: this.createElement("leftPaddle"),
-            right: this.createElement("rightPaddle"),
+            left: this.createSpanElement("leftPaddle"),
+            right: this.createSpanElement("rightPaddle"),
         };
-        this.ball = this.createElement("ball");
-        this.statusMessage = this.createElement("statusMessage");
+        this.ball = this.createSpanElement("ball");
+        this.statusMessage = this.createSpanElement("statusMessage");
         this.append(this.statusMessage, this.paddels.left, this.paddels.right, this.ball);
     }
 
@@ -106,8 +106,8 @@ class PongRemote extends Pong {
                 break;
             case "score":
                 this.toggleBallDisplay("score");
-                this.player1Score = data.score[this.playerSide];
-                this.player2Score = data.score[1 - this.playerSide];
+                this.player1Score = data.score[0];
+                this.player2Score = data.score[1];
                 this.updateScoreDisplay();
                 break;
             case "endGame":

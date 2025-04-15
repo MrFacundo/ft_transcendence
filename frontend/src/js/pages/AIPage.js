@@ -10,7 +10,6 @@ class AIPage extends Page {
       isProtected: true,
       app: app,
     });
-    this.handleGameOver = this.handleGameOver.bind(this);
   }
 
   async render() {
@@ -22,8 +21,6 @@ class AIPage extends Page {
         if (!this.app.stateManager.state.currentGame) this.startGame(difficulty);
       };
     });
-
-    this.mainElement.addEventListener("gameOver", this.handleGameOver);
   }
 
   startGame(difficulty) {
@@ -33,20 +30,6 @@ class AIPage extends Page {
     settingsEl.classList.add("d-none");
     pongAiEl.classList.remove("d-none");
     pongAiEl.startGame(difficulty);
-  }
-
-  handleGameOver(e) {
-    const pongAiEl = this.mainElement.querySelector("pong-ai");
-    const settingsEl = this.mainElement.querySelector("#ai-game-settings");
-    setTimeout(() => {
-      pongAiEl.classList.add("d-none");
-      settingsEl.classList.remove("d-none");
-    }, 3000);
-  }
-
-  close() {
-    super.close();
-    this.mainElement.removeEventListener("gameOver", this.handleGameOver);
   }
 }
 
