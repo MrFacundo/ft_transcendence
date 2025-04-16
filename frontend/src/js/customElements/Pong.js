@@ -27,6 +27,10 @@ class Pong extends BaseElement {
       "../static/images/mk3-subway-stage.gif",
       "../static/images/mk3-waterfront-stage.gif",
       "../static/images/mk3-the-streets-stage.gif",
+      "../static/images/mk3-desert-stage.gif",
+      "../static/images/mk3-scorpions-lair-stage.gif",
+      "../static/images/mk3-the-bank-stage.gif",
+      "../static/images/mk3-tree-stage.gif",
     ];
     let randomIndex;
     if (seed !== null) {
