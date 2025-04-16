@@ -91,3 +91,8 @@ schema.json
 
 #file blockchain
 blockchain/deployedAddress.json
+blockchain/foundry.toml
+blockchain/foundry/broadcast
+blockchain/foundry/cache
+blockchain/foundry/lib
+blockchain/foundry/out

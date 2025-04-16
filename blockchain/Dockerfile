@@ -26,7 +26,7 @@ COPY --from=foundry-base /usr/local/bin/forge /usr/bin/forge
 COPY --from=foundry-base /usr/local/bin/cast /usr/bin/cast
 COPY --from=foundry-base /usr/local/bin/anvil /usr/bin/anvil
 
-
+ENV FOUNDRY_DISABLE_NIGHTLY_WARNING=1
 ENV GIT_DISCOVERY_ACROSS_FILESYSTEM=1
 
 WORKDIR /usr/src/app
