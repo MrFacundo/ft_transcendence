@@ -107,7 +107,7 @@ services:
     restart: unless-stopped
   waf:
     container_name: modecurity_waf
-    image: bit3/nginx-waf:latest
+    image: bit3/nginx-waf:1.23.1
     platform: linux/amd64
     expose:
       - 8081
