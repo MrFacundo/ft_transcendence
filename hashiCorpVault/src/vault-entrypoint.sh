@@ -39,7 +39,7 @@ $VAULT_BIN server -config=/vault/config/vault.hcl &
 VAULT_PID=$!
 
 echo "Waiting for Vault to be ready..."
-sleep 10
+sleep 30
 
 # Vault initialization and unseal process with error checks
 if [ "$($VAULT_BIN status -format=json | jq -r '.initialized')" == "false" ]; then
