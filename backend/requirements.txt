@@ -20,3 +20,4 @@ hvac>=1.0,<2.0
 py-avataaars
 cairosvg
 django-health-check
+django-prometheus
