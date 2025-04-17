@@ -13,6 +13,12 @@ scrape_configs:
   - job_name: "db"
     static_configs:
       - targets: ['postgres_exporter:9187']
+  - job_name: 'vault'
+    metrics_path: /v1/sys/metrics
+    params:
+      format: ['prometheus']
+    static_configs:
+      - targets: ['hashicorpvault:8200']
 
 rule_files:
   - 'alert-rules.yml'
@@ -20,5 +26,6 @@ rule_files:
 alerting:
   alertmanagers:
     - scheme: http
+      path_prefix: /alertmanager
       static_configs:
         - targets: ['alertmanager:9093']

@@ -28,6 +28,8 @@ services:
         condition: service_healthy
       grafana:
         condition: service_started
+      prometheus:
+        condition: service_healthy
 
   frontend:
     container_name: transcendence_front
@@ -188,15 +190,19 @@ services:
   prometheus:
     container_name: prometheus
     build:
-      context: ./prometheus
+      context: ./monitoring/prometheus
       dockerfile: Dockerfile
     restart: unless-stopped
-    ports:
-    - 9090:9090
+    expose:
+      - 9090
     volumes:
-    - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    - ./monitoring/prometheus/alert-rules.yml:/etc/prometheus/alert-rules.yml
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9090/-/healthy"]
+      test: ["CMD", "curl", "-f", "http://localhost:9090/prometheus/-/healthy"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     depends_on:
       redis_exporter:
         condition: service_started
@@ -206,14 +212,16 @@ services:
         condition: service_started
     networks:
       - monitoring-network
+      - backend-network
 
   alertmanager:
-    image: prom/alertmanager:v0.25.0
+    build:
+      context: ./monitoring/alertmanager
+      dockerfile: Dockerfile
+    expose:
+      - 9093
     ports:
       - 9093:9093
-    volumes:
-      - ./prometheus:/config
-    command: ["/bin/sh", "/config/entrypoint.sh"]
     environment:
       EMAIL_TO: ${DJANGO_SUPERUSER_EMAIL}
       EMAIL_FROM: ${DEFAULT_FROM_EMAIL}
@@ -222,6 +230,7 @@ services:
       SMTP_PASS: ${EMAIL_HOST_PASSWORD}
     networks:
       - monitoring-network
+      - backend-network
     env_file:
       - .env
     restart: unless-stopped
@@ -231,8 +240,8 @@ services:
     image: oliver006/redis_exporter:v1.70.0-alpine
     container_name: redis_exporter
     restart: unless-stopped
-    ports:
-      - 9121:9121
+    expose:
+      - 9121
     command:
       - --redis.addr=redis://cache:6379
       - --redis.password=${REDIS_PASSWORD}
@@ -246,8 +255,8 @@ services:
     image: prometheuscommunity/postgres-exporter:v0.17.1
     container_name: postgres_exporter
     restart: unless-stopped
-    ports:
-      - 9187:9187
+    expose:
+      - 9187
     environment:
       DATA_SOURCE_NAME: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}?sslmode=disable"
     depends_on:
@@ -273,13 +282,15 @@ services:
       GF_USERS_DEFAULT_ORG_NAME: ft_transcendence
       GF_USERS_AUTO_ASSIGN_ORG: true
       GF_USERS_AUTO_ASSIGN_ORG_ROLE: Viewer
-      GF_USERS_THEME: light
+      GF_USERS_DEFAULT_THEME: light
+      GF_USERS_ALLOW_USER_THEME_CHANGE: false
       GF_USERS_DEFAULT_LANGUAGE: en
+      GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /etc/grafana/provisioning/dashboards/default.json
     volumes:
-      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
-      - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
-    ports:
-      - "3000:3000"
+      - ./monitoring/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+      - ./monitoring/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+    expose:
+      - 3000
     networks:
       - monitoring-network
       - backend-network

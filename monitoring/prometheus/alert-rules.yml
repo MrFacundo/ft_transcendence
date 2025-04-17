@@ -1,0 +1,56 @@
+groups:
+  - name: alerts
+    rules:
+      - alert: HighCPUUsage
+        expr: rate(process_cpu_seconds_total[1m]) > 0.8
+        for: 1m #fires if CPU usage is above 80% for 1 minute
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage detected"
+          description: "CPU usage is above 80% for more than 1 minute."
+
+      - alert: InstanceDown
+        expr: up == 0
+        for: 1m #fires if instance is down for 1 minute
+        labels:
+          severity: critical
+        annotations:
+          summary: "Instance {{ $labels.instance }} is down"
+          description: "No data received from {{ $labels.job }} for 2+ minutes."
+
+      - alert: VaultSealed
+        expr: vault_core_unsealed == 0
+        for: 30s #fires if vault is sealed for 30 seconds
+        labels:
+          severity: critical
+        annotations:
+          summary: "Vault is sealed"
+          description: "Vault instance {{ $labels.instance }} is sealed and cannot process requests."
+
+      - alert: VaultStandby
+        expr: vault_core_active == 0
+        for: 0m #fires if vault is in standby mode for 0 seconds
+        labels:
+          severity: warning
+        annotations:
+          summary: "Vault in standby mode"
+          description: "Vault instance {{ $labels.instance }} is in standby mode."
+
+      - alert: VaultHighTokenUsage
+        expr: vault_token_count / vault_token_max > 0.8
+        for: 5m #fires if vault token usage is above 80% of max capacity for 5 minutes
+        labels:
+          severity: warning
+        annotations:
+          summary: "High token usage in Vault"
+          description: "Vault token usage is above 80% of max capacity."
+
+      - alert: AlwaysFiring
+        expr: vector(1)
+        for: 10s 
+        labels:
+          severity: critical
+        annotations:
+          summary: "Test alert"
+          description: "This is a test alert that always fires."

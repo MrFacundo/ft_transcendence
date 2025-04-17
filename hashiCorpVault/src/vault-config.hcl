@@ -5,13 +5,19 @@ storage "file" {
 
 listener "tcp" {
   address = "0.0.0.0:8200"
-  tls_disable = true # enable this for production
+  tls_disable = true
+  telemetry {
+    unauthenticated_metrics_access = true
+  }
+}
+
+telemetry {
+  prometheus_retention_time = "12h"
+  disable_hostname = true
 }
 
 api_addr = "http://localhost:8200"
 cluster_addr = "https://localhost:8201"
 
-
-# vault uses mlock to prevent memory from being swapped to disk. In production, you should not disable this.
 disable_mlock = true
 ui = true
