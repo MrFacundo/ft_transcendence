@@ -72,13 +72,13 @@ class VaultClient:
         else:
             raise ValueError("Invalid variable name. Choose from: redis_host, redis_port, redis_password.")
 
-    def get_ganache_vars(self, var):
-        secret = self.client.secrets.kv.read_secret_version(path="ganache")
+    def get_anvil_vars(self, var):
+        secret = self.client.secrets.kv.read_secret_version(path="anvil")
 
         if var == "code":
             return secret['data']['data']['code']
         else:
-            raise ValueError("Invalid variable name. Choose from: ganache_code.")
+            raise ValueError("Invalid variable name. Choose from: anvil_code.")
 
     def get_jwt_key(self):
         secret = self.client.secrets.kv.read_secret_version(path="jwt")

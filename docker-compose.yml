@@ -138,13 +138,10 @@ services:
       - DB_USER=${POSTGRES_USER}
       - DB_PASSWORD=${POSTGRES_PASSWORD}
       - DB_HOST=${POSTGRES_HOST}
+      - PROJECT_DIR=/usr/src/app
     restart: unless-stopped
     build:
       context: ./blockchain
-      args:
-        GANACHE_ENV: ${GANACHE_COD}
-        GANACHE_URL: ${GANACHE_URL}
-        GANACHE_PORT: ${GANACHE_PORT}
       dockerfile: Dockerfile
     image: blockchain:local
     ports:

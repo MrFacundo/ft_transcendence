@@ -1,38 +1,108 @@
 #!/bin/sh
 
-set -e
+set -eu
 
-echo "Starting entrypoint.sh"
+echo "🔧 Starting entrypoint.sh"
 
-variables="GANACHE_URL GANACHE_PORT GANACHE_COD DB_NAME DB_USER DB_PASSWORD DB_HOST"
-
-for var in $variables; do
+required_vars="DB_NAME DB_USER DB_PASSWORD DB_HOST FOUNDRY_MNEMONIC FOUNDRY_PRIVATE_KEY FOUNDRY_URL PROJECT_DIR"
+for var in $required_vars; do
   if [ -z "$(eval echo \$$var)" ]; then
-    echo "Error: The environment variable $var is not defined."
+    echo "❌ Missing required env var: $var"
     exit 1
   fi
 done
 
-echo "Starting Ganache..."
-ganache-cli -h $GANACHE_HOST -p 8545 -m "$GANACHE_COD" &
-GANACHE_PID=$!
+cleanup() {
+  echo "🛑 Cleaning up..."
+  if [ -n "${ANVIL_PID:-}" ] && kill -0 "$ANVIL_PID" 2>/dev/null; then
+    kill "$ANVIL_PID"
+  fi
+  exit 1
+}
 
-while ! nc -z $GANACHE_HOST $GANACHE_PORT; do
+reset_balance() {
+  echo "💰 Resetting balance of $1 to max u64..."
+  curl -s -X POST -H "Content-Type: application/json" \
+    --data "{\"jsonrpc\":\"2.0\",\"method\":\"anvil_setBalance\",\"params\":[\"$1\", \"0xFFFFFFFFFFFFFFFF\"],\"id\":1}" \
+    $FOUNDRY_URL > /dev/null
+  echo "✅ Balance reset for account: $1"
+}
+
+echo "🚀 Starting Anvil..."
+anvil --mnemonic "$FOUNDRY_MNEMONIC" \
+      --balance 18446744073709551615 \
+      --gas-limit 10000000 \
+      --host 0.0.0.0 2>&1 &
+ANVIL_PID=$!
+
+echo "⏳ Waiting for Anvil to be ready..."
+for i in $(seq 1 30); do
+  if nc -z $FOUNDRY_HOST $FOUNDRY_PORT; then
+    echo "✅ Anvil is ready!"
+    break
+  fi
   sleep 1
 done
-echo "Ganache is ready!"
 
-echo "Compiling smart contracts..."
-truffle compile || { echo "Error compiling smart contracts."; exit 1; }
-
-echo "Deploying smart contracts..."
-truffle migrate --reset || { echo "Error deploying smart contracts."; exit 1; }
-
-if [ -f /usr/src/app/deployedAddress.json ]; then
-  echo " ✅ Smart contract deployed successfully"
-else
-  echo "❌ Smart contract deployment failed"
-  exit 1
+if ! nc -z $FOUNDRY_HOST $FOUNDRY_PORT; then
+  echo "❌ Error: Anvil did not start in time."
+  cleanup
 fi
 
-wait $GANACHE_PID
+cat <<EOF > "$PROJECT_DIR/foundry.toml"
+[profile.default]
+src = "src"
+script = "foundry/script"
+out = "foundry/out"
+libs = ["foundry/lib"]
+cache_path = "foundry/cache"
+broadcast = "foundry/broadcast"
+remappings = ["forge-std=foundry/lib/forge-std/src"]
+EOF
+
+echo "🔍 Deriving account from private key..."
+ACCOUNT_ADDRESS=$(cast wallet address --private-key "$FOUNDRY_PRIVATE_KEY")
+echo "🔑 Using account: $ACCOUNT_ADDRESS"
+
+reset_balance "$ACCOUNT_ADDRESS"
+
+echo "🔨 Compiling smart contracts..."
+forge build
+
+echo "🚀 Deploying smart contract..."            
+DEPLOY_OUTPUT=$(forge script foundry/script/Deploy.s.sol:DeployScript \
+  --rpc-url "$FOUNDRY_URL" \
+  --broadcast \
+  --private-key "$FOUNDRY_PRIVATE_KEY" \
+  --gas-limit 5000000 \
+  --gas-price 0 \
+  --json || true)
+
+
+CONTRACT_ADDRESS=$(echo "$DEPLOY_OUTPUT" | jq -r '.contract_address // empty')
+if [ -z "$CONTRACT_ADDRESS" ] || [ "$CONTRACT_ADDRESS" = "null" ]; then
+  CONTRACT_ADDRESS=$(echo "$DEPLOY_OUTPUT" | jq -r '.logs[]?' | grep -Eo '^0x[a-fA-F0-9]{40}$' | tail -n1 || echo "")
+fi
+
+if [ -z "$CONTRACT_ADDRESS" ] || [ "$CONTRACT_ADDRESS" = "null" ]; then
+  echo "❌ Could not extract contract address"
+  echo "$DEPLOY_OUTPUT"
+  cleanup
+fi
+
+echo "💾 Saving contract address to deployedAddress.json..."
+echo "{\"address\": \"$CONTRACT_ADDRESS\"}" > "$PROJECT_DIR/deployedAddress.json"
+chmod 664 "$PROJECT_DIR/deployedAddress.json"
+echo "✅ Contract deployed at: $CONTRACT_ADDRESS"
+
+rm -rf foundry/lib/forge-std/.git
+rm -rf foundry/lib/forge-std/.github
+rm -rf foundry/lib/forge-std/test
+rm -f foundry/lib/forge-std/CONTRIBUTING.md
+rm -f foundry/lib/forge-std/LICENSE-APACHE
+rm -f foundry/lib/forge-std/LICENSE-MIT
+rm -f foundry/lib/forge-std/README.md
+rm -f foundry/lib/forge-std/.gitattributes
+rm -f foundry/lib/forge-std/.gitignore
+echo "✅ entrypoint.sh finished. Anvil will continue running..."
+tail -f /dev/null

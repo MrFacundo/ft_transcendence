@@ -1,22 +1,41 @@
-FROM node:18-alpine
+# -------------------------------
+# Stage 1: BASE FOUNDRY
+# -------------------------------
+FROM ghcr.io/foundry-rs/foundry:latest AS foundry-base
 
-ARG GANACHE_ENV GANACHE_URL GANACHE_PORT
+# -------------------------------
+# Stage 2: PYTHON + Foundry
+# -------------------------------
+FROM python:3.10-slim
 
-RUN apk add --no-cache \
-bash git python3 py3-pip py3-setuptools py3-wheel make g++ \
-libc6-compat linux-headers postgresql-client procps
+
+RUN apt-get update && apt-get install -y \
+	procps curl git jq bc netcat-openbsd build-essential \
+	libssl-dev pkg-config ca-certificates && \
+	rm -rf /var/lib/apt/lists/*
+
+RUN git init && \
+git config user.name "Temp" && \
+git config user.email "temp@example.com" && \
+git config --global --add safe.directory /usr/src/app && \
+git add . && \
+git commit -m "temp commit" || echo "(commit falhou, ignorando)"
+
+
+COPY --from=foundry-base /usr/local/bin/forge /usr/bin/forge
+COPY --from=foundry-base /usr/local/bin/cast /usr/bin/cast
+COPY --from=foundry-base /usr/local/bin/anvil /usr/bin/anvil
+
+ENV FOUNDRY_DISABLE_NIGHTLY_WARNING=1
+ENV GIT_DISCOVERY_ACROSS_FILESYSTEM=1
 
 WORKDIR /usr/src/app
+
 COPY . .
 
-RUN npm install dotenv
+RUN pip install --no-cache-dir -r requirements.txt || true
 
 RUN chmod +x entrypoint.sh
 
-RUN pip install --no-cache-dir --break-system-packages -r requirements.txt
-
-RUN npm install -g ganache-cli@latest truffle@latest
-
-VOLUME ["/usr/src/app"]
-
-CMD ["sh", "/usr/src/app/entrypoint.sh"]
+ENTRYPOINT ["./entrypoint.sh"]
+	
