@@ -25,10 +25,6 @@ VAULT_BIN=/bin/vault
 VAULT_UNSEAL_KEY_FILE="/vault/data/.unseal-key"
 VAULT_TOKEN_FILE="/vault/data/.root-token"
 
-# Wait until Vault is reachable
-echo "Waiting for Vault to be reachable..."
-sleep 20
-
 # Initialize Vault if not already
 if [ "$($VAULT_BIN status -format=json | jq -r '.initialized')" == "false" ]; then
 	echo "Initializing Vault..."

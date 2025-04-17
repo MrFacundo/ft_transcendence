@@ -169,11 +169,10 @@ services:
     cap_add:
       - IPC_LOCK
     healthcheck:
-      test: ["CMD-SHELL", "curl -s http://localhost:8200/v1/sys/health | grep '\"initialized\":true'"]
-      interval: 5s
+      test: ["CMD-SHELL", "sh", "-c", "curl -s http://localhost:8200/v1/sys/health | jq -e '.initialized == true and .sealed == false and .standby == false' > /dev/null 2>&1"]
+      interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 20s
     networks:
       - backend-network
     restart: unless-stopped
