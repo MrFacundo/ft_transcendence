@@ -19,9 +19,13 @@ RUN touch /vault/data/.root-token && \
     chmod 640 /vault/data/.root-token && \
     chmod 640 /vault/data/.unseal-key
 
+ENV VAULT_UNSEAL_KEY_FILE="/vault/data/.unseal-key"
+ENV VAULT_TOKEN_FILE="/vault/data/.root-token"
+
 # Copy entrypoint script for automated unsealing
-COPY src/vault-entrypoint.sh /vault/vault-entrypoint.sh
-RUN chmod +x /vault/vault-entrypoint.sh
+COPY src/init-secrets.sh /vault/init-secrets.sh
+COPY src/entrypoint.sh /vault/vault-entrypoint.sh
+RUN chmod +x /vault/init-secrets.sh vault/vault-entrypoint.sh
 
 # Expose Vault API port
 EXPOSE 8200
