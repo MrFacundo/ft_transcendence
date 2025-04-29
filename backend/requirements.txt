@@ -6,7 +6,6 @@ python-decouple
 channels
 daphne
 channels-redis
-asyncio
 requests
 pyotp
 djangorestframework-simplejwt
